@@ -92,6 +92,19 @@ International License:
 
 %% assumes some familiarity with R
 
+
+\section{Introduction}
+This document is a brief reviews of statistical approaches for comparing
+two groups (t-tests et al.) and linear models (anovas, regressions,
+etc). It assumes you know a little bit of R. You will probably need to
+install several additional packages as you go along; you will see a
+something like \texttt{library(something)} or \texttt{require(something)}.
+
+All the original files for the document are available (again, under a
+Creative Commons license ---see section \ref{license}) from
+\Burl{https://github.com/rdiaz02/R-basic-stats}.
+
+
 \section{Comparing two groups}
 
 
@@ -233,25 +246,25 @@ require(RcmdrMisc)
 
 To get you going, I show all those for p53.
 <<out.width='11cm',out.height='11cm'>>=
-with(dp53, Hist(p53, groups=cond, scale="frequency", breaks="Sturges",
-                col="darkgray"))
+with(dp53, Hist(p53, groups = cond, 
+                col = "darkgray"))
 @
 
 <<fig.height=10, fig.width=8,results='hide'>>=
 op <- par(mfrow = c(2, 2)) ## to show 2 by 2 on the same figure
-Boxplot(p53~cond, data=dp53, id.method="y")
-plotMeans(dp53$p53, dp53$cond, error.bars="se", 
-  xlab="Condition", ylab="P53 expression levels")
-stripchart(p53 ~ cond, vertical=TRUE, method="jitter", 
-  ylab="p53", data=dp53)
-densityPlot(p53~cond, data=dp53, bw="SJ", adjust=1, 
-  kernel="gaussian")
+Boxplot(p53 ~ cond, data = dp53, id.method = "y")
+plotMeans(dp53$p53, dp53$cond, error.bars = "se", 
+  xlab = "Condition", ylab = "P53 expression levels")
+stripchart(p53 ~ cond, vertical = TRUE, method = "jitter", 
+  ylab = "p53", data = dp53)
+densityPlot(p53 ~ cond, data = dp53, bw = "SJ", adjust = 1, 
+  kernel = "gaussian")
 par(op)
 @ 
 
 Note that I used the \Rfunction{Boxplot}, but we could have used
 \Rfunction{boxplot}. The first is from \CRANpkg{car} and provides added
-functionality. The \verb@op <- par(mfrow=c(1,2))@ and \verb@par(op)@ are a
+functionality. The \verb@op <- par(mfrow = c(1,2))@ and \verb@par(op)@ are a
 minor detail to restore options as they were.
 
 Likewise, I have used \Rfunction{Hist} and
@@ -386,9 +399,11 @@ display the different (two, in this case) groups. %% Playing around, you
 %% data).
 
 <<fig.width=8, fig.height=8,echo=FALSE>>=
-scatterplotMatrix(~brca1+brca2+p53+pten | cond, reg.line=FALSE, 
-  smooth=FALSE, spread=FALSE, span=0.5, id.n=0, diagonal= 'density', 
-  by.groups=TRUE, data=dp53)
+scatterplotMatrix( ~ brca1 + brca2 + p53 + pten | cond, 
+                  reg.line = FALSE, 
+                  smooth = FALSE, spread = FALSE,
+                  diagonal= 'density', 
+                  by.groups = TRUE, data = dp53)
 @ 
 
 We will not pursue this any further. But you know you can and probably
@@ -432,11 +447,12 @@ Repeat the above with brca1.
 One key assumption is \textbf{independence} of the data. This is the case
 for the t-test but is also the case for many statistical tests. We return
 to this below several times because it is a \textbf{crucial} assumption
-(e.g., section \ref{pseudorep} and also Lesson 3). Lack of independence is
-a serious and pervasive problem (and one form of non-independence is also
-referred to as ``pseudoreplication'' \footnote{A major paper, a long while
-  ago, in the journal \textit{Ecological Monographs} by Hurlbert dealt
-  with this and made ``pseudoreplication'' a well known term.}).
+(e.g., section \ref{pseudorep} and \ref{diagnostics}). Lack of
+independence is a serious and pervasive problem (and one form of
+non-independence is also referred to as ``pseudoreplication'' \footnote{A
+  major paper, a long while ago, in the journal \textit{Ecological
+    Monographs} by Hurlbert dealt with this and made ``pseudoreplication''
+  a well known term.}).
 
 
 When comparing two means, \textbf{equality of variances} is also
@@ -533,15 +549,15 @@ log-transformed variable.
 
 <<results='hide', fig.show='hold', fig.width=5, fig.height=5>>=
 op <- par(mfrow = c(1, 2))
-Boxplot(pten~cond, data=dp53, id.method="y")
-Boxplot(logpten~cond, data=dp53, id.method="y")
+Boxplot(pten ~ cond, data = dp53, id.method = "y")
+Boxplot(logpten ~ cond, data = dp53, id.method = "y")
 par(op)
 @ 
 
 
 Do we expect multiplicative or additive effects? (With a two-group
 comparisons it isn't always easy to think this, but can be crucial in
-regression; we will see it in Lesson 3). 
+regression; we will see it later). 
 
 
 
@@ -807,7 +823,7 @@ test).
 What do you think of this plot?
 
 <<fig.width=3.5, fig.height=3.5>>=
-plotMeans(dmyc$myc, dmyc$cond, error.bars="se", ylab = "MYC",
+plotMeans(dmyc$myc, dmyc$cond, error.bars = "se", ylab = "MYC",
           xlab = "Condition")
 @ 
 
@@ -842,7 +858,7 @@ segment connecting the two observations of a subject%% . For that, though, we
 (beware: this code does the job but it is not very efficient or elegant):
 
 <<fig.show='hold'>>=
-stripchart(myc ~ cond, vertical=TRUE, data=dmyc)
+stripchart(myc ~ cond, vertical = TRUE, data = dmyc)
 for(i in unique(dmyc$id)) 
   segments(x0 = 1, x1 = 2, 
            y0 = dmyc$myc[dmyc$cond == "Cancer" & dmyc$id == i], 
@@ -922,7 +938,7 @@ Lets go and fit that model! %% Do it under ``Fit models'', ``Linear models'',
 %%  \end{figure}
 
 <<>>=
-LinearModel.1 <- lm(myc ~ id + cond, data=dmyc)
+LinearModel.1 <- lm(myc ~ id + cond, data = dmyc)
 summary(LinearModel.1)
 @ 
 
@@ -936,7 +952,7 @@ ANOVA.%%  If you go to ``Models'', ``Hypothesis tests'', ``Anova table'' you
 %% will get
 
 <<>>=
-Anova(LinearModel.1, type="II")
+Anova(LinearModel.1, type = "II")
 @ 
 
 Relate this to the figures above. This should all make sense. Regardless,
@@ -1031,7 +1047,7 @@ understand why you can use both ordinal and interval scales.
 
 For example:
 <<>>=
-wilcox.test(p53 ~ cond, alternative="two.sided", data=dp53)
+wilcox.test(p53 ~ cond, alternative = "two.sided", data = dp53)
 @ 
 
 
@@ -1057,7 +1073,7 @@ distribution.
 
 
 <<>>=
-wilcox.test(myc.nc, myc.cancer, alternative='two.sided', paired=TRUE)
+wilcox.test(myc.nc, myc.cancer, alternative = 'two.sided', paired = TRUE)
 @ 
 
 You can verify that the results are the same as doing a single sample
@@ -1224,8 +1240,7 @@ after the fact. It tells you nothing valuable.
 \subsection{Multiple measures per  subject}
 Paired data are non-independent: they are associated via the subject, or
 id. There are other forms of non-dependency. Many. We will now look at the
-most common one: multiple measures per subject. (This, by the way, you saw
-in Lesson 1).
+most common one: multiple measures per subject. 
 
 <<create_brca, echo=FALSE, results='hide'>>=
 set.seed(27)
@@ -1304,9 +1319,9 @@ is a double check that each subject is in one, and only one, of the
 groups. Call this data ``aggbrca''.
 
 <<>>=
-aggbrca <- aggregate(dbrca[,c("brca2"), drop=FALSE],
-                     by=list(cond=dbrca$cond, 
-                         id=dbrca$id), FUN=mean)
+aggbrca <- aggregate(dbrca[,c("brca2"), drop = FALSE],
+                     by = list(cond = dbrca$cond, 
+                         id = dbrca$id), FUN = mean)
 @ 
 
 We want to double check that we have the exact same number of measures per
@@ -1322,8 +1337,8 @@ Now, let's do a t-test on the aggregated data. Pay attention to the
 degrees of freedom (and the statistic and p-values):
 
 <<>>=
-t.test(brca2~cond, alternative='two.sided', conf.level=.95, var.equal=FALSE, 
-  data=aggbrca)
+t.test(brca2 ~ cond, alternative = 'two.sided', conf.level = .95, var.equal = FALSE, 
+  data = aggbrca)
 @ 
 
 You can see that doing things correctly makes, in this case, a large
@@ -1351,7 +1366,7 @@ discuss issues of sample size choice at different levels.
 By the way, not surprisingly, split-plot ANOVA and nested ANOVA are
 typical, traditional, ways of analyzing these kinds of designs. Many of
 these issues are, thus, naturally addressed in the context of linear
-models (Lesson 3).
+models.
 
 
 
@@ -1455,7 +1470,7 @@ What if some subjects had cousins and brothers in the data set? And if
 some of them came from the same hospital and other from other hospitals?
 And ... ? This all lead to multilevel and possible crossed terms of
 variance. Mixed effects models can be used here. Go talk to a
-statistician (after looking at the notes for Lesson 3).
+statistician (after looking at the rest of these notes).
 
 
 
@@ -1478,16 +1493,15 @@ aneuploidy in embryos from two groups of fathers, ``younger fathers'' and
 ``older fathers'' (wait, not older, just ``fathers that so far have
 accumulated more hours of life on Earth''). The simplest idea here is to
 use a chi-square ($\mathcal{X}^2$) test to compare the frequency of
-aneuploidies between older and younger fathers (you will see chi-square
-tests in Lesson 4). But the problem is that each couple (each father in
-this case) contributes multiple embryos and we cannot simply do a
-chi-square counting embryos, as we would again run into a non-independence
-problem. A simple approach, especially if each father contributes the same
-number of embryos, is to calculate, for each father, the proportion of
-embryos with aneuploidies. And then, to examine if that per-father
-proportion of aneuplodies differs between older and younger fathers with,
-say, an independent samples t-test (possibly of suitably transformed data)
-or a two-samples Wilcoxon test.
+aneuploidies between older and younger fathers. But the problem is that
+each couple (each father in this case) contributes multiple embryos and we
+cannot simply do a chi-square counting embryos, as we would again run into
+a non-independence problem. A simple approach, especially if each father
+contributes the same number of embryos, is to calculate, for each father,
+the proportion of embryos with aneuploidies. And then, to examine if that
+per-father proportion of aneuplodies differs between older and younger
+fathers with, say, an independent samples t-test (possibly of suitably
+transformed data) or a two-samples Wilcoxon test.
 
 
 
@@ -1609,7 +1623,7 @@ we must do, then, is fix that. %% Go to ``Data'', ``Manage variables ...'',
 Note the \Rcode{factor} function call:
 <<>>=
 dmit$ftraining <- factor(dmit$training, 
-                         labels=c('Morning','Lunch','Afternoon'))
+                         labels = c('Morning','Lunch','Afternoon'))
 @ 
 
 
@@ -1626,7 +1640,7 @@ You are advised to also plot the data. For instance, this
 will do:
 
 <<>>=
-Boxplot(activ~ftraining, data=dmit, id.method="y")
+Boxplot(activ ~ ftraining, data = dmit, id.method = "y")
 @ 
 
 
@@ -1646,7 +1660,7 @@ will allow us to test directly.
 %% ``Means''). You'll see this in the R Script window:
 
 <<results='hide'>>=
-AnovaMIT <- aov(activ ~ ftraining, data=dmit)
+AnovaMIT <- aov(activ ~ ftraining, data = dmit)
 summary(AnovaMIT)
 @ 
 
@@ -1677,7 +1691,7 @@ By the way, notice how we created a ``Model'' which is called
 
 \subsection{So which means are different? Multiple comparisons}
 \label{multcomp1}
-That small p-value leads us to reject the null hypothesis $\mu_{Morning} =
+That small p-value leads us to reject the null hypothesis $\mu_{Morning}  = 
 \mu_{Lunch} = \mu_{Afternoon}$. So there is strong evidence that all three
 means are not equal. But which one(s) is(are) different from the other(s)?
 
@@ -1686,7 +1700,7 @@ Let us get some summary data. I will do it in two different ways. This is
 a convenient one, using a function from \CRANpkg{RcmdrMisc}:
 
 <<>>=
-numSummary(dmit$activ , groups=dmit$ftraining, statistics=c("mean", "sd"))
+numSummary(dmit$activ , groups = dmit$ftraining, statistics = c("mean", "sd"))
 @ 
 
 But of course, you can get a similar thing building what you want from
@@ -1787,13 +1801,14 @@ using \Rfunction{glht} does not depend on R Commander.}
 
 <<tukey1,fig.cap='Plot of pairwise differences with Tukey contrasts', fig.lp='fig:', fig.width=5,fig.height=5, fig.show='hold', results='hide'>>=
 
+library(multcomp) ## for glht
 ## The next two lines carry out the multiple comparisons and the following
 ## lines plot them
 Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 summary(Pairs) # pairwise tests
 confint(Pairs) # confidence intervals
 cld(Pairs) # compact letter display
-old.oma <- par(oma=c(0,5,0,0))
+old.oma <- par(oma = c(0,5,0,0))
 plot(confint(Pairs))
 par(old.oma) ## restore graphics windows settings
 @ 
@@ -1848,7 +1863,7 @@ A simple way of doing it is using the \Rfunction{allEffects} function from
 the \CRANpkg{effects}:
 <<out.width='9cm'>>=
 require(effects)
-plot(allEffects(AnovaMIT), ask=FALSE)
+plot(allEffects(AnovaMIT), ask = FALSE)
 @ 
 
 
@@ -1870,10 +1885,10 @@ the second, so we use ``Training'' in the name, not ``ftraining'':
 <<out.width='7cm', out.height='7cm', fig.show='hold'>>=
 Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 tmp <- cld(Pairs) ## silent assignment 
-old.oma <- par(oma=c(0,5,0,0), mfrow = c(1, 2))
+old.oma <- par(oma = c(0,5,0,0), mfrow = c(1, 2))
 plot(confint(Pairs), 
      main = "95% family-wise confidence interval using Tukey contrasts")
-plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
+plot(allEffects(AnovaMIT), ask = FALSE, main = "Training: effect plot")
 par(old.oma) 
 @ 
 
@@ -1981,8 +1996,8 @@ Here, let us focus just on the effect of Diet. First a couple of figures:
 <<>>=
 par(mfrow = c(1, 2))
 boxplot(y ~ Diet, data = dcholest)
-with(dcholest, plotMeans(y, Diet, error.bars="se", 
-  xlab="Diet", ylab="Cholesterol reduction"))
+with(dcholest, plotMeans(y, Diet, error.bars = "se", 
+  xlab = "Diet", ylab = "Cholesterol reduction"))
 
 @ 
 Now, look at the output carefully:
@@ -2163,8 +2178,7 @@ testing. % When you declare some of these genes as ``significant'' under the
 
 
 How do you adjust for multiple testing in R? This is easily done with the
-function \Rfunction{p.adjust} (there is no menu entry in R Commander, so
-we will type it by hand). When you are applying FDR you often have a
+function \Rfunction{p.adjust}. When you are applying FDR you often have a
 collection of p-values already. 
 
 
@@ -2256,17 +2270,17 @@ Let us use the cholesterol data again.
 Look at the output, which I comment below
 <<>>=
 ## This fits the model. Pay attention to the "*"
-cholestanova <- (lm(y ~ Diet*Drug, data=dcholest))
+cholestanova <- (lm(y ~ Diet*Drug, data = dcholest))
 ## This shows the ANOVA table. Notice the "Type II"
 Anova(cholestanova)
 
 ## Now we are shown the 3 by 2 table of means, standard deviations, and number 
 ## of observations
-tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
-       mean, na.rm=TRUE) # means
-tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
-       sd, na.rm=TRUE) # std. deviations
-tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
+tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
+       mean, na.rm =TRUE) # means
+tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
+       sd, na.rm =TRUE) # std. deviations
+tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
        function(x) sum(!is.na(x))) # counts
 @ 
 
@@ -2276,7 +2290,7 @@ tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug),
 We will use an  ``Effects plot'' to look at interactions:
 
 <<out.width='12cm', out.height='12cm'>>=
-plot(allEffects(cholestanova), ask=FALSE)
+plot(allEffects(cholestanova), ask = FALSE)
 @ 
 
 
@@ -2310,7 +2324,7 @@ or using the \CRANpkg{HH} package%% :and going to ``Graphs'',
 
 <<out.width='14cm', out.height='14cm'>>=
 require(HH)
-interaction2wt(y ~ Diet + Drug, data=dcholest)
+interaction2wt(y ~ Diet + Drug, data = dcholest)
 @ 
 
 Notice how this last figure displays both main effects and interactions. So
@@ -2363,13 +2377,13 @@ set without the ``HF'' subjects. %% Go to ``Active data set'', ``Subset
 
 
 <<>>=
-dcholest2 <- subset(dcholest, subset=Diet != "HF")
+dcholest2 <- subset(dcholest, subset = Diet != "HF")
 @ 
 
 Now do a two-way ANOVA:
 
 <<>>=
-cholest2anova <- (lm(y ~ Diet*Drug, data=dcholest2))
+cholest2anova <- (lm(y ~ Diet*Drug, data = dcholest2))
 Anova(cholest2anova)
 @ 
 
@@ -2377,12 +2391,11 @@ So no evidence whatsoever of interactions. For simplicity, we can go and
 refit the model without the interaction.%% , and that we do in ``Statistics'',
 %% ``Fit models'', ``Linear model''.
 We will actually fit two models, which differ only by the order in which
-we give Diet and Drug in the formula (we showed this already in Lesson 2)
-and we will call them lm1 and lm2
+we give Diet and Drug in the formula and we will call them lm1 and lm2
 
 <<>>=
-lm1 <- lm(y ~ Diet + Drug, data=dcholest2)
-lm2 <- lm(y ~ Drug + Diet, data=dcholest2)
+lm1 <- lm(y ~ Diet + Drug, data = dcholest2)
+lm2 <- lm(y ~ Drug + Diet, data = dcholest2)
 @ 
 
 Look at the ANOVA tables:
@@ -2466,7 +2479,12 @@ discuss this in class.
 
 
 \subsection{Does order always matter?}
-Nope. Let us show a simple example. For the sake of the exposition, I will
+Nope. When the design is balanced, order does not
+matter\footnote{Technically, orthogonality of the design matrix does not
+  require identical cell counts; if row/column counts are proportional,
+  for instance, we should be OK. But for simplicity, we will use a nicely
+  balanced example here.}
+Let us show a simple example. For the sake of the exposition, I will
 here simulate the data, so everything is clear and in the open.
 
 <<>>=
@@ -2498,16 +2516,16 @@ interaction, for simplicity ---there is none, in fact).
 
 
 <<>>=
-m1 <- lm(chol ~ sex + drug, data = chol.data)
-m2 <- lm(chol ~ drug + sex, data = chol.data)
+m1 <- lm(y ~ sex + drug, data = y.data)
+m2 <- lm(y ~ drug + sex, data = y.data)
 @ 
 
 And we also fit two small models, one only with sex, the other only with
 drug:
 
 <<>>=
-msex <- lm(chol ~ sex, data = chol.data)
-mdrug <- lm(chol ~ drug, data = chol.data)
+msex <- lm(y ~ sex, data = y.data)
+mdrug <- lm(y ~ drug, data = y.data)
 @
 
 Now, the output for the coefficients for m1 and m2 is the same (these are
@@ -2581,13 +2599,30 @@ included now in the error term.
 
 
 
-So, to summarize: when there is perfect balance, order does not change a
-thing if we include both factors in the model.
+So, to summarize: when there is balance, order does not change a thing if
+we include both factors in the model. However, having or not the other
+factor in the model can make a difference for the standard errors, the
+residual standard errors, and thus the p-values.
 
-However, having or not the other factor in the model can make a difference
-for the standard errors, the residual standard errors, and thus the
-p-values.
 
+
+
+
+%% I do not show this, to avoid further messing around, but could also have
+%% done this, where there is no same number of cases in all cells, but this
+%% also orthogonal:
+
+%% <<>>=
+%% set.seed(51)
+%% sex <- factor(rep(c("Male", "Female"), c(17, 17)))
+%% drug <- factor(rep(c("A", "B", "A", "B"), c(10, 7, 10, 7)))
+%% z <- rep(c(10, 13, 12, 16), c(10, 10, 7, 7))
+%% z <- z + rnorm(length(y), sd = 1.5)
+%% z.data <- data.frame(z, sex, drug)
+
+%% anova(lm(z ~ sex + drug, data = z.data))
+%% anova(lm(z ~ drug + sex, data = z.data))
+%% @ 
 
 
 
@@ -2602,7 +2637,7 @@ program. Or maybe \ldots.
 \subsection{Multiple comparisons of means in two-way ANOVA}
 Can they be done? Yes. You can use the \Rfunction{glht} or the TukeyHDS
 functions directly. Or you fit the model using \Rfunction{aov} (not
-\Rfunction{lm}), and use the package \CRANpkg{RcmdrPlugin.HH}, and ask for
+\Rfunction{lm}), and use the package \CRANpkg{HH}, and ask for
 the ``MMC plot''. We will not pursue this any further here (among other
 questions you should ask yourself, at what levels of one variable will you
 be comparing the other? How does lack of balance affect the contrasts? Do
@@ -2703,8 +2738,7 @@ for aves and reptilia, the proper Class names).
 
 <<create_anage, echo=FALSE, results='hide'>>=
 anage_a_r <-  read.table("AnAge_birds_reptiles.txt", 
-                         header=TRUE, sep="", na.strings="NA", dec=".", 
-                         strip.white=TRUE)
+                         header = TRUE)
 
 @ 
 
@@ -2712,8 +2746,9 @@ We want to take the log of all the relevant continuous variables (yes, you
 would not know this before hand, but I do, so create those new variables
 now to avoid going back later)\footnote{Creating these new variables is
   not really necessary in general for fitting models. But some functions
-  from the \CRANpkg{HH} package lead to problems if we don't.}. It is much faster
-to just do it by typing the code in the R Script or RStudio console:
+  from the \CRANpkg{HH} package lead to problems if we
+  don't.}. %% It is much faster
+%% to just do it by typing the code in the R Script or RStudio console:
 
 <<>>=
 anage_a_r$logMetabolicRate <- log(anage_a_r$Metabolic.rate..W.)
@@ -2723,9 +2758,9 @@ anage_a_r$logLongevity <- log(anage_a_r$Maximum.longevity..yrs.)
 
 
 For now, we will only use the birds. So use subsetting to keep only birds
-and call it \Robject{anage\_a} (yes, you know how to do that; look at
-Figure \ref{subset}, and recall that the Class is ``Aves''; look at the
-data).
+and call it \Robject{anage\_a}%%  (yes, you know how to do that; look at
+%% Figure \ref{subset}, and recall that the Class is ``Aves''; look at the
+%% data).
 
 <<create_anage_a, echo=FALSE, results='hide'>>=
 anage_a <- anage_a_r[anage_a_r$Class == "Aves",]
@@ -2745,11 +2780,11 @@ data\footnote{This can be done correctly, incorporating phylogenetic
   this class. It is a really fascinating topic, though!}.
 
 
-Now go to ``Statistics'', ``Fit models'', ``Linear regression'' and fit
-that model. Let's call the model \Robject{metab}
+%% Now go to ``Statistics'', ``Fit models'', ``Linear regression'' and fit
+%% that model. Let's call the model \Robject{metab}
 
 <<>>=
-metab <- lm(Metabolic.rate..W. ~ Body.mass..g., data=anage_a)
+metab <- lm(Metabolic.rate..W. ~ Body.mass..g., data = anage_a)
 summary(metab)
 @ 
 
@@ -2773,23 +2808,23 @@ means?
 \subsection{And how does it look like}
 Eh!!! We should probably have plotted the data as the first thing. A
 couple of plots will be good here. First, let's do a scatterplot (you
-might want to unclick the ``Show spread''\footnote{I find the spread
+might want to not show the spread \footnote{I find the spread
   information to be confusing. But I like to leave the
   smoothed line, as it can help me see errors in the model
   specification.}):
 
 <<out.width = '10cm', out.height = '10cm', results='hide'>>=
-scatterplot(Metabolic.rate..W.~Body.mass..g., 
-            reg.line=lm, smooth=TRUE, 
-            spread=FALSE, id.method='mahal', id.n = 2, boxplots='xy', 
-            span=0.5, data=anage_a)
+scatterplot(Metabolic.rate..W. ~ Body.mass..g., 
+            smooth = TRUE, 
+            spread = FALSE,  data = anage_a)
 @ 
 
-The second plot we can get from ``Models'', ``Confidence interval plot''
-(you need to have the \CRANpkg{RcmdrPlugin.HH} loaded) which will show
-something like
+The second plot we will do requires you to load \CRANpkg{HH}%% can get from ``Models'', ``Confidence interval plot''
+%% (you need to have the \CRANpkg{RcmdrPlugin.HH} loaded) which will show
+%% something like
 
 <<out.width = '12cm', out.height = '12cm'>>=
+require(HH)
 ci.plot(metab)
 @
  
@@ -2803,18 +2838,21 @@ with a log (why a log? theory and previous empirical evidence from the
 field of allometry and life history suggest that it is a reasonable way to
 go).
 
-You can refit the model by creating new variables, etc. That is up to
-you. An easier thing might be to copy the previous model, and modify it in
-the R Script/ RStudio console, giving it a new name
-(\Robject{metablog}). We will also replot, and pay attention because in
-the scatterplot menu you can tell it to log both axis which is nicer than
-plotting the log-transformed data directly.
+%% You can refit the model by creating new variables, etc. That is up to
+%% you. An easier thing might be to copy the previous model, and modify it in
+%% the R Script/ RStudio console, giving it a new name
+%% (\Robject{metablog}). We will also replot, and pay attention because in
+%% the scatterplot menu you can tell it to log both axis which is nicer than
+%% plotting the log-transformed data directly.
 
-First fit the model: \footnote{You could have fitted the model as\\ 
- \texttt{metablog <- lm(log(Metabolic.rate..W.) $\sim$ log(Body.mass..g.), data  = anage\_a)}\\
-and that would have been fine. But then, functions \Rfunction{ci.plot} and \Rfunction{ancova} from \CRANpkg{HH} choke.}  
+
+First fit the model: \footnote{You could have fitted the model as\\
+  \texttt{metablog <- lm(log(Metabolic.rate..W.) $\sim$ log(Body.mass..g.), data  = anage\_a)}\\
+  and that would have been fine. But then, functions \Rfunction{ci.plot}
+  and \Rfunction{ancova} from \CRANpkg{HH} choke.}
+
 <<>>=
-metablog <- lm(logMetabolicRate ~ logBodyMass, data=anage_a)
+metablog <- lm(logMetabolicRate ~ logBodyMass, data = anage_a)
 summary(metablog)
 @ 
 
@@ -2823,11 +2861,12 @@ summary(metablog)
 Now the two plots:
 
 <<fig.width=7, fig.height=7,results='hide'>>=
-scatterplot(Metabolic.rate..W.~Body.mass..g., log="xy", 
-            reg.line=lm, smooth=TRUE, spread=FALSE, 
-            id.method='mahal', id.n = 2, boxplots='xy', 
-            span=0.5, data=anage_a)
+
+scatterplot(Metabolic.rate..W. ~ Body.mass..g., log = "xy", 
+            smooth = TRUE, spread = FALSE, 
+            data = anage_a)
 @ 
+
 %% (I have suppressed the output that gives the flagged points and will do so
 %% for the rest of scatterplots)
 
@@ -2935,9 +2974,9 @@ age, height, and weigth are correlated is easy to check with a scatterplot
 matrix:
 
 <<results='hide'>>=
-scatterplotMatrix(~age+height+pemax+weight, reg.line=lm, 
-                  smooth=TRUE, spread=FALSE, span=0.5, id.n=0, 
-                  diagonal = 'density', data=cystfibr2)
+scatterplotMatrix( ~ age+height+pemax+weight, reg.line = lm, 
+                  smooth = TRUE, spread = FALSE, span = 0.5, id.n = 0, 
+                  diagonal = 'density', data = cystfibr2)
 @ 
 
 In fact, if you refit the model and now put height first, and do a
@@ -3010,11 +3049,11 @@ obviously) and age. However, sex is coded with 0/1 and we want it to be a
 factor, explictly. Let's recode it:
 
 <<>>=
-cystfibr2$sex <- factor(cystfibr2$sex, labels=c('Male','Female'))
+cystfibr2$sex <- factor(cystfibr2$sex, labels = c('Male','Female'))
 @ 
 
 <<>>=
-mcyst2 <- lm(pemax ~ age * sex, data=cystfibr2)
+mcyst2 <- lm(pemax ~ age * sex, data = cystfibr2)
 summary(mcyst2)
 @ 
 
@@ -3025,9 +3064,8 @@ would an interaction have looked like? Different slopes for each group.
 Look at the plots:
 
 <<results='hide'>>=
-scatterplot(pemax~age | sex, reg.line=lm, smooth=FALSE, 
-            spread=FALSE, id.method='mahal', id.n = 2, boxplots='xy', 
-            span=0.5, by.groups=TRUE, data=cystfibr2)
+scatterplot(pemax ~ age | sex, smooth = FALSE, 
+            spread = FALSE,  by.groups = TRUE, data = cystfibr2)
 @ 
 
 (yes, the best fitting slopes are slightly different, but they are not
@@ -3056,7 +3094,7 @@ Note that function \Rfunction{ancova} is not available from the menus. You
 have to type the above expression directly.
 
 
-FIXME: use a model with only age + sex, to go slow.
+%% FIXME: use a model with only age + sex, to go slow.
 
 
 
@@ -3067,11 +3105,11 @@ our model a lot, and use one with a single intercept and slope (i.e., just
 like a simple linear regression as in section \ref{regr}) as neither
 ``sex'' by itself nor the interaction is relevant. We will do that, and we
 will then do a global model comparison to verify the simplified model is a
-reasonable one (go to ``Models'', ``Hypothesis tests'', ``Compare two
-models''):
+reasonable one:%%  (go to ``Models'', ``Hypothesis tests'', ``Compare two
+%% models''):
 
 <<>>=
-mcyst3 <- lm(pemax ~ age, data=cystfibr2)
+mcyst3 <- lm(pemax ~ age, data = cystfibr2)
 anova(mcyst3, mcyst2)
 @ 
 
@@ -3155,11 +3193,10 @@ only removing the interaction, for which we already saw a test).
 Let's see the plots:
 \clearpage
 <<results='hide'>>=
-scatterplot(Metabolic.rate..W.~Body.mass..g. | Class, 
-            log="xy", reg.line=lm, smooth=FALSE, spread=FALSE, 
-            id.method='mahal', 
-            id.n = 2, boxplots='xy', span=0.5, by.groups=TRUE, 
-            data=anage_a_r)
+scatterplot(Metabolic.rate..W. ~ Body.mass..g. | Class, 
+            log = "xy", smooth = FALSE, spread = FALSE, 
+            by.groups = TRUE, 
+            data = anage_a_r)
 @ 
 
 \clearpage
@@ -3184,11 +3221,10 @@ body mass is faster in reptiles than in birds (note the coefficient
 How do things look?
 
 <<results='hide'>>=
-scatterplot(Maximum.longevity..yrs.~Body.mass..g. | Class, 
-            log="xy", reg.line=lm, smooth=FALSE, spread=FALSE, 
-            id.method='mahal', 
-            id.n = 2, boxplots='xy', span=0.5, by.groups=TRUE, 
-            data=anage_a_r)
+scatterplot(Maximum.longevity..yrs. ~ Body.mass..g. | Class, 
+            smooth = FALSE, spread = FALSE, 
+            by.groups = TRUE, 
+            data = anage_a_r)
 @ 
 
 <<echo=TRUE, results='hide'>>=
@@ -3220,14 +3256,14 @@ variables, using the \Robject{hellung} dataset included in \CRANpkg{ISwR}.
 
 
 
-\subsection{Anova as lm, etc (zz: put this better)}
-FIXME:
+%% \subsection{Anova as lm, etc (zz: put this better)}
+%% FIXME:
 
-add examples of variables with three or more levels, and show what lm and
-anova show
+%% add examples of variables with three or more levels, and show what lm and
+%% anova show
 
-yes, show here. Also mentioned above So for ancova, use a factor with
-three levels (maybe mammals, birds, reptiles)
+%% yes, show here. Also mentioned above So for ancova, use a factor with
+%% three levels (maybe mammals, birds, reptiles)
 
 
 
@@ -3261,8 +3297,8 @@ The three main types are:
 \clearpage
 \section{Diagnostics}\label{diagnostics}
 
-\red{FIXME: add from a fully balanced designs, and explain differences in
-  last plot ---all have same leverage?}
+%% \red{FIXME: add from a fully balanced designs, and explain differences in
+%%   last plot ---all have same leverage?}
 
 Wait!!! Do our models make sense? These are models, so we can, and should,
 check some of their basic assumptions. We cannot do justice to this
@@ -3291,11 +3327,11 @@ really correct.
 
 
 We will first use the two simple regression models we fitted in section
-\ref{regr}. Make the first one (\Robject{metab}) active and go to
-``Models'', ``Graphs'', ``Basic diagnostic plots''. 
+\ref{regr}. %% Make the first one (\Robject{metab}) active and go to
+%% ``Models'', ``Graphs'', ``Basic diagnostic plots''. 
 
 <<fig.show='hold'>>=
-oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
+oldpar <- par(mfrow = c(2,2))
 plot(metab)
 par(oldpar)
 @ 
@@ -3346,7 +3382,7 @@ Cook's distance (function \Rfunction{cooks.distance}).
 
 Now, repeat the above with the model that has taken logs:
 <<fig.show='hold'>>=
-oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
+oldpar <- par(mfrow = c(2,2))
 plot(metablog)
 par(oldpar)
 @ 
@@ -3380,11 +3416,13 @@ look at all of these yourself to see them.
 For you to read and play around further:
 
 \begin{itemize}
-\item A very nice type of qqplot is available from package \CRANpkg{car},
-  and in R Commander under ``Residual quantile comparison plots''.
+\item An extended qqplot is available from package \CRANpkg{car},
+  \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
+  comparison plots'').
 \item ``Component+Residual'' (or partial residual) plots allow us to
   examine, in models with multiple regressors, deviations from linearity
-  and could suggest the appropriate transformation.
+  and could suggest the appropriate transformation. Also available from
+  \CRANpkg{car}. 
 \item Various diagnostics related to dfbetas allow us to identify
   influential observations in specific terms of the model.
 \item Variance inflation factors help us detect possible problems caused
@@ -3393,7 +3431,8 @@ For you to read and play around further:
   problems with multiple independent variables; they can help to identify
   influential points (which are easily masked with multiple variables) and
   can also help to try to find a good functional relationship (but
-  Component+Residual are more useful here).
+  Component+Residual are more useful here). Again, available from
+  \CRANpkg{car}. 
 \item A variety of numerical tests and diagnostics are also available
   (e.g., tests for nonlinearity or for homoscedasticity).
 \item Package \CRANpkg{car} and the accompanying book ``An R companion to
@@ -3442,10 +3481,10 @@ additional covariates, etc, are nowadays analyzed using mixed-effects
 models.
 
 
-This also relates to questions we asked in Lesson 2 (see the section on
-``Non-independent data''): What if we had
-repeated measures on the same subjects over time? Or if we had some data
-that came from brothers, cousins, etc?
+This also relates to questions we asked in section on ``Non-independent
+data'' \ref{pseudorep}: What if we had repeated measures on the same
+subjects over time? Or if we had some data that came from brothers,
+cousins, etc?
 
 
 And how would you go about designing an experiment from scratch? What
@@ -3477,15 +3516,15 @@ later\footnote{R.\ Fisher, one of the fathers of modern statistics, as
 
 
 
-\section{Appendix}
-\subsection{What if we did not recode training?}\label{nofactor}
+% \section{Appendix}
+\section{What if we did not recode training?}\label{nofactor}
 Suppose we had not recoded training but we had fitted a linear model. This
 would have happened:
 
 <<>>=
-lmMITnofactor <- lm(activ ~ training, data=dmit)
+lmMITnofactor <- lm(activ ~ training, data = dmit)
 summary(lmMITnofactor)
-Anova(lmMITnofactor, type="II")
+Anova(lmMITnofactor)
 @ 
 
 See how the degrees of freedom make no sense.
@@ -3510,7 +3549,7 @@ and 7 of Dalgaard's ``Introductory statistics with R'' and chapters 8 and
 This is the information about the version of R and packages used when
 producing this document:
 <<echo=FALSE,results='hide',error=FALSE>>=
-options(width=60)
+options(width = 60)
 @ 
 
 <<>>=
