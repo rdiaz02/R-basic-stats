@@ -1932,14 +1932,89 @@ correspondence between a t statistic and an F statistic).
 
 
 
-\subsection{Anova as lm, etc (zz: put this better)}
-FIXME:
+\subsection{One way-anova with three or more groups, and lm}
 
-add examples of variables with three or more levels, and show what lm and
-anova show
+And what if the categorical independent variable has three or more groups?
+Let us use a data set we will use below (section \ref{twoway}).  These
+data come from an experiment about the effects of three diets and two
+cholesterol-controlling drugs in the reduction of cholesterol levels
+(note: the response variable is change in cholesterol, so the larger the
+value, the larger the reduction of cholesterol). As usual, read the data
+and look at them. Since the author used names for the levels within each
+of the two factors, Diet and Drug, we do not need to transform them into
+factors, in contrast to what we did in section \ref{recode}. Call the data
+\Robject{dcholest}.
 
-yes, show here. Also below
 
+<<create_chol, echo=FALSE, results='hide'>>=
+
+set.seed(45)
+n <- c(4, 7, 9, 5, 7, 8)
+m <- c(2.1, 1, 2, -.2, 4, 5)
+y <- round(unlist(mapply(function(x, y) rnorm(x, y), n, m)), 3)
+Drug <- c(rep("A", sum(n[1:3])),
+          rep("B", sum(n[4:6])))
+Diet <- rep(rep(c("HF", "M1", "M2"), 2), n)
+chol <- data.frame(y = y,
+                   Drug = Drug,
+                   Diet = Diet)
+rm(y, n, m, Drug, Diet)
+## lm1 <- lm(y ~ Drug * Diet, data = chol)
+## lm0 <- lm(y ~ Drug + Diet, data = chol)
+## anova(lm1)
+## Anova(lm1)
+## anova(lm0)
+## anova(lm(y ~ Diet + Drug, data = chol))
+## Anova(lm0)
+write.table(chol, file = "Cholesterol.txt", col.names = TRUE,
+            row.names = FALSE, sep = "\t", quote = FALSE)
+rm(chol)
+@ 
+
+<<>>=
+dcholest <- read.table("Cholesterol.txt", header = TRUE)
+
+@ 
+
+
+Here, let us focus just on the effect of Diet. First a couple of figures:
+<<>>=
+par(mfrow = c(1, 2))
+boxplot(y ~ Diet, data = dcholest)
+with(dcholest, plotMeans(y, Diet, error.bars="se", 
+  xlab="Diet", ylab="Cholesterol reduction"))
+
+@ 
+Now, look at the output carefully:
+<<>>=
+summary(aov(y ~ Diet, data = dcholest))
+anova(lm(y ~ Diet, data = dcholest))
+summary(lm(y ~ Diet, data = dcholest))
+@ 
+
+The first two give you the typical ANOVA table, whereas the third gives a
+kind of output you might be more familiar with from
+regression. Interpreting the numbers requires thinking about the
+parameterization. 
+
+Look at the means for each group:
+<<>>=
+with(dcholest, tapply(y, Diet, mean))
+@ 
+
+Now, notice how the \texttt{(Intercept)} term above corresponds to the
+mean of group HF, and the other two terms are the deviations of each mean
+from the intercept:
+
+<<>>=
+means <- with(dcholest, tapply(y, Diet, mean))
+means[2] - means[1]
+means[3] - means[1]
+rm(means) ## let's remove it, so as not the leave
+          ## garbage around
+@ 
+
+This is the default parameterization in R. But is is not the only one available.
 
 
 \subsection{One way ANOVA: summary of steps}
@@ -2160,51 +2235,23 @@ take a look at a three-page one by W.\ Noble, in \textit{nature
 
 % FIXME: start first without interactions!!! Use the data from orderfactors
 
-\section{Two-way ANOVA}
+\section{Two-way ANOVA}\label{twoway}
 
-The following data come from an experiment about the effects of three
-diets and two cholesterol-controlling drugs in the reduction of
-cholesterol levels (note: the response variable is change in cholesterol,
-so the larger the value, the larger the reduction of cholesterol). As
-usual, read the data and look at them. Since the author used names for the
-levels within each of the two factors, Diet and Drug, we do not need to
-transform them into factors, in contrast to what we did in section
-\ref{recode}. Call the data \Robject{dcholest}.
-
-<<create_tooth, echo=FALSE, results='hide'>>=
-
-set.seed(45)
-n <- c(4, 7, 9, 5, 7, 8)
-m <- c(2.1, 1, 2, -.2, 4, 5)
-y <- round(unlist(mapply(function(x, y) rnorm(x, y), n, m)), 3)
-Drug <- c(rep("A", sum(n[1:3])),
-          rep("B", sum(n[4:6])))
-Diet <- rep(rep(c("HF", "M1", "M2"), 2), n)
-chol <- data.frame(y = y,
-                   Drug = Drug,
-                   Diet = Diet)
-rm(y, n, m, Drug, Diet)
-## lm1 <- lm(y ~ Drug * Diet, data = chol)
-## lm0 <- lm(y ~ Drug + Diet, data = chol)
-## anova(lm1)
-## Anova(lm1)
-## anova(lm0)
-## anova(lm(y ~ Diet + Drug, data = chol))
-## Anova(lm0)
-write.table(chol, file = "Cholesterol.txt", col.names = TRUE,
-            row.names = FALSE, sep = "\t", quote = FALSE)
-rm(chol)
-@ 
-
-<<>>=
-dcholest <- read.table("Cholesterol.txt", header = TRUE)
-@ 
+Let us use the cholesterol data again.
+%% The following data come from an experiment about the effects of three
+%% diets and two cholesterol-controlling drugs in the reduction of
+%% cholesterol levels (note: the response variable is change in cholesterol,
+%% so the larger the value, the larger the reduction of cholesterol). As
+%% usual, read the data and look at them. Since the author used names for the
+%% levels within each of the two factors, Diet and Drug, we do not need to
+%% transform them into factors, in contrast to what we did in section
+%% \ref{recode}. Call the data \Robject{dcholest}.
 
 
 \subsection{Fitting a two-way ANOVA}\label{twoway}
 
-As usual, go to ``Statistics'', ``Means'', and then ``Multiway
-ANOVA''. Call it ``cholanova''
+%% As usual, go to ``Statistics'', ``Means'', and then ``Multiway
+%% ANOVA''. Call it ``cholanova''
 
 Look at the output, which I comment below
 <<>>=
@@ -2226,10 +2273,9 @@ tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug),
 
 \subsection{Interactions}\label{2way-int}
 
-Now, go to the ``Models'' menu and do a ``Effects plot''
+We will use an  ``Effects plot'' to look at interactions:
 
 <<out.width='12cm', out.height='12cm'>>=
-## trellis.device(theme="col.whitebg")
 plot(allEffects(cholestanova), ask=FALSE)
 @ 
 
@@ -2253,16 +2299,17 @@ seen at as epistasis in genetics.
 
 
 
-You can also see interaction plots using this directly from R:
+You can also see interaction plots using other functions from R. For example:
 
 <<out.width = '8cm', out.height = '8cm'>>=
 with(dcholest, interaction.plot(Drug, Diet, y, type = "b"))
 @ 
 
-or using the \CRANpkg{RcmdrPlugin.HH} and going to ``Graphs'',
-``Plot of two-way interactions'' %this from package ``HH'' (I will first load it)
+or using the \CRANpkg{HH} package%% :and going to ``Graphs'',
+%% ``Plot of two-way interactions'' %this from package ``HH'' (I will first load it)
 
 <<out.width='14cm', out.height='14cm'>>=
+require(HH)
 interaction2wt(y ~ Diet + Drug, data=dcholest)
 @ 
 
@@ -2280,7 +2327,7 @@ different ones, that differ by the order in which factors are specified
 
 <<out.width='8cm', out.height='8cm', fig.show='hold'>>=
 boxplot(y ~ Drug * Diet, data = dcholest, col = c("salmon", "gold"))
-boxplot(y ~ Diet * Drug, data = dcholest, col = c("salmon", "gold"))
+boxplot(y ~ Diet * Drug, data = dcholest, col = c("salmon", "gold", "lightblue"))
 @ 
 
 
@@ -2302,17 +2349,17 @@ not) of the Diet or Drug term. In general, \textbf{in the presence of
 \subsection{The order of factors}\label{orderfactors}
 
 Let's pretend there are no interactions. We can do that by creating a data
-set without the ``HF'' subjects. Go to ``Active data set'', ``Subset
-active data set''. 
+set without the ``HF'' subjects. %% Go to ``Active data set'', ``Subset
+%% active data set''. 
 
 
 
-\begin{figure}[h!]
-  \begin{center}
-    \includegraphics[width=0.40\paperwidth,keepaspectratio]{subset-chol.png}
-    \caption{\label{subset} Subset a data set. Note the ``Subset expression'.}
-  \end{center}
-\end{figure}
+%% \begin{figure}[h!]
+%%   \begin{center}
+%%     \includegraphics[width=0.40\paperwidth,keepaspectratio]{subset-chol.png}
+%%     \caption{\label{subset} Subset a data set. Note the ``Subset expression'.}
+%%   \end{center}
+%% \end{figure}
 
 
 <<>>=
@@ -2327,21 +2374,22 @@ Anova(cholest2anova)
 @ 
 
 So no evidence whatsoever of interactions. For simplicity, we can go and
-refit the model without the interaction, and that we do in ``Statistics'',
-``Fit models'', ``Linear model''. We will actually fit two models, which
-differ only by the order in which we give Diet and Drug in the formula (we
-showed this already in Lesson 2) and we will call them lm1 and lm2
+refit the model without the interaction.%% , and that we do in ``Statistics'',
+%% ``Fit models'', ``Linear model''.
+We will actually fit two models, which differ only by the order in which
+we give Diet and Drug in the formula (we showed this already in Lesson 2)
+and we will call them lm1 and lm2
 
 <<>>=
 lm1 <- lm(y ~ Diet + Drug, data=dcholest2)
 lm2 <- lm(y ~ Drug + Diet, data=dcholest2)
 @ 
 
-
-Now, go to ``Models'', ``Hypothesis tests'' and do ``ANOVA table (Type I
-sums of squares)'' (if you do all of this via the GUI and mouse, remember
-to change the model clicking on ``Models'', ``Select active model'' or via
-the box that says ``Model:''):
+Look at the ANOVA tables:
+%% Now, go to ``Models'', ``Hypothesis tests'' and do ``ANOVA table (Type I
+%% sums of squares)'' (if you do all of this via the GUI and mouse, remember
+%% to change the model clicking on ``Models'', ``Select active model'' or via
+%% the box that says ``Model:''):
 
 <<>>=
 anova(lm1)
@@ -2404,11 +2452,143 @@ SPSS, SAS, etc.)\footnote{The type of sums of squares used (and,
 
 
 
+Some of this might still seem mysterious. Think about doing a regression
+of body height on the length of both the left and right arms. And think
+about how unbalanced data, with categorical independent variables, is
+somewhat similar to inducing a correlation between variables. We will
+discuss this in class. 
 
-\red{FIXME}
-\red{Explain why order of factors matter with unbalanced designs and how
-  it relates to correlation of indep. vars. with regression. Example of
-  hegith on left and right arms}
+%% \red{FIXME}
+%% \red{Explain why order of factors matter with unbalanced designs and how
+%%   it relates to correlation of indep. vars. with regression. Example of
+%%   hegith on left and right arms}
+
+
+
+\subsection{Does order always matter?}
+Nope. Let us show a simple example. For the sake of the exposition, I will
+here simulate the data, so everything is clear and in the open.
+
+<<>>=
+set.seed(1)
+sex <- factor(rep(c("Male", "Female"), c(20, 20)))
+drug <- factor(rep(rep(c("A", "B"), c(10, 10)), 2))
+y <- rep(c(10, 13, 12, 16), rep(10, 4))
+y <- y + rnorm(length(y), sd = 1.5)
+y.data <- data.frame(y, sex, drug)
+@ 
+
+First, some basic stats about those data. Notice the perfect balance:
+
+<<>>=
+with(y.data, tapply(y, list(sex, drug), function(x) sum(!is.na(x))))
+with(y.data, tapply(y, list(sex, drug), mean))
+@ 
+
+Just by eye, it seems the difference between sexes is around 2, and the
+difference between drugs of about 4. And no, there is no interaction:
+
+<<>>=
+summary(lm(y ~ sex * drug, data = y.data))
+@ 
+
+
+Let us fit two models, simply changing the order (we assume no
+interaction, for simplicity ---there is none, in fact).
+
+
+<<>>=
+m1 <- lm(chol ~ sex + drug, data = chol.data)
+m2 <- lm(chol ~ drug + sex, data = chol.data)
+@ 
+
+And we also fit two small models, one only with sex, the other only with
+drug:
+
+<<>>=
+msex <- lm(chol ~ sex, data = chol.data)
+mdrug <- lm(chol ~ drug, data = chol.data)
+@
+
+Now, the output for the coefficients for m1 and m2 is the same (these are
+always the coefficients as if entered last in the model):
+
+<<>>=
+summary(m1)
+summary(m2)
+@
+
+
+So nothing new up to here. Now look at what happens if we get the
+coefficients for the small models, those with only sex or only drug:
+<<>>=
+summary(msex)
+summary(mdrug)
+@
+
+In both cases, the estimate is the same from the model with the two
+factors, or with only a single factor. For example, the differences
+between sexes are of about 2.2 (the coefficient that says "sexMale") and
+the differences between drugs of about 3.8 (the coefficient that says
+"drugB").  However, the standard error, and thus the t value and the
+p-value change. In the case of sex, they change a lot.
+
+Again, the key is to understand that even if the coefficient does not
+change whether or not the other factor is included in the model (and it
+does not change because there is complete balance), the t statistic and
+the p-value do change. Why? Because the other factor explains a large part
+of variance, and thus makes the residual standard error much smaller if we
+include it in the model.
+
+
+And what about the ANOVA tables?
+<<>>=
+anova(m1)
+anova(m2)
+@
+
+Order does not change anything. Why? Because the contributions of each
+factor do not depend at all on the other (i.e., the Mean Squares of each
+factor does not depend on the other). And since the F is the ratio of the
+Mean Squares of the factor over the Mean Squares of the residuals (and
+this is whatever is left after we have fitted everything), the order does
+not affect the F statistic or the p-value.
+
+
+Of course, an "Anova" (Type II tests) would show the same:
+
+<<>>=
+Anova(m1)
+@ 
+
+To understand this better, look at the anova tables for the models with
+only one factor:
+
+<<>>=
+anova(msex)
+anova(mdrug)
+@ 
+
+
+Notice how the Mean Sq for each factor is the same as in the previous
+tables. So the Mean Squares for Sex do not depend on whether or not drug
+is in the model. But the F statistic (and the p-value) do change a
+lot. Why? Because what changes a lot are the Mean Sq. of the
+residuals. And why is that? Because the other factor, the one we have not
+included, does indeed explain a lot of variability, but in these two last
+tables, since the other factor is not in the model, that variability is
+included now in the error term.
+
+
+
+So, to summarize: when there is perfect balance, order does not change a
+thing if we include both factors in the model.
+
+However, having or not the other factor in the model can make a difference
+for the standard errors, the residual standard errors, and thus the
+p-values.
+
+
 
 
 \subsection{ANOVA/linear models with more than two factors}
