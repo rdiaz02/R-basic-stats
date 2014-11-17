@@ -53,7 +53,7 @@ BiocStyle::latex()
 
 
 
-\bioctitle{Basic stats with R}
+\bioctitle{Some basic statistics with R}
 
 \author{Ramon Diaz-Uriarte\\
   Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\ 
@@ -105,7 +105,7 @@ Creative Commons license ---see section \ref{license}) from
 \Burl{https://github.com/rdiaz02/R-basic-stats}.
 
 
-\section{Comparing two groups}
+\part{Comparing two groups}
 
 
 Someone in your lab has measured the expression of several genes from a
@@ -224,7 +224,7 @@ set''). Resist the temptation to modify it there. \red{Why?}
 
 \subsection{Plots to do}
 For all except the trivially tiniest datasets we want to use graphics.
-Make sure you do the following plots (in the menu, under ``Graphs''):
+Make sure you do the following plots: % (in the menu, under ``Graphs''):
 \begin{itemize}
 \item Histogram for each gene, using condition (``cond'') as the conditioning or grouping
   variable (``Plot by:'').
@@ -401,9 +401,8 @@ display the different (two, in this case) groups. %% Playing around, you
 <<fig.width=8, fig.height=8,echo=FALSE>>=
 scatterplotMatrix( ~ brca1 + brca2 + p53 + pten | cond, 
                   reg.line = FALSE, 
-                  smooth = FALSE, spread = FALSE,
-                  diagonal= 'density', 
-                  by.groups = TRUE, data = dp53)
+                  smooth = FALSE, 
+                  data = dp53)
 @ 
 
 We will not pursue this any further. But you know you can and probably
@@ -956,7 +955,8 @@ Anova(LinearModel.1, type = "II")
 @ 
 
 Relate this to the figures above. This should all make sense. Regardless,
-linear models and ANOVAs will be covered in much more detail \ldots next!
+linear models and ANOVAs will be covered in much more detail \ldots in the
+next part!
 
 
 
@@ -1540,7 +1540,7 @@ transformed data) or a two-samples Wilcoxon test.
 %% @ 
 
 
-
+\part{Linear models: ANOVA, regression, ANCOVA}
 \section{Introduction to ANOVAs, regression, and linear models}
 
 Linear models and their extensions (which include logistic regression, but
@@ -1551,8 +1551,10 @@ the surface. But you should come away from this lesson understanding that
 these methods are extremely powerful and flexible and that they can be
 used to address a huge variety of different research questions. You would
 spend your time wisely if you at least took a look at some of the
-references we provide at the end.
-
+references we provide at the end. To emphasize again: ANOVAs, regression,
+ANCOVAs, are just special type of linear models; the terminology is not
+that important, but I'll use those terms as they might be more familiar to
+you. 
 
 \subsection{Files we will use}
 
@@ -1639,14 +1641,13 @@ would be a disaster (look at the output in section \ref{nofactor}).
 You are advised to also plot the data. For instance, this
 will do:
 
-<<>>=
+<<results='hide'>>=
 Boxplot(activ ~ ftraining, data = dmit, id.method = "y")
 @ 
 
-
-(the ``2'' is the identifier ---row name--- of a point that
-has been flagged as a potential outlier and we will silent that output
-from now on in these notes).
+(The output might show a ``2''; that is the identifier ---row name--- of a
+point that has been flagged as a potential outlier and we will silent that
+output from now on in these notes).
 
 
 \subsection{An ANOVA}\label{oneway}
@@ -1819,7 +1820,8 @@ Look carefully at the plot in Figure \ref{fig:tukey1}: for each difference
 (for each \textbf{contrast}), it shows the estimate and a 95\% confidence
 interval around it. The plot title says ``95\% family-wise confidence
 interval'', and that indicates that multiple testing correction has been
-used.
+used. (You might want to make that even more explicit by using a title
+such as ``95\% family-wise confidence interval using Tukey contrasts'').
 
 Given how far two of the contrasts are from 0.0, it seems those are highly
 significant differences. %% Let's go to the numerical output.
@@ -1877,20 +1879,20 @@ into account.
 That is up to you :-). But this can work: present both the original means
 and the plot with the contrasts. %% You can just copy and paste code
 %% judiciously.
-Note that I modify slightly the title of the first figure, so
-that the usage of Tukey contrasts is explicit and I modify the title of
-the second, so we use ``Training'' in the name, not ``ftraining'':
+%% Note that I modify slightly the title of the first figure, so
+%% that the usage of Tukey contrasts is explicit and I modify the title of
+%% the second, so we use ``Training'' in the name, not ``ftraining'':
 
 
-<<out.width='7cm', out.height='7cm', fig.show='hold'>>=
-Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
-tmp <- cld(Pairs) ## silent assignment 
-old.oma <- par(oma = c(0,5,0,0), mfrow = c(1, 2))
-plot(confint(Pairs), 
-     main = "95% family-wise confidence interval using Tukey contrasts")
-plot(allEffects(AnovaMIT), ask = FALSE, main = "Training: effect plot")
-par(old.oma) 
-@ 
+%% <<out.width='7cm', out.height='7cm', fig.show='hold'>>=
+%% Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
+%% tmp <- cld(Pairs) ## silent assignment 
+%% old.oma <- par(oma = c(0,5,0,0), mfrow = c(1, 2))
+%% plot(confint(Pairs), 
+%%      main = "95% family-wise confidence interval using Tukey contrasts")
+%% plot(allEffects(AnovaMIT), ask = FALSE, main = "Training: effect plot")
+%% par(old.oma) 
+%% @ 
 
 %% \red{FIXME}:
 
@@ -2236,13 +2238,13 @@ When you screen 20000 genes, you are running 20000 times the experiment of
 the p-value and the null hypothesis. And remember the rules: for one true
 null hypothesis, the probability of finding a p-value $\le 0.05$ is
 $0.05$. Now imagine you do that 20000 times; you are almost certain to
-have many p-values $\le 0.05$. (Some thing with lightning: even if the
+have many p-values $\le 0.05$. (Same thing with lightning: even if the
 chances of dying from lightning are $\le \frac{1}{300000}$, with millions
 of people on earth, some are almost sure to die from lightning).
 
 
 There are many reviews about multiple testing, FDR, etc. You might want to
-take a look at a three-page one by W.\ Noble, in \textit{nature
+take a look at a three-page one by W.\ Noble, in \textit{Nature
   Biotechnology}, 2009, 27: 1135--1136, ``How does multiple testing work''.
 
 
@@ -2270,7 +2272,7 @@ Let us use the cholesterol data again.
 Look at the output, which I comment below
 <<>>=
 ## This fits the model. Pay attention to the "*"
-cholestanova <- (lm(y ~ Diet*Drug, data = dcholest))
+cholestanova <- (lm(y ~ Diet * Drug, data = dcholest))
 ## This shows the ANOVA table. Notice the "Type II"
 Anova(cholestanova)
 
@@ -2341,7 +2343,8 @@ different ones, that differ by the order in which factors are specified
 
 <<out.width='8cm', out.height='8cm', fig.show='hold'>>=
 boxplot(y ~ Drug * Diet, data = dcholest, col = c("salmon", "gold"))
-boxplot(y ~ Diet * Drug, data = dcholest, col = c("salmon", "gold", "lightblue"))
+boxplot(y ~ Diet * Drug, data = dcholest, 
+        col = c("salmon", "gold", "lightblue"))
 @ 
 
 
@@ -2483,9 +2486,9 @@ Nope. When the design is balanced, order does not
 matter\footnote{Technically, orthogonality of the design matrix does not
   require identical cell counts; if row/column counts are proportional,
   for instance, we should be OK. But for simplicity, we will use a nicely
-  balanced example here.}
-Let us show a simple example. For the sake of the exposition, I will
-here simulate the data, so everything is clear and in the open.
+  balanced example here.}. The following is an example. For the sake of
+the exposition, I will here simulate the data, so everything is clear and
+in the open.
 
 <<>>=
 set.seed(1)
@@ -2511,8 +2514,8 @@ summary(lm(y ~ sex * drug, data = y.data))
 @ 
 
 
-Let us fit two models, simply changing the order (we assume no
-interaction, for simplicity ---there is none, in fact).
+Fit two models, simply changing the order (we assume no interaction, as
+shown above).
 
 
 <<>>=
@@ -2941,7 +2944,7 @@ For the multiple regression we model
 
 \[pemax = \alpha + \beta_1 age + \beta_2 height + \beta_3 weight + \epsilon\]
 
-You should know how to work around the menus and get something like:
+%% You should know how to work around the menus and get something like:
 
 <<>>=
 mcyst <- lm(pemax ~ age + height + weight, data=cystfibr2)
@@ -2974,9 +2977,8 @@ age, height, and weigth are correlated is easy to check with a scatterplot
 matrix:
 
 <<results='hide'>>=
-scatterplotMatrix( ~ age+height+pemax+weight, reg.line = lm, 
-                  smooth = TRUE, spread = FALSE, span = 0.5, id.n = 0, 
-                  diagonal = 'density', data = cystfibr2)
+scatterplotMatrix( ~ age+height+pemax+weight, smooth = TRUE, 
+                  spread = FALSE,  data = cystfibr2)
 @ 
 
 In fact, if you refit the model and now put height first, and do a
@@ -2999,24 +3001,7 @@ among themselves. Is this a common phenomenon: yes, it is rather common.
 
 
 
-\subsection{Variable and model selection}
-You say you want to select variables? Select them for what? Prediction?
-Interpretation?  Variable selection is a touchy and delicate
-subject. First, procedures based purely in statistical criteria might
-select ``statistically important'' variables (under some suitable
-definition of ``important''), but those need not be the most relevant,
-causally. And with regards to the statistical procedures, we will
-summarize it as follows: please, distrust automated variable selection
-procedures that rely on p-values or F-statistics of individual variables
-(in all their variants, such as stepwise, etc). Much more reasonable are
-strategies based on model-comparison criteria such as AIC and even better
-is bootstrapping the whole process to get estimates of error, predictive
-ability, etc. Even better, of course, is subject-matter guidance on how to
-proceed and what are and are not candidates for deletion and in what
-order. The book by Frank Harrell, ``Regression modelling strategies''
-contains great discussions of these topics. The actual data set used here
-is discussed, also in the context of variable selection, by P.\ Dalgaard
-in chapter 11 of ``Introductory statistics with R''.
+
 
 \subsection{Interactions between continuous variables}\label{regr-int}
 Can we add interactions? Yes, of course. Interactions between continuous
@@ -3040,8 +3025,12 @@ Right now, nothing should stop us from thinking about models where the
 right hand side contains both continuous and discrete variables. Let's do
 it with the cystic fibrosis data set.  ANCOVA refers to this mixture of
 ANOVA and regression and stands for ``Analysis of
-covariance''. Regardless, all of ANOVA, regression, and ANCOVA are special
-types of linear models.
+covariance''\footnote{But this does not mean that we are comparing
+  covariances, as in comparing correlations, between groups; we are
+  comparing groups after adjusting for possible covariates, if that is
+  warranted by the absence of interactions between the continuous and
+  discrete predictors.}. Regardless, all of ANOVA, regression, and ANCOVA
+are especial types of linear models.
 
 
 Let's fit a model where the independent variables are sex (discrete,
@@ -3064,8 +3053,7 @@ would an interaction have looked like? Different slopes for each group.
 Look at the plots:
 
 <<results='hide'>>=
-scatterplot(pemax ~ age | sex, smooth = FALSE, 
-            spread = FALSE,  by.groups = TRUE, data = cystfibr2)
+scatterplot(pemax ~ age | sex, smooth = FALSE, data = cystfibr2)
 @ 
 
 (yes, the best fitting slopes are slightly different, but they are not
@@ -3081,8 +3069,9 @@ one below: \ref{ancova_rept}).
 
 
 One can visualize this also with the function \Rfunction{ancova} in
-package \CRANpkg{HH} (which is loaded when we load
-\CRANpkg{RcmdrPlugin.HH}, so we do not need to load it again);
+package \CRANpkg{HH}%% (which is loaded when we load
+%% \CRANpkg{RcmdrPlugin.HH}
+, so we do not need to load it again);
 \Rfunction{ancova} also produces and anova table (with sequential sums of
 squares, Type I):
 
@@ -3090,8 +3079,11 @@ squares, Type I):
 ancova(pemax ~ age * sex, data = cystfibr2)
 @ 
 
-Note that function \Rfunction{ancova} is not available from the menus. You
-have to type the above expression directly.
+Note that we are using \Rfunction{ancova} just to produce plots. The
+analysis are directly available using \Rfunction{lm}, \Rfunction{anova}, etc.
+
+%% Note that function \Rfunction{ancova} is not available from the menus. You
+%% have to type the above expression directly.
 
 
 %% FIXME: use a model with only age + sex, to go slow.
@@ -3194,9 +3186,7 @@ Let's see the plots:
 \clearpage
 <<results='hide'>>=
 scatterplot(Metabolic.rate..W. ~ Body.mass..g. | Class, 
-            log = "xy", smooth = FALSE, spread = FALSE, 
-            by.groups = TRUE, 
-            data = anage_a_r)
+            log = "xy", smooth = FALSE, data = anage_a_r)
 @ 
 
 \clearpage
@@ -3222,14 +3212,11 @@ How do things look?
 
 <<results='hide'>>=
 scatterplot(Maximum.longevity..yrs. ~ Body.mass..g. | Class, 
-            smooth = FALSE, spread = FALSE, 
-            by.groups = TRUE, 
-            data = anage_a_r)
+            smooth = FALSE, data = anage_a_r)
 @ 
 
 <<echo=TRUE, results='hide'>>=
-ancova(logLongevity ~ logBodyMass * Class, 
-                data = anage_a_r)
+ancova(logLongevity ~ logBodyMass * Class, data = anage_a_r)
 @ 
 
 Note: the tightness of the data around the lines in this model for
@@ -3330,7 +3317,7 @@ We will first use the two simple regression models we fitted in section
 \ref{regr}. %% Make the first one (\Robject{metab}) active and go to
 %% ``Models'', ``Graphs'', ``Basic diagnostic plots''. 
 
-<<fig.show='hold'>>=
+<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation '>>=
 oldpar <- par(mfrow = c(2,2))
 plot(metab)
 par(oldpar)
@@ -3381,7 +3368,7 @@ Cook's distance (function \Rfunction{cooks.distance}).
 
 
 Now, repeat the above with the model that has taken logs:
-<<fig.show='hold'>>=
+<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model after log transformation '>>=
 oldpar <- par(mfrow = c(2,2))
 plot(metablog)
 par(oldpar)
@@ -3453,6 +3440,37 @@ For you to read and play around further:
 
 
 
+\section{Variable and model selection}
+You say you want to select variables? Select them for what? Prediction?
+Interpretation?  Variable selection is a touchy and delicate
+subject. First, procedures based purely in statistical criteria might
+select ``statistically important'' variables (under some suitable
+definition of ``important''), but those need not be the most relevant from
+a biological point of view, or causally, etc
+
+And with regards to the statistical procedures, we will summarize it as
+follows: please, please, please, distrust automated variable selection
+procedures that rely on p-values or F-statistics of individual variables
+(in all their variants, such as stepwise, etc). Careful model comparison,
+for instance using something like \verb@ anova(model1, model2) @, as we
+have seen (e.g., section \ref{model-comp} or \ref{ancova-rept}), might be
+a good idea. Notice, again, that \verb@ anova(model1, model2) @ is all
+about comparing models.
+
+
+If you really need automated or semiautomated procedures, then reasonable
+strategies use model-comparison criteria such as AIC (e.g., with the
+\Rfunction{stepAIC} function from \CRANpkg{MASS}) and even better is then
+bootstrapping the whole process to get estimates of error, predictive
+ability, etc. Even better, of course, is subject-matter guidance on how to
+proceed and what are and are not candidates for deletion and in what
+order. The book by Frank Harrell, ``Regression modeling strategies''
+contains great discussions of these topics. The actual data set used here
+is discussed, also in the context of variable selection, by P.\ Dalgaard
+in chapter 11 of ``Introductory statistics with R''.
+
+
+
 
 \section{Experimental design matters}
 
@@ -3499,25 +3517,38 @@ numbered samples and treatment B to all odd numbered ones, or do you
 randomize order? Etc, etc. And, of course, how should we allocate sample
 sizes to the different \textbf{levels of variation}?
 
-
-Understanding what is the experimental unit is \textbf{absolutely
-  crucial}. And sometimes things are complicated: talk to (collaborate
-with) a statistician as soon as you can. Some high-profile mistakes in the
-literature are derived from misunderstanding experimental design (a
-somewhat amusing half-page comment about this by G.\ Churchill in
-\textit{Science}, 2013, v.\ 343, p.\ 370). In fact, some mistakes made
-during the experimental design phase just cannot be corrected
-later\footnote{R.\ Fisher, one of the fathers of modern statistics, as
-  well as modern quantitative and evolutionary genetics, is often quoted
-  in this context because he said ``To consult the statistician after an
-  experiment is finished is often merely to ask him to conduct a post
-  mortem examination. He can perhaps say what the experiment died of.''}
-
-
+ 
+ Understanding what is the experimental unit is \textbf{absolutely
+   crucial}. And sometimes things are complicated: talk to (collaborate
+ with) a statistician as soon as you can. Some high-profile mistakes in the
+ literature are derived from misunderstanding experimental design (a
+ somewhat amusing half-page comment about this by G.\ Churchill in
+ \textit{Science}, 2013, v.\ 343, p.\ 370). In fact, some mistakes made
+ during the experimental design phase just cannot be corrected
+ later\footnote{R.\ Fisher, one of the fathers of modern statistics, as
+   well as modern quantitative and evolutionary genetics, is often quoted
+   in this context because he said ``To consult the statistician after an
+   experiment is finished is often merely to ask him to conduct a post
+   mortem examination. He can perhaps say what the experiment died of.''}.
 
 
-% \section{Appendix}
+\section{Additional reading and what next}\label{biblio}
+
+Many books have been devoted to linear models, ANOVA, et al. And in R (not
+necessarily through R Commander) there is a wide variety of procedures
+implemented. To begin with, look at the great book by Fox and Weisberg
+``An R companion to applied regression''. Take also a look at chapters 6
+and 7 of Dalgaard's ``Introductory statistics with R'' and chapters 8 and
+9 of Kabakoff's ``R in action''. This should get you going. From here, you
+will probably want to look at generalized linear models, survival
+analysis, mixed effects models, nonlinear models, and generalized additive
+models to name some extensions of linear models.
+
+
+\appendix
+
 \section{What if we did not recode training?}\label{nofactor}
+
 Suppose we had not recoded training but we had fitted a linear model. This
 would have happened:
 
@@ -3527,19 +3558,10 @@ summary(lmMITnofactor)
 Anova(lmMITnofactor)
 @ 
 
-See how the degrees of freedom make no sense.
+See how the degrees of freedom for training make no sense.
 
 
 
-
-\section{Additional reading}
-
-Many books have been devoted to linear models, ANOVA, et al. And in R (not
-necessarily through R Commander) there is a wide variety of procedures
-implemented. To begin with, look at the great book by Fox and Weisberg
-``An R companion to applied regression''. Take also a look at chapters 6
-and 7 of Dalgaard's ``Introductory statistics with R'' and chapters 8 and
-9 of Kabakoff's ``R in action''. This should get you going.
 
 
 
@@ -3558,36 +3580,7 @@ sessionInfo()
 
 
 
-
-
-
-
-
-
-
-%% \bibliography{lesson2}
-
-
-%% \section{Session info and packages used}
-
-%% This is the information about the version of R and packages used when
-%% producing this document:
-%% <<echo=FALSE,results='hide',error=FALSE>>=
-%% options(width=60)
-%% @ 
-
-%% <<>>=
-%% sessionInfo()
-%% @ 
-
-
 \end{document}
-
-%% remember to use bibexport to keep just the minimal bib needed
-%% bibexport -o extracted.bib OncoSimulR.aux
-%% rm OncoSimulR.bib
-%% mv extracted.bib OncoSimulR.bib
-%% and then turn URL of packages into notes
 
 
 %%% Local Variables:
