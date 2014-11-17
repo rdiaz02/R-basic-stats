@@ -2264,7 +2264,7 @@ Let us use the cholesterol data again.
 %% \ref{recode}. Call the data \Robject{dcholest}.
 
 
-\subsection{Fitting a two-way ANOVA}\label{twoway}
+\subsection{Fitting a two-way ANOVA}\label{twoway-fitting}
 
 %% As usual, go to ``Statistics'', ``Means'', and then ``Multiway
 %% ANOVA''. Call it ``cholanova''
@@ -3453,7 +3453,7 @@ follows: please, please, please, distrust automated variable selection
 procedures that rely on p-values or F-statistics of individual variables
 (in all their variants, such as stepwise, etc). Careful model comparison,
 for instance using something like \verb@ anova(model1, model2) @, as we
-have seen (e.g., section \ref{model-comp} or \ref{ancova-rept}), might be
+have seen (e.g., section \ref{model-comp} or \ref{ancova_rept}), might be
 a good idea. Notice, again, that \verb@ anova(model1, model2) @ is all
 about comparing models.
 
