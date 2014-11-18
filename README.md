@@ -10,8 +10,8 @@ programming and using R, without emphasis in statistics.
 
 
 
-These notes are very similar to those in the
-[BM-1](https://github.com/rdiaz02/BM-1), but those notes use [R
+These notes are very similar to those in the [BM-1
+repository](https://github.com/rdiaz02/BM-1), but those notes use [R
 Commander](http://socserv.mcmaster.ca/jfox/Misc/Rcmdr) whereas these notes
 do not (the intended audience is different).
 
