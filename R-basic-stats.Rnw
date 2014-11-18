@@ -1,31 +1,5 @@
 %\VignetteEngine{knitr::knitr}
 \documentclass[a4paper,11pt]{article}
-<<echo=FALSE,results='hide',error=FALSE>>=
-require(knitr, quietly = TRUE)
-opts_knit$set(concordance = TRUE)
-opts_knit$set(stop_on_error = 2L)
-## require(car, quietly = TRUE)
-@ 
-
-%% For using listings, so as to later produce HTML
-%% uncommented by the make-knitr-hmtl.sh script
-%%listings-knitr-html%%\usepackage{listings}
-%%listings-knitr-html%%\lstset{language=R}
-%%listings-knitr-html%%<<error=FALSE, include=FALSE, cache=FALSE>>=
-%%listings-knitr-html%%opts_chunk$set(fig.path = 'figures_html/listings-')
-%%listings-knitr-html%%options(formatR.arrow = TRUE)
-%%listings-knitr-html%%options(replace.assign = TRUE)
-%%listings-knitr-html%%render_listings()
-%%listings-knitr-html%%@ 
-
-
-%% Packages needed: knitr, BiocStyle needs to be 1.2.0 or above
-<<packages,echo=FALSE,results='hide',message=FALSE>>=
-require(BiocStyle, quietly = TRUE)
-## suppressMessages(library(Rcmdr, quietly = TRUE, warn.conflicts = FALSE))
-## require(doBy, quietly = TRUE)
-## require(RcmdrPlugin.plotByGroup, quietly = TRUE)
-@ 
 
 %% not if using BiocStyle
 %% \usepackage[authoryear,round,sort]{natbib}
@@ -46,22 +20,45 @@ require(BiocStyle, quietly = TRUE)
 %% \newcommand{\Burl}[1]{\blu{\url{#1}}}
 \newcommand{\red}[1]{{\textcolor {red} {#1}}}
 \newcommand{\Burl}[1]{{\textcolor{blue}{\url{#1}}}}
-
 %\usepackage{tikz}
 %\usetikzlibrary{arrows,shapes,positioning}
-
 \usepackage[latin1]{inputenc}
 %\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-
 \usepackage[copyright]{ccicons} %% for the CC license icons
 \usepackage{gitinfo2}
 
+%% For using listings, so as to later produce HTML
+%% uncommented by the make-knitr-hmtl.sh script
+%%listings-knitr-html%%\usepackage{listings}
+%%listings-knitr-html%%\lstset{language=R}
+
+<<setup,include=FALSE,cache=FALSE>>=
+require(knitr)
+opts_knit$set(concordance = TRUE)
+opts_knit$set(stop_on_error = 2L)
+## next are for listings, to produce HTML
+##listings-knitr-html%%options(formatR.arrow = TRUE)
+##listings-knitr-html%%render_listings()
+@ 
+
+
+%% BiocStyle needs to be 1.2.0 or above
+<<packages,echo=FALSE,results='hide',message=FALSE>>=
+require(BiocStyle, quietly = TRUE)
+@ 
 <<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
 BiocStyle::latex()
 @
-%% %% Modify margins
+%% Modify margins; must issue after BioC style
 \geometry{verbose,a4paper,tmargin=23mm,bmargin=23mm,lmargin=28mm,rmargin=28mm}
+
+\begin{document}
+
+%% Only takes effect after begin document
+%%listings-knitr-html%%<<listingfigdir,error=FALSE, include=FALSE, cache=FALSE>>=
+%%listings-knitr-html%%opts_chunk$set(fig.path = 'figures_html/listings-')
+%%listings-knitr-html%%@ 
 
 
 
@@ -79,7 +76,6 @@ BiocStyle::latex()
 
 \date{\gitAuthorDate\ {\footnotesize (Release\gitRels: Rev: \gitAbbrevHash)}}
 
-\begin{document}
 \maketitle
 
 \tableofcontents
@@ -274,8 +270,7 @@ require(RcmdrMisc)
 
 To get you going, I show all those for p53.
 <<out.width='11cm',out.height='11cm'>>=
-with(dp53, Hist(p53, groups = cond, 
-                col = "darkgray"))
+with(dp53, Hist(p53, groups = cond, col = "darkgray"))
 @
 
 <<fig.height=10, fig.width=8,results='hide'>>=
