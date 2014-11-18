@@ -7,6 +7,18 @@ opts_knit$set(stop_on_error = 2L)
 ## require(car, quietly = TRUE)
 @ 
 
+%% For using listings, so as to later produce HTML
+%% uncommented by the make-knitr-hmtl.sh script
+%%listings-knitr-html%%\usepackage{listings}
+%%listings-knitr-html%%\lstset{language=R}
+%%listings-knitr-html%%<<error=FALSE, include=FALSE, cache=FALSE>>=
+%%listings-knitr-html%%opts_chunk$set(fig.path = 'figure/listings-')
+%%listings-knitr-html%%options(formatR.arrow = TRUE)
+%%listings-knitr-html%%options(replace.assign = TRUE)
+%%listings-knitr-html%%render_listings()
+%%listings-knitr-html%%@ 
+
+
 %% Packages needed: knitr, BiocStyle needs to be 1.2.0 or above
 <<packages,echo=FALSE,results='hide',message=FALSE>>=
 require(BiocStyle, quietly = TRUE)
@@ -1025,7 +1037,7 @@ Wilcoxon as with the t-test. Nonparametric tests are not
 An excellent non-parametrics book is Conover's ``Practical nonparametric
 statistics'', in its 3rd edition (it is so awesome, I have two copies, one
 at home and one at the office ---you can get one from Amazon for about 20
-\texteuro{}). (For more general categorical data analysis, Agresti's
+euros). (For more general categorical data analysis, Agresti's
 ``Categorical data analysis'' is a must. It is now also in its third
 edition. There is, by the same author, a smaller ``Introduction to
 categorical data analysis'').
