@@ -132,7 +132,7 @@ you type the code and change it, etc.
 
 \part{Comparing two groups}
 
-
+\section{Introduction to comparing two groups}
 Someone in your lab has measured the expression of several genes from a
 set of patients with and without cancer. You are in charge of looking at
 the data and answering the question ``Does the expression of the genes
