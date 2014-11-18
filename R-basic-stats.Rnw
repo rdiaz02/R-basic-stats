@@ -96,15 +96,6 @@ International License:
 \centerline \ccbysa
 
 
-%% \section{Introduction}
-
-%% blablabla
-
-%% basic stats
-
-%% assumes some familiarity with R
-
-
 \section{Introduction}
 This document is a brief reviews of statistical approaches for comparing
 two groups (t-tests et al.) and linear models (anovas, regressions,
@@ -160,7 +151,6 @@ differ between patients with and without cancer?''.
 \item \Robject{P53.txt}
 \item \Robject{MYC.txt}
 \item \Robject{BRCA2.txt}
-%%  \item ACRB.txt
 \end{itemize}
 
 

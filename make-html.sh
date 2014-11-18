@@ -9,6 +9,14 @@ cp $FILE $FILE2
 sed -i 's/^%%listings-knitr-html%%//' $FILE2
 # but nameref does not work either
 sed -i 's/\\nameref{/\\ref{/' $FILE2
+
+# and CRNApkg and Rfunction and others confuse it
+
+sed -i 's/\\CRANpkg{/\\texttt{/' $FILE2
+sed -i 's/\\Rfunction{/\\texttt{/' $FILE2
+## sed -i 's/\\CRANpkg{/\\texttt{/' $FILE2
+
+
 $RSCRIPT -e 'library(knitr); knit("'$FILE2'")'
 
 # do not use left overs
