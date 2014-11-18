@@ -28,12 +28,12 @@ mv $BASENAME2.html $BASENAME.html
 
 mkdir $BASENAME-html-dir
 cp $BASENAME.html ./$BASENAME-html-dir/.
-cp -a figure ./$BASENAME-html-dir/.
+cp -a figures_html ./$BASENAME-html-dir/.
 zip -r $BASENAME-html-dir.zip $BASENAME-html-dir
 
 ## sweave2html from http://biostat.mc.vanderbilt.edu/wiki/Main/SweaveConvert#Converting_from_LaTeX_to_html  
 
 ## otherwise, the PDF document uses some of those
-rm ./figure/*.pdf
-rm ./figure/*.png
+# rm ./figure/*.pdf
+# rm ./figure/*.png
 
