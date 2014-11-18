@@ -32,8 +32,11 @@ cp -a figures_html ./$BASENAME-html-dir/.
 zip -r $BASENAME-html-dir.zip $BASENAME-html-dir
 
 ## sweave2html from http://biostat.mc.vanderbilt.edu/wiki/Main/SweaveConvert#Converting_from_LaTeX_to_html  
+<<<<<<< HEAD
 
 ## otherwise, the PDF document uses some of those
 # rm ./figure/*.pdf
 # rm ./figure/*.png
 
+=======
+>>>>>>> parent of 12d07f4... clean up ./figure dir (o.w. end up in pdf)
