@@ -1254,7 +1254,10 @@ Power can be computed before hand to:
 
 
 Please note: \textbf{it makes little sense} to compute the power of a test
-after the fact. It tells you nothing valuable.
+after the fact. It tells you nothing valuable\footnote{The paper by Hoenig
+and Heisey, ``The abuse of power: the pervasive fallacy of power
+calculations for data analysis'', \textit{The American Statistician},
+2001, 55: 19--24, explains this in more detail..
 
 
 
