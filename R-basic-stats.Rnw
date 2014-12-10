@@ -642,6 +642,16 @@ paired t-test. \red{Why?} When answering this question think about the
 idea of using each subject as its own control.
 
 
+
+
+How can we check the above?
+
+<<>>=
+all(with(dmyc, table(id, cond)) == 1)
+@ 
+
+
+
 \subsection{Paired t-test}
 Let's do the paired t-test.
 
@@ -888,6 +898,22 @@ for(i in unique(dmyc$id))
            col = "red")
 @ 
 
+
+
+Alternatively (though I do not see much of a gain here):
+<<>>=
+stripchart(myc ~ cond, vertical = TRUE, data = dmyc)
+f1 <- function(x) {
+    segments(x0 = 1, x1 = 2, 
+             y0 = dmyc$myc[dmyc$cond == "Cancer" & dmyc$id == x], 
+             y1 = dmyc$myc[dmyc$cond == "NC" & dmyc$id == x], 
+             col = "red")
+}
+sapply(unique(dmyc$id), f1) 
+@ 
+
+
+
 %% You can copy the above code in the R Script window and click on
 %% ``Submit'', or you can copy it in the RStudio console. 
 
@@ -1130,8 +1156,8 @@ differences might differ if we use a transformation on the original data
 and then rank the within-subject differences.
 
 
-We will use R directly here (as before, you can copy this code in the R
-Script window and click ``Submit'', or copy it in the RStudio console, etc)
+%% We will use R directly here (as before, you can copy this code in the R
+%% Script window and click ``Submit'', or copy it in the RStudio console, etc)
 
 %% <<>>=
 %% ## taking log does not change things when using the two-sample Wilcoxon
