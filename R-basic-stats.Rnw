@@ -264,8 +264,8 @@ Make sure you do the following plots: % (in the menu, under ``Graphs''):
 We will load a few packages we need:
 
 <<>>=
-require(car)
-require(RcmdrMisc)
+library(car)
+library(RcmdrMisc)
 @ 
 
 To get you going, I show all those for p53.
@@ -672,7 +672,7 @@ dmyc
 
 However, to ensure that order is OK we could have pre-ordered the data
 by patient ID and by condition within patient (this second step isn't
-really needed):
+really needed in this case, but is in general):
 
 <<>>=
 dmycO <- dmyc[order(dmyc$id, dmyc$cond), ]
@@ -1916,7 +1916,7 @@ Sure. %%Go to ``Models'', ``Graphs'', ``Effects plots'':
 A simple way of doing it is using the \Rfunction{allEffects} function from
 the \CRANpkg{effects}:
 <<out.width='9cm'>>=
-require(effects)
+library(effects)
 plot(allEffects(AnovaMIT), ask = FALSE)
 @ 
 
@@ -2176,7 +2176,7 @@ is an adjusted p-value?  The classical paper from Wright, 1992, ``Adjusted
 p-values for simultaneous inference'', \textit{Biometrics}, 48:
 1005--1013, has in p.\ 1006 this definition of adjusted p-value: ``The
 adjusted $P$-value for a particular hypothesis within a collection of
-hypotheses, then, is the smaleest overall (i.e., 'experimentwise')
+hypotheses, then, is the smallest overall (i.e., 'experimentwise')
 significance level at which the particular hypothesis would be rejected.''
 This might sound like a mess, but it really ain't. Think about it. It is
 so nice that it makes comparisons very simple, as Wright explains: ``An
@@ -2251,13 +2251,13 @@ cbind(p.values, adjusted.p.values)
 @ 
 
 
-How do we interpret this? Here I will only cover the very basics (if you
-want more details, sing up for BM-13 :-) ). But go back a couple of
-paragraphs, and re-read the definition of adjusted p-value for the
-FDR. So, for example, if we keep as ``significant'' all the genes with a
-p-value (not adjusted p-value, but p-value, so the last first three) $\leq
-0.30$, the FDR (the expected number of false discoveries) will be 0.40
-(the FDR-adjusted p-value for the gene with $p-$value of 0.03).
+How do we interpret this? Here I will only cover the very basics. But go
+back a couple of paragraphs, and re-read the definition of adjusted
+p-value for the FDR. So, for example, if we keep as ``significant'' all
+the genes with a p-value (not adjusted p-value, but p-value, so the last
+first three) $\leq 0.30$, the FDR (the expected number of false
+discoveries) will be 0.40 (the FDR-adjusted p-value for the gene with
+$p-$value of 0.03).
 
 
 
@@ -2354,7 +2354,7 @@ variable depends on the effect of the other. In this case, even if Drug B
 overall leads to a larger change (decrease) in cholesterol, its effects
 depend on the Diet. This has practical consequences: is Drug B a better
 drug?  It depends on the diet of the patient: for the HF (high fat) diet,
-Drub B is clearly worse than Drug A.
+Drug B is clearly worse than Drug A.
 
 Interaction is also called ``non-additivity'' because the model deviates
 from a simple model like
@@ -2373,11 +2373,10 @@ You can also see interaction plots using other functions from R. For example:
 with(dcholest, interaction.plot(Drug, Diet, y, type = "b"))
 @ 
 
-or using the \CRANpkg{HH} package%% :and going to ``Graphs'',
-%% ``Plot of two-way interactions'' %this from package ``HH'' (I will first load it)
+or using the \CRANpkg{HH} package
 
 <<out.width='14cm', out.height='14cm'>>=
-require(HH)
+library(HH)
 interaction2wt(y ~ Diet + Drug, data = dcholest)
 @ 
 
@@ -2879,7 +2878,7 @@ The second plot we will do requires you to load \CRANpkg{HH}%% can get from ``Mo
 %% something like
 
 <<out.width = '12cm', out.height = '12cm'>>=
-require(HH)
+library(HH)
 ci.plot(metab)
 @
  
