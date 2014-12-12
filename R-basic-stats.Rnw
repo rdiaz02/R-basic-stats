@@ -1283,7 +1283,7 @@ Please note: \textbf{it makes little sense} to compute the power of a test
 after the fact. It tells you nothing valuable\footnote{The paper by Hoenig
 and Heisey, ``The abuse of power: the pervasive fallacy of power
 calculations for data analysis'', \textit{The American Statistician},
-2001, 55: 19--24, explains this in more detail..
+2001, 55: 19--24, explains this in more detail.}
 
 
 
@@ -2416,7 +2416,8 @@ summary(m4)
 
 
 
-\subsubsection{What is the overall intercept with \texttt{contr.treatment}?*}
+\subsubsection{What is the overall intercept with \texttt{contr.treatment}
+  in the no-interaction model?*}
 
 If you recall the model we write, then, if we look at the cells, with
 \texttt{contr.treatment}, the intercept (the abstract ``a1b1'' reference
@@ -2433,7 +2434,8 @@ or the first column, those that are ``b1''
 1/2 * (means[1, 1] + (means[2, 1] - coefficients(m1)["Aa2"]))
 @ 
 
-
+(I am keeping things simple here; we could have looked at
+\Rfunction{model.matrix}, etc, too)
 
 \subsubsection{Other types of coding: \texttt{contr.sum}}
 
@@ -2762,7 +2764,7 @@ factors, or with only a single factor. For example, the differences
 between sexes are of about 2.2 (the coefficient that says "sexMale") and
 the differences between drugs of about 3.8 (the coefficient that says
 "drugB").  However, the standard error, and thus the t value and the
-p-value change. In the case of sex, they change a lot.
+p-value change.
 
 Again, the key is to understand that even if the coefficient does not
 change whether or not the other factor is included in the model (and it
@@ -2804,7 +2806,7 @@ anova(mdrug)
 Notice how the Mean Sq for each factor is the same as in the previous
 tables. So the Mean Squares for Sex do not depend on whether or not drug
 is in the model. But the F statistic (and the p-value) do change a
-lot. Why? Because what changes a lot are the Mean Sq. of the
+lot. Why? Because what changes a lot are the Mean Sq.\ of the
 residuals. And why is that? Because the other factor, the one we have not
 included, does indeed explain a lot of variability, but in these two last
 tables, since the other factor is not in the model, that variability is
@@ -2893,8 +2895,9 @@ regression procedure will estimate $\alpha$ and $\beta$, finding values
 ($\hat{\alpha}, \hat{\beta}$) that produce a \textbf{best fitting line}
 (note: it is a line, not an arbitrary curve).
 
-%% Let's use a simple data set that relates data set from the base package, ``women''. Go to ``Data'',
-%% ``Data in packages'' and select \Robject{women} (it is in package \CRANpkg{datasets})
+%% Let's use a simple data set that relates data set from the base
+%% package, ``women''. Go to ``Data'', ``Data in packages'' and select
+%% \Robject{women} (it is in package \CRANpkg{datasets})
 
 
 %% \begin{figure}[h!]
