@@ -2416,26 +2416,26 @@ summary(m4)
 
 
 
-\subsubsection{What is the overall intercept with \texttt{contr.treatment}
-  in the no-interaction model?*}
+%% \subsubsection{What is the overall intercept with \texttt{contr.treatment}
+%%   in the no-interaction model?*}
 
-If you recall the model we write, then, if we look at the cells, with
-\texttt{contr.treatment}, the intercept (the abstract ``a1b1'' reference
-level) is either:
+%% If you recall the model we write, then, if we look at the cells, with
+%% \texttt{contr.treatment}, the intercept (the abstract ``a1b1'' reference
+%% level) is either:
 
-Use the first row, all those that are ``a1''
-<<>>=
-1/2 * (means[1, 1] + (means[1, 2] - coefficients(m1)["Bb2"]))
-@ 
+%% Use the first row, all those that are ``a1''
+%% <<>>=
+%% 1/2 * (means[1, 1] + (means[1, 2] - coefficients(m1)["Bb2"]))
+%% @ 
 
-or the first column, those that are ``b1''
+%% or the first column, those that are ``b1''
 
-<<>>=
-1/2 * (means[1, 1] + (means[2, 1] - coefficients(m1)["Aa2"]))
-@ 
+%% <<>>=
+%% 1/2 * (means[1, 1] + (means[2, 1] - coefficients(m1)["Aa2"]))
+%% @ 
 
-(I am keeping things simple here; we could have looked at
-\Rfunction{model.matrix}, etc, too)
+%% (I am keeping things simple here; we could have looked at
+%% \Rfunction{model.matrix}, etc, too)
 
 \subsubsection{Other types of coding: \texttt{contr.sum}}
 
@@ -3688,6 +3688,16 @@ is discussed, also in the context of variable selection, by P.\ Dalgaard
 in chapter 11 of ``Introductory statistics with R''.
 
 
+To give some examples (look at them carefully, and compare with what we
+did by hand, and with whether or not these are the models you would use):
+
+<<results='hide'>>=
+library(MASS)
+stepAIC(mcyst2, direction = "both")
+stepAIC(mcyst, direction = "both")
+stepAIC(longev_b_r, direction = "both")
+stepAIC(metab_b_r, direction = "both")
+@ 
 
 
 \section{Experimental design matters}
