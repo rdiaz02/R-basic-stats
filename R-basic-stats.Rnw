@@ -1008,6 +1008,13 @@ linear models and ANOVAs will be covered in much more detail \ldots in the
 next part!
 
 
+%%% % And also 
+
+%% <<>>=
+%% summary(aov(myc ~ cond + Error(id/cond), data = dmyc))
+%% summary(aov(myc ~ cond + Error(cond), data = dmyc))
+%% @ 
+
 
 
 \section{One-sample t-test}\label{sec:one-sample-t}
