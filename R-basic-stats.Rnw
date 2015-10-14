@@ -1383,6 +1383,13 @@ aggbrca <- aggregate(dbrca[,c("brca2"), drop = FALSE],
                          id = dbrca$id), FUN = mean)
 @ 
 
+
+You can also call \Rfunction{aggregate} in a simpler way in this case:
+
+<<>>=
+aggbrca <- aggregate(brca2 ~ cond + id, data = dbrca, FUN = mean)
+@ 
+
 We want to double check that we have the exact same number of measures per
 subject. How? A simple procedure is to aggregate again (give the output
 another name) but using ``length'' instead of ``mean''. Now we will be
@@ -1390,6 +1397,11 @@ aggregating over only ``id'' (so we aggregate brca2 and cond) and also
 over both ``id'' and ``cond'', to double check. Do you understand why we
 are doing this?
 
+<<>>=
+aggregate(brca2 ~ cond + id, data = dbrca, FUN = length)
+aggregate(brca2 ~ id, data = dbrca, FUN = length)
+aggregate(. ~ id, data = dbrca, FUN = length)
+@ 
 
 
 Now, let's do a t-test on the aggregated data. Pay attention to the
@@ -3291,7 +3303,27 @@ We've said this: ANOVAs are a type of linear models. Thus, in R (and in
 most statistical packages) you can get the output for an ANOVA by
 different routes. Let us make sure we understand this, and can interpret
 the output from using the different routes available to us. In fact, we
-have jumped from using \Rfunction{aov} to \Rfunction{lm}. Let us see a
+have jumped from using \Rfunction{aov} to \Rfunction{lm}.
+
+This is also a good time to recap and make sure we understand ideas we
+have used like ``more complex models'' and ``number of
+parameters''. Before we see the examples with code below, make sure we can
+understand how many parameters (and how many degrees of freedom are taken
+by the model) and what they represent in models like:
+\begin{itemize}
+\item A simple linear regression like \verb@ y ~ x@.
+\item A multiple linear regression like \verb@ y ~ x + z@.
+\item A one-way ANOVA like the one for the training regimes, with three
+  possible training regimes: \verb@y ~ ftraining@.
+\item A two-way ANOVA with interactions, like the one about Drug (two
+  levels) and Diet (three levels): \verb@y ~ Drug*Diet@.
+\item A two-way ANOVA without interactions, like one we might fit to the
+  Drug and Diet data: \verb@y ~ Drug + Diet@.
+\end{itemize}
+
+
+
+Let us see a
 simple example:
 
 <<>>=
@@ -3336,6 +3368,41 @@ This is the default parameterization in R. But is is not the only one available.
 
 Of course, the above applies to more than one factor, and to factors with
 an arbitrary number of levels.
+
+
+
+%% Explaining parameters for a two-way. The interaction is simple, since we
+%% just have each cell mean in contr.treatment. The additive is messier. A
+%% numerical example
+%% <<>>=
+%% y <- c(1:9, 20, 21, 22)
+%% X <- rep(rep(c("1", "2"), c(3, 3)), 2)
+%% U <- rep(c("1", "2"), c(6, 6))
+%% anova(lm(y ~ U * X))
+%% tapply(y, list(X, U), mean)
+%% summary(lm(y ~ X * U))
+%% ## the X2:U2 = 21 - (2 + 3 + 6)
+%% summary(lm(y ~ X  + U))
+%% m1 <- lm(y ~ X + U)
+%% model.matrix(m1)
+%% fitted(m1)
+%% ## fitted for first group are the intercept term
+%% mean(y) ## 9
+
+%% ## effect of X:2: 0.5 * ((5 -2) + (21 - 8)) = 8
+%% ## effect of U:2: 0.5 * ((8 -2) + (21 - 5)) = 11
+
+%% ## what is the first cell? the overall mean with the effect of X:1 and
+%% ## U:1, which is the overall mean minus half the effects
+
+%% 9 - 11/2 - 8/2
+
+%% ## Yes, the first cell is the first cell UNDER that additive model. You can't 
+%% ## just put the first cell mean in there.
+%% @ 
+
+
+
 
 \clearpage
 \section{Continuous and discrete independent variables 
@@ -3613,6 +3680,141 @@ variables, using the \Robject{hellung} dataset included in \CRANpkg{ISwR}.
 We can extend the models to incorporate more variables, add interactions,
 etc. Interactions can involve more than two variables, can involve
 continuous and discrete variables, etc.
+
+
+\section{Dealing with ratios}\label{ratios}
+
+In biology (as well as in other disciplines) it is common for researchers
+to use ratios of variables to try to standardize/normalize a
+variable. This procedure looks deceptively simple, but it is not. Here, we
+will explore some of the problems\footnote{I thank Alba Concepción, a
+  former student of BM-1, for asking me questions that prompted me to
+  write this section. She also provided the link to Curran-Everett's
+  paper}. You can find more details\footnote{With discussion about errors
+  in the X variable, an issue we have not covered here} in this commentary
+from Curran-Everett:
+\Burl{http://ajpadvan.physiology.org/cgi/doi/10.1152/advan.00053.2013}.
+
+Before we start, though, note that this section should not really be
+necessary after previous sections :-).
+
+
+
+
+So that nothing is hidden, I will simulate the data here, but in these
+notes I won't provide details about how/why the data have been simulated
+that way (the code is below; look at it if you want). We will pretend
+there is a response variable, called ``Y'', two groups (``g1'' and ``g2'')
+and another variable, called ``Z''. Z might be some reporter protein, or
+something that can be taken as a proxy for cell volume, etc.
+
+
+<<>>=
+set.seed(1) ## irrelevant, but so that we all 
+            ## get the same numbers
+n <- 20
+sd <- 0.5
+@ 
+
+
+
+\subsection{A misleading case with parallel lines}
+\label{mislead-ratios-1}
+
+
+<<>>=
+z1 <- runif(n, 1, 10)
+t1 <- factor(rep(c("g1", "g2"), rep(n, 2)))
+y1 <-  2 * z1 + 3 * as.numeric(t1) + rnorm(n, 0, sd)
+data1 <- data.frame(Y = y1, Z = z1, Group = t1, Ratio = y1/z1)
+@ 
+
+
+%%, fig.cap="Parallel slopes but ratio differences?">>=
+<<fig.height=6,fig.cap='Parallel slopes but ratio differences?'>>= 
+par(mfrow = c(1, 2))
+with(data1, plot(Ratio ~ Group))
+with(data1, plot(Y ~ Z, col = c("red", "blue")[Group]))
+abline(lm(Y ~ Z, subset(data1, Group == "g1")), col = "red")
+abline(lm(Y ~ Z, subset(data1, Group == "g2")), col = "blue")
+legend(x = 3, y = 20, legend = c("g1", "g2"), col = c("blue", "red"),
+       pch = 1)
+
+@ 
+
+<<>>=
+summary(lm(Y ~ Z * Group, data = data1))
+t.test(Ratio ~ Group, data = data1)
+## This is the equivalent to the t-test, except the
+## t-test used by default by R does not assume equal variances
+summary(aov(Ratio ~ Group, data = data1))
+@ 
+
+The lines are perfectly parallel, but the test for ratios says they
+differ. Why? Because it is forcing a regression through the origin. Note
+the the linear model does get the results right: there are no differences
+in the rate of change of Y relative to Z, but the groups differ in
+intercept. As you can see, the analysis with ratios is misleading.
+
+
+\subsection{A misleading case where ratios differ}
+\label{mislead-ratios2}
+
+Generate  the data:
+<<>>=
+set.seed(123)
+sd <- 0.1
+z2 <- seq(from = 1, to = 3, length.out = n)
+ya <- z2 + rnorm(n, 0, sd)
+yb <- 0.5 * z2 + 1 + rnorm(n, 0, sd)
+y <- c(ya, yb)
+tf <- factor(rep(c("g1", "g2"), rep(n, 2)))
+z <- rep(z2, 2)
+data2 <- data.frame(Y = y, Z = z, Group = tf, Ratio = y/z)
+@ 
+
+
+The figure and analysis:
+%% fig.cap="Different slopes and no ratio differences?">>=
+<<fig.height=6,fig.cap='Different slopes and no ratio differences?'>>=
+par(mfrow = c(1, 2))
+with(data2, plot(Ratio ~ Group))
+with(data2, plot(Y ~ Z, col = c("red", "blue")[Group]))
+abline(lm(Y ~ Z, subset(data2, Group == "g1")), col = "red")
+abline(lm(Y ~ Z, subset(data2, Group == "g2")), col = "blue")
+legend(x = 1.5, y = 2.5, legend = c("g1", "g2"), col = c("blue", "red"),
+       pch = 1)
+@ 
+
+<<>>=
+summary(lm(Y ~ Z * Group, data = data2))
+t.test(Ratio ~ Group, data = data2) ## or do an ANOVA, as above
+@ 
+
+
+The ratios do differ, if we do not force them through the origin: the rate
+of change of Y relative to Z differs between the two groups. But just
+comparing the ratios will not detect it. Again, a linear model does detect
+it just fine: you see a strong interaction between slope and
+group. And, again, the analysis of ratios is misleading.
+
+
+
+\subsection{Diagnostics et al.\ and other warning signs}
+
+If you look closely, the data show warning signals, such as possible
+differences in variances of ratios. And if you have no idea about the
+model, you might be able to compare several and use diagnostics, as
+explained in section \ref{diagnostics} to choose among models. But, in
+general, ratios are not the way to. And using diagnostics might require a
+decently large sample size. Summary: only use ratios if you really know
+what you are doing and have good reasons to do it. Otherwise, use linear
+models.
+
+By the way: we have covered just two very simple examples. Things can of
+course get a lot more complicated with non-linear relationships, etc.
+
+
 
 
 
