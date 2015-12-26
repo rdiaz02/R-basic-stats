@@ -685,6 +685,200 @@ t.test(myc.nc, myc.cancer, paired = TRUE)
 
 
 
+\subsection{Reshaping the data for a paired t-test}
+
+\subsubsection{The shape of the data}\label{datashape}
+Often, when you know you are only going to do a paired test you can
+organize your data in a table structure like the one in Table 
+\ref{unstacked}:
+
+\begin{table}[h!]
+\begin{tabular}{ccc}
+  SubjectID&Tumor&Non-Tumor\\
+  \hline
+  pepe&23&45\\
+  maria&29&56\\
+  \ldots&\ldots&\ldots\\
+\end{tabular}
+\caption{Paired data in a ``unstacked'' shape/format.}\label{unstacked}
+\end{table}
+
+
+That looks ok, but is really a very limiting format for the data. Think
+about what you would do if you had additional ``tumor'' and ``non-tumor''
+data per subject, or you had additional covariates for each measure,
+etc. That is why we often want to have the data in a ``stacked'' format as
+in Table \ref{stacked}:
+
+
+\begin{table}[h!]
+\begin{tabular}{ccc}
+  SubjectID&Myc&Condition\\
+  \hline
+  pepe&23&tumor\\
+  pepe&45&nontumor\\
+  maria&29&tumor\\
+  maria&56&nontumor\\
+  \ldots&\ldots&\ldots\\
+\end{tabular}
+\caption{Paired data in a ``stacked'' shape/format.}\label{stacked}
+\end{table}
+
+This is arguably a much more useful way of storing the data for most
+general analyses and we can keep adding additional information if we need
+to. Whole papers have been written about these issues\footnote{For
+  example, Wickham's ``Tidy data'', in the \textit{Journal of Statistical
+    Software}: \Burl{http://www.jstatsoft.org/v59/i10}}, but we will stop
+here.
+
+\subsubsection{Reshaping our data}\label{reshaping}
+
+%% In our case, we cannot do a paired t-test directly with our data because
+%% of the way the data have been given to us. We first need to reshape the
+%% data as R Commander ---in contrast to using directly R--- will not allow
+%% us to carry out a paired t-test on these data as they are. Of course, you
+%% could also do this outside R if you want and then import the data so that
+%% the two values of myc expression for a subject are on the same row but
+%% that is ugly.
+
+So that is what we want: the values of myc of the same subject to be on
+the same row. We will do this reshaping in several different ways.
+
+There are many alternative approaches for reshaping the data directly from
+the command line. Many, many, many\footnote{For instance:
+  \Burl{http://www.cookbook-r.com/Manipulating_data/Converting_data_between_wide_and_long_format/}
+  or \Burl{https://rpubs.com/bradleyboehmke/data_wrangling}; these are
+  heavily biased towards the ``Hadley's way''.}. And yes, it is unavoidable
+that this will get a little bit complicated. But manipulating and
+reshaping data must be done with a lot of care. You do not need to
+remember the details here, you just need to be aware of the issues.
+
+
+%% \subsubsection{Reshaping using the menus}\label{reshapemenu}
+
+
+
+%% \begin{enumerate}
+%% \item Create a data set that contains only the values for observations
+%%   with status ``Cancer''. (``Subset'', under ``Active data set''). Use the
+%%   ``Subset expression'' you want; in this case 
+%%   \verb@cond == ``Cancer''@. Call this data set cc.
+  
+%% \item Make sure ``id'' is used as row name. Do this using ``Set case
+%%   names'' under ``Active data set''. Can you understand why we are doing
+%%   this?
+  
+%% \item Rename the value of variable ``myc'' to ``myc.c'' (for MYC in the
+%%   cancer patients).
+  
+%% \item Create a data set that contains only the values for observations
+%%   with status ``NC''.  Call this data set, say, nc.
+%%   \item Again, set ``id'' as case names for this data set.
+%% \item Rename this ``myc'' to ``myc.nc''.
+  
+%% \item Merge nc and cc. Call it ``merged''. Use the option to merge columns!
+
+%% \item (Why can we trust that it did get it right? Look at the code that
+%%   shows \\
+%%   \verb@merge(cc, nc, all=TRUE, by="row.names")@).
+%% \end{enumerate}
+
+
+\subsubsection{Reshaping with \Rfunction{unstack}}\label{reshapestack}
+
+%%  I will use just one here,
+%% which might be the easiest to begin with, with data with a structure as
+%% simple as ours (I'd probably very rarely use this approach for real, with
+%% my own data, but doing it differently would require us to take a longer
+%% diversion).
+We will first use the R function \Rfunction{unstack}. This is the natural
+reverse operation of ``stacking''.
+
+
+<<>>=
+unstack(x = dmyc, form = myc ~  cond)
+@ 
+
+That seems to do it but \ldots how can you be sure each row corresponds to
+the same subject? We are counting on it to work, but it might not if the
+data had not been ordered by subject id. (See also section \ref{ptr}). So
+we will be explicit here, ordering by condition and then id:
+
+<<>>=
+dmyc0 <- dmyc[order(dmyc$cond, dmyc$id), ]
+dmyc0
+@ 
+
+Now, we unstack:
+
+<<>>=
+merged2 <- unstack(dmyc0, form = myc ~ cond)
+merged2
+@ 
+
+We could directly use the data, but we are missing the IDs. We will add them:
+
+<<>>=
+(merged2$id <- dmyc0$id[1:12])
+@ 
+
+Verify we are now ok comparing merged2 with dmyc.
+
+
+
+\subsubsection{Reshaping with \Rfunction{reshape}}
+\label{reshapereshape}
+
+This is another built-in function in R, \Rfunction{reshape}. This can be a
+complicated function to use, but it is extremely powerful. I'll use it
+here fully specifying all the  arguments\footnote{In this case, you
+  do not need to specify the \texttt{v.names} argument, for example, but
+  I'd rather be explicit.}:
+
+<<>>=
+(merged3 <- reshape(dmyc, direction = "wide", idvar = "id", 
+                    timevar = "cond", v.names = "myc"))
+@ 
+
+
+%% FIXME: or dcast from reshape2?
+\subsubsection{Reshaping with  \Rfunction{spread}}\label{spread}
+
+OK, so we will do it in yet another way. You need to install the
+\CRANpkg{tidyr} package. If you don't have it, install it if you
+want. This is not a big deal: it is just to show you a fourth way.
+
+<<>>=
+library(tidyr)
+(merged4 <- spread(dmyc, cond, myc))
+@ 
+
+You can compare with \texttt{merged3} and \texttt{merged2} and \texttt{merged},
+and verify they have the same data.
+
+
+\subsubsection{\Rfunction{dcast} from \CRANpkg{reshape2}?}
+\label{sec:rfunct-from-cranpkgr}
+
+As it says, you could try doing the reshaping using \Rfunction{dcast} from
+\CRANpkg{reshape2}. Try it if you want to.
+
+
+\subsubsection{Reshaping et al: final comments}
+
+A few comments:
+\begin{itemize}
+\item This data reshaping is not strictly necessary from doing a paired
+  t-test in R. %% but it is for R Commander (see below ---section \ref{ptr} ).
+\item We will see below a way to carry out these same analyses with a
+  linear model (section \ref{lm-paired}). And no reshaping needed.
+
+\item Data manipulation can be tricky: you \textbf{must} be sure to get it
+  right. What would I do? Do it in two different ways, and compare. Among
+  those two I'd probably have \Rfunction{reshape} because, even if
+  complicated, it allows you to be completely explicit about what is what.
+\end{itemize}
+
 
 
 
@@ -3687,7 +3881,7 @@ continuous and discrete variables, etc.
 In biology (as well as in other disciplines) it is common for researchers
 to use ratios of variables to try to standardize/normalize a
 variable. This procedure looks deceptively simple, but it is not. Here, we
-will explore some of the problems\footnote{I thank Alba Concepción, a
+will explore some of the problems\footnote{I thank Alba Concepci\'on, a
   former student of BM-1, for asking me questions that prompted me to
   write this section. She also provided the link to Curran-Everett's
   paper}. You can find more details\footnote{With discussion about errors
@@ -3838,6 +4032,8 @@ The three main types are:
   curved surfaces.
 \end{description}
 \clearpage
+
+
 \section{Diagnostics}\label{diagnostics}
 
 %% \red{FIXME: add from a fully balanced designs, and explain differences in
@@ -3894,23 +4090,118 @@ Before looking at the plots, two concepts should be clear:
 \end{description}
 
 
+\subsection{Diagnostics: an example with a designed experiment with
+  factors} \label{diag-factors}
+
+
+We will first use the fake data from a perfectly balanced experimental
+design, the data used in section \ref{ordermatter}. The diagnostic plots
+from these kinds of designed experiments can look slightly different from
+those for regression, which makes sense if you think about it. I will
+recreate the data here. However, to make things more interesting, I will
+create a very large outlier:
+
+<<>>=
+## Create the data 
+set.seed(1)
+sex <- factor(rep(c("Male", "Female"), c(20, 20)))
+drug <- factor(rep(rep(c("A", "B"), c(10, 10)), 2))
+y <- rep(c(10, 13, 12, 16), rep(10, 4))
+y <- y + rnorm(length(y), sd = 1.5)
+y.data <- data.frame(y, sex, drug)
+y.data[1, 1] <- 25
+## Fit the model
+myAdditive <- lm(y ~ sex + drug, data = y.data)
+myInteract <- lm(y ~ sex * drug, data = y.data)
+## What are they saying?
+summary(myAdditive)
+summary(myInteract)
+@ 
+
+<<fig.show='hold', fig.cap='Model diagnostics for designed experiment, additive model '>>=
+oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
+plot(myAdditive)
+par(oldpar)
+@ 
+
+<<fig.show='hold', fig.cap='Model diagnostics for designed experiment, interaction model '>>=
+oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
+plot(myInteract)
+par(oldpar)
+@ 
+
+
+First, look at the plots. Try to see what they are about. See how there is
+one point that stands out in several plots, look at the regularity of the
+patterns.
+
 
 The plot on the upper left is used to judge if the functional form of the
-model makes sense: if the relationship is really linear as modeled, you
-should see no systematic pattern here, but we see it (in this case, it
-suggests that out model is predicting too small a metabolic rate at
-intermediate values, and the opposite at large values, which suggests a
-curvilinear relationship). This figure also helps spots systematic changes
-in variance (i.e., violations of homoscedasticity). But for this, the
-bottom left plot is better and it does suggest that violations of
-homoscedasticity are present (though, right now, with such strong evidence
-of non-linearity, this is not a surprise). 
+model makes sense, especially for regression models (not so much for
+designed experiments with factors, but it is still helpful).  This figure
+also helps spots systematic changes in variance (i.e., violations of
+homoscedasticity). But for this, the bottom left plot is better which, in
+this case, does not suggest anything serious, except for the outlier.
 
-The  upper  right plot  (a  ``q-q  plot'') is  used to  assess  approximate
-normality of the residuals: you want points  to more or less lie along the
-dotted line (with some  allowance for deviations in the tails); things
-do  not look  great here,  and this  distribution has  several very  large
-residuals, is heavy tailed, and also somewhat skewed.
+The upper right plot (a ``q-q plot'') is used to assess approximate
+normality of the residuals: you want points to more or less lie along the
+dotted line (with some allowance for deviations in the tails). Here the
+``q-q plot'' is not perfect (even if we discount the outlier), even when
+data did come from a normal; this is totally normal (remember, we are
+sampling).
+
+The bottom right differs in regression models and experiments with
+factors. Here you are shown residuals vs.\ factor level combinations. (The
+idea of leverage that makes a lot of sense in regression ---see below---
+is not that useful here). Notice how this plot shows four vertical lines
+in both models, the additive and the interaction one, but plots on the
+upper left and bottom left differ in the apparent number of vertical
+lines. Do you understand why?
+
+
+\subsection{Diagnostics: examples with some of the regression models}\label{diag-regr}
+
+We will now use the two simple regression models we fitted in section
+\ref{regr}. Make the first one (\Robject{metab}) active and go to
+``Models'', ``Graphs'', ``Basic diagnostic plots''. 
+
+<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation '>>=
+oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
+plot(metab)
+par(oldpar)
+@ 
+
+%% Before looking at the plots, two concepts should be clear:
+%% \begin{description}
+%% \item[Fitted value] The predicted, or fitted value: if we have an equation
+%%   like $Y = \alpha + \beta_1 X + \beta_2 Z$, then the fitted values are
+%%   the $Y$ for the observed combinations of $X$ and $Z$ (with the values of
+%%   $\alpha$ and $\beta$ returned from the model). It is just what the
+%%   model predicts.
+
+%% \item[Residual] Basically, the difference between the observed and the
+%%   fitted value. There are different types of residuals (residuals,
+%%   standardized and studentized being the most common).
+
+%% \end{description}
+
+
+
+Now you can see why with regression models we can use the plot on the
+upper left to judge if the functional form of the model makes sense: if
+the relationship is really linear as modeled, you should see no systematic
+pattern here, but we see it (in this case, it suggests that out model is
+predicting too small a metabolic rate at intermediate values, and the
+opposite at large values, which suggests a curvilinear
+relationship). Again, this figure also helps spots systematic changes in
+variance (i.e., violations of homoscedasticity). But for this, the bottom
+left plot is better and it does suggest that violations of
+homoscedasticity are present (though, right now, with such strong evidence
+of non-linearity, this is not a surprise).
+
+What about the ``q-q plot'': things do not look great here, and this
+distribution has several very large residuals, is heavy tailed, and also
+somewhat skewed.
 
 The bottom right can be hard to interpret: it shows two quantities
 (residuals and leverage) that, together, are part of Cook's distance, that
@@ -3925,7 +4216,7 @@ Cook's distance (function \Rfunction{cooks.distance}).
 
 Now, repeat the above with the model that has taken logs:
 <<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model after log transformation '>>=
-oldpar <- par(mfrow = c(2,2))
+oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
 plot(metablog)
 par(oldpar)
 @ 
@@ -3950,14 +4241,97 @@ only be able to detect if a model is a bad one if it really is very bad.
 (remember, this is an ANOVA, and there were six combinations of levels,
 and thus the discrete values you observe in two of the plots). However,
 the qqplot of residuals is a little bit ugly, but it is hard to tell from
-relatively so little data\footnote{This is an interesting case, since
+relatively so little data\footnote{Again, this is an interesting case, since
   these data are simulated from a normal distribution}. Finally,
-\Robject{AnovaMIT}, from section \ref{oneway}, looks just fine. Please
+\Robject{AnovaModel.1}, from section \ref{oneway}, looks just fine. Please
 look at all of these yourself to see them.
 
 
-For you to read and play around further:
 
+\subsection{Diagnostics: a couple more examples with designed experiments}
+
+Follow the text and the graphics. We will discuss this in class.
+
+<<>>=
+## Diagnostics suggest missing interaction
+set.seed(1)
+sex <- factor(rep(c("Male", "Female"), c(20, 20)))
+drug <- factor(rep(rep(c("A", "B"), c(10, 10)), 2))
+y <- rep(c(8, 16, 10, 12), rep(10, 4))
+y <- y + rnorm(length(y), sd = 1.5)
+y.data1 <- data.frame(y, sex, drug)
+rm(y, sex, drug)
+with(y.data1, tapply(y, list(sex, drug), mean))
+
+## Fit the model
+myAdditive2 <- lm(y ~ sex + drug, data = y.data1)
+myInteract2 <- lm(y ~ sex * drug, data = y.data1)
+summary(myAdditive2)
+summary(myInteract2)
+
+dev.off()
+par(mfrow = c(2, 3))
+plot(myAdditive2, which = c(1:5)) ## look at first plot
+
+dev.off()
+par(mfrow = c(2, 3))
+plot(myInteract2, which = c(1:5))
+
+############
+
+## Large cook's in anova
+set.seed(1)
+sex <- factor(rep(c("Male", "Female"), c(20, 20)))
+drug <- factor(rep(rep(c("A", "B"), c(10, 10)), 2))
+y <- rep(c(8, 12, 11, 15), rep(10, 4))
+y <- y + rnorm(length(y), sd = 1.5)
+y.data2 <- data.frame(y, sex, drug)
+rm(y, sex, drug)
+## create a large outlier
+
+y.data2[1, 1] <- 30
+with(y.data2, tapply(y, list(sex, drug), mean))
+
+## ## Fit the model
+myAdditive2b <- lm(y ~ sex + drug, data = y.data2)
+## myInteract <- lm(y ~ sex * drug, data = y.data2)
+## summary(myAdditive)
+## summary(myInteract)
+
+## ## diagnostics, all of them except 6th
+## we actually have a large Cook's distance
+par(mfrow = c(2, 3))
+plot(myAdditive2b, which = 1:5)
+
+## model with and without first obs
+summary(lm(y ~ sex + drug, data = y.data2))
+summary(lm(y ~ sex + drug, data = y.data2[-1, ]))
+
+#### Diagnostics if we remove the offending value
+dev.off()
+par(mfrow = c(2, 3))
+plot(lm(y ~ sex + drug, data = y.data2[-1, ]), which = 1:5)
+
+## The model with two observations missing
+## create unbalance
+y.data3 <- y.data2[-c(35, 40), ]
+with(y.data3, tapply(y, list(sex, drug), mean))
+
+dev.off()
+par(mfrow = c(2, 3))
+myAdditive3 <- lm(y ~ sex + drug, data = y.data3)
+plot(myAdditive3, which = 1:5) ## see Cook's
+
+## some details, from plot.lm
+lm.influence(myAdditive2b, do.coef = FALSE)$hat ## constant
+lm.influence(myAdditive3, do.coef = FALSE)$hat ##nope
+diff(range(hii))
+
+@ 
+
+\subsection{Diagnostics: further issues}
+
+For you to read and play around further:
 \begin{itemize}
 \item An extended qqplot is available from package \CRANpkg{car},
   \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
@@ -3989,6 +4363,105 @@ For you to read and play around further:
   summary, at the very nice sections 8.3 to 8.5 in Kabakoff's ``R in
   action.''
 \end{itemize}
+
+
+
+
+
+%% The plot on the upper left is used to judge if the functional form of the
+%% model makes sense: if the relationship is really linear as modeled, you
+%% should see no systematic pattern here, but we see it (in this case, it
+%% suggests that out model is predicting too small a metabolic rate at
+%% intermediate values, and the opposite at large values, which suggests a
+%% curvilinear relationship). This figure also helps spots systematic changes
+%% in variance (i.e., violations of homoscedasticity). But for this, the
+%% bottom left plot is better and it does suggest that violations of
+%% homoscedasticity are present (though, right now, with such strong evidence
+%% of non-linearity, this is not a surprise). 
+
+%% The  upper  right plot  (a  ``q-q  plot'') is  used to  assess  approximate
+%% normality of the residuals: you want points  to more or less lie along the
+%% dotted line (with some  allowance for deviations in the tails); things
+%% do  not look  great here,  and this  distribution has  several very  large
+%% residuals, is heavy tailed, and also somewhat skewed.
+
+%% The bottom right can be hard to interpret: it shows two quantities
+%% (residuals and leverage) that, together, are part of Cook's distance, that
+%% measures the effect of individual points on the fitted coefficients
+%% (values of Cook's distance larger than 1 usually indicate a possibly very
+%% influential point, but any point with a widely outstanding Cook's distance
+%% deserves a closer look).  The plot called ``Influence plots'' is very
+%% similar to this one. However, I often find it simpler to look at plots
+%% Cook's distance (function \Rfunction{cooks.distance}).
+
+
+
+%% Now, repeat the above with the model that has taken logs:
+%% <<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model after log transformation '>>=
+%% oldpar <- par(mfrow = c(2,2))
+%% plot(metablog)
+%% par(oldpar)
+%% @ 
+
+%% and you will see that all diagnostics look much better.
+
+
+%% You should also take a look at the diagnostics for some of the other
+%% models we have fitted, specifically \Robject{longev\_b\_r} and
+%% \Robject{metab\_b\_r} (or \Robject{metab\_b\_r\_2}) (section
+%% \ref{ancova_rept}). The metabolism one are OK, but the longevity model is
+%% not fully satisfactory (small problems in all diagnostic plots, and one
+%% potentially influential value). \Robject{mcyst2} (section \ref{ancova})
+%% and \Robject{mcyst} (section \ref{multreg}), the two models we fitted to
+%% the cystic fibrosis data, both look relatively decent, although there
+%% could be some concerns about increases in variance with fitted values.
+%% However, it is not easy to tell, because of the relatively few
+%% points. This, of course, makes sense: if there are few points, we will
+%% only be able to detect if a model is a bad one if it really is very bad.
+
+%% \Robject{cholestanova}, from section \ref{twoway}, looks relatively OK
+%% (remember, this is an ANOVA, and there were six combinations of levels,
+%% and thus the discrete values you observe in two of the plots). However,
+%% the qqplot of residuals is a little bit ugly, but it is hard to tell from
+%% relatively so little data\footnote{This is an interesting case, since
+%%   these data are simulated from a normal distribution}. Finally,
+%% \Robject{AnovaMIT}, from section \ref{oneway}, looks just fine. Please
+%% look at all of these yourself to see them.
+
+
+%% For you to read and play around further:
+
+%% \begin{itemize}
+%% \item An extended qqplot is available from package \CRANpkg{car},
+%%   \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
+%%   comparison plots'').
+%% \item ``Component+Residual'' (or partial residual\footnote{These plots,
+%%     for each variable, shows a plot of the independent variable, say $x$, on the
+%%     horizontal axis and, on the ordinates, the ``partial residuals'' $=
+%%     residual + \hat{\beta}x$.}) plots allow us to
+%%   examine, in models with multiple regressors, deviations from linearity
+%%   and could suggest the appropriate transformation. ``CERES plots'' are a
+%%   variation of ``Component + Residual'' plots that work well even if
+%%   relationships are strongly nonlinear. Both also available from
+%%   \CRANpkg{car}.
+%% \item Various diagnostics related to dfbetas allow us to identify
+%%   influential observations in specific terms of the model.
+%% \item Variance inflation factors help us detect possible problems caused
+%%   by collinearity (correlations between independent variables).
+%% \item Added variable plots are particularly useful in multiple regression
+%%   problems with multiple independent variables; they can help to identify
+%%   influential points (which are easily masked with multiple variables) and
+%%   can also help to try to find a good functional relationship (but
+%%   Component+Residual are more useful here). Again, available from
+%%   \CRANpkg{car}. 
+%% \item A variety of numerical tests and diagnostics are also available
+%%   (e.g., tests for nonlinearity or for homoscedasticity).
+%% \item Package \CRANpkg{car} and the accompanying book ``An R companion to
+%%   applied regression'' contain excellent and detailed comments about those
+%%   and other diagnostics, and several functions. Take also a look, for a
+%%   summary, at the very nice sections 8.3 to 8.5 in Kabakoff's ``R in
+%%   action.''
+%% \end{itemize}
 
 
 
