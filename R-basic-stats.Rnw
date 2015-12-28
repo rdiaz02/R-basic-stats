@@ -1,6 +1,6 @@
 %\VignetteEngine{knitr::knitr}
 \documentclass[a4paper,11pt]{article}
-
+\synctex=1
 %% not if using BiocStyle
 %% \usepackage[authoryear,round,sort]{natbib}
 %% \usepackage{hyperref} 
@@ -35,6 +35,7 @@
 
 <<setup,include=FALSE,cache=FALSE>>=
 require(knitr)
+library(patchSynctex)
 opts_knit$set(concordance = TRUE)
 opts_knit$set(stop_on_error = 2L)
 ## next are for listings, to produce HTML
@@ -889,6 +890,39 @@ A few comments:
 
 
 
+\subsection{The paired t-test}
+Just do a paired t-test. What is the result? Compare it with doing a
+t-test as if they were two independent samples. The differences are rather
+dramatic! 
+
+
+I'll use \texttt{merged3}; you can use  \texttt{merged2}
+or \texttt{merged4}
+if you want. 
+
+<<>>=
+## Paired
+t.test(merged3$myc.NC, merged3$myc.Cancer, alternative='two.sided', 
+       conf.level=.95,  paired=TRUE)
+@ 
+
+
+<<>>=
+## Two-sample
+t.test(merged3$myc.NC, merged3$myc.Cancer, alternative='two.sided', 
+       conf.level=.95,  paired=FALSE)
+@ 
+
+The last is of course the same as
+<<>>=
+t.test(myc ~ cond, alternative = 'two.sided', conf.level=.95, 
+       var.equal=FALSE,  data=dmyc)
+
+@ 
+
+(Is there a sign difference? Why? What happens if you change the order of
+NC and Cancer in the paired test?)
+
 
 
 
@@ -1056,7 +1090,7 @@ test).
 
 What do you think of this plot?
 
-<<fig.width=3.5, fig.height=3.5>>=
+<<fig.width=5.5, fig.height=5.5>>=
 plotMeans(dmyc$myc, dmyc$cond, error.bars = "se", ylab = "MYC",
           xlab = "Condition")
 @ 
@@ -1071,10 +1105,9 @@ very good idea. % In fact, I will now create them from scratch directly from R
 % the first myc.cancer is the same patient as the same myc.nc, etc. This is
 % the case in our data, but need not be; see details in section \ref{ptr})
 
-
-<<fig.width=3.5, fig.height=3.5, echo=TRUE, fig.show = 'hold'>>=
-Boxplot( ~ diff.nc.c, xlab = "",
-        ylab = "Intra-subject difference (NC - C)", main = "MYC")
+<<fig.width=5.5, fig.height=5.5, echo=TRUE, fig.show = 'hold'>>=
+Boxplot( ~ diff.nc.c, data = merged3, xlab = "",
+         ylab = "Intra-subject difference (NC - Cancer)", main = "MYC")
 @ 
 
 
