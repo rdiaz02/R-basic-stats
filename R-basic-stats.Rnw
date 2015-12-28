@@ -84,12 +84,18 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014, Ramon Diaz-Uriarte, and is
-licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
-International License:
+This work is Copyright, \copyright, 2014, 2015, 2016, Ramon Diaz-Uriarte,
+and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
+4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
 
 \centerline \ccbysa
+
+All the original files for the document are available (again, under a
+Creative Commons license) from
+\Burl{https://github.com/rdiaz02/R-basic-stats}. (Note that in the github
+repo you will not see the PDF, or R files, nor many of the data files,
+since those are derived from the Rnw file).
 
 
 \section{Introduction}
@@ -105,17 +111,15 @@ something like \texttt{library(something)} or \texttt{require(something)}.
 
 
 
-\subsection{The PDF and the HTML and the code}
+\subsection{The PDF and the code}
 
-The primary output of this document is a PDF. I also provide (and will
-use) an HTML file; this is kind of experimental (a few things might not
-be typeset correctly, or some links not work fully, etc). The HTML offers
-the advantage that we can accommodate, on the same screen, a running
-session with \R\, and have the web browser size adjusted to our liking (so
-less fiddling around than using a PDF). In the HTML, the code is in red
-and the output in blue. 
-
-
+The primary output of this document is a PDF. %% I also provide (and will
+%% use) an HTML file; this is kind of experimental (a few things might not
+%% be typeset correctly, or some links not work fully, etc). The HTML offers
+%% the advantage that we can accommodate, on the same screen, a running
+%% session with \R\, and have the web browser size adjusted to our liking (so
+%% less fiddling around than using a PDF). In the HTML, the code is in red
+%% and the output in blue. 
 All the original files for the document are available (again, under a
 Creative Commons license ---see section \ref{license}) from
 \Burl{https://github.com/rdiaz02/R-basic-stats}. (Note that in the
@@ -128,6 +132,10 @@ provide boring and space-filling output). However, make sure you type and
 understand it. You can copy and paste, of course, but I strongly suggest
 you type the code and change it, etc.
 
+\subsection{Warning: eternally provisional}
+This file can get changed often. When asking questions in class or in the
+forum, refer to the section numbers AND section names (these change less
+than the page numbers).
 
 
 \part{Comparing two groups}
@@ -242,8 +250,8 @@ dp53 <- read.table("P53.txt", header = TRUE)
 
 
 The first step ever is to look at the data. In fact, here we can look at
-all the original data. So go take a look at the data (``View data
-set''). Resist the temptation to modify it there. \red{Why?}
+all the original data. So go take a look at the data.%% (``View data
+%% set''). Resist the temptation to modify it there. \red{Why?}
 
 
 \subsection{Plots to do}
@@ -1149,18 +1157,17 @@ exomes, but from 50 patients, getting tumor and non-tumor tissue? The
 answer is not always obvious. Go talk to a statistician.
 
 
-
-
 \subsection{A first taste of linear models}\label{lm-paired}
 
 In the paired test, we implicitly have a model like this:
 
-\[Expression.of.MYC = function(subject and condition) + \epsilon\]
+\[Expression.of.MYC = function(subject\ and\ condition) + \epsilon\]
 
 which we make simpler (assuming additive contributions of each factor) as
 
 
-\[Expression.of.MYC = effect.of.subject + effect.of.condition + \epsilon\]
+\[Expression.of.MYC = \mathit{effect.of.subject} + \mathit{effect.of.condition} + \epsilon\]
+
 
 
 
@@ -1243,16 +1250,16 @@ considerations that come into play are:
 \begin{itemize}
 \item Do the data look bad enough that a parametric procedure will lead to
   trouble?
-\item What about the relative efficiency of the non parametric procedure?
+  \item What about the relative efficiency of the non parametric procedure?
   (relative efficiency refers to the sample size required for two
-  different procedures that are equally good in power and type I error
-  rate). When assumptions are met, parametric methods do have more power
-  (though not always a lot more). When assumptions are not met,
-  nonparametric methods might have more power, or the correct Type I
-  error, etc. Note that very, very, very small p-values are often not
-  achievable with non-parametric methods (because of the way they work),
-  and this is a concern with multiple testing adjustments in omics
-  experiments (this will be covered in the last lesson).
+  different procedures that have similar type I error rate to achieve the
+  same power ---more on power later). When assumptions are met, parametric
+  methods do have more power (though not always a lot more). When
+  assumptions are not met, nonparametric methods might have more power, or
+  the correct Type I error, etc. Note that very, very, very small p-values
+  are often not achievable with non-parametric methods (because of the way
+  they work), and this is a concern with multiple testing adjustments in
+  omics experiments (this will be covered in the next lesson).
 \item Is this test flexible enough? In particular, can I accommodate
   additional experimental factors?
 \end{itemize}
@@ -1312,7 +1319,7 @@ data (see also section \ref{wpi}).
 In a nutshell, this is what the test does: for each pair, it computes the
 difference of the two measures (thus, taking differences must make sense,
 and it does not for ordinal data but it does for interval data). These
-differences (discarding the sign) are then ranked, and then sum of the
+differences (discarding the sign) are then ranked, and then the sum of the
 ranks of all the positive differences is computed and compared to the null
 distribution.
 
@@ -1748,26 +1755,26 @@ chi-squares, regressions, etc, etc. (As has been mentioned repeatedly,
 there are ways to incorporate or deal with the non-independence, for
 categorical, ordinal, and interval data, but they are far from trivial).
 
-
 To make the point more clear, this is an example from the data for the TFM
 (``trabajo fin de master'') from a former student of BM-1\footnote{This is
   true. I am not making it up.}. Briefly, she was interested in the rates
 of chromosomal aberrations in different types of couples that went to a
 fertility clinic. For instance, suppose you want to examine incidence of
 aneuploidy in embryos from two groups of fathers, ``younger fathers'' and
-``older fathers'' (wait, not older, just ``fathers that so far have
-accumulated more hours of life on Earth''). The simplest idea here is to
+``older fathers''%% (wait, not older, just ``fathers that so far have
+%% accumulated more hours of life on Earth'')
+. The simplest idea here is to
 use a chi-square ($\mathcal{X}^2$) test to compare the frequency of
-aneuploidies between older and younger fathers. But the problem is that
-each couple (each father in this case) contributes multiple embryos and we
-cannot simply do a chi-square counting embryos, as we would again run into
-a non-independence problem. A simple approach, especially if each father
-contributes the same number of embryos, is to calculate, for each father,
-the proportion of embryos with aneuploidies. And then, to examine if that
-per-father proportion of aneuplodies differs between older and younger
-fathers with, say, an independent samples t-test (possibly of suitably
-transformed data) or a two-samples Wilcoxon test.
-
+aneuploidies between older and younger fathers (you will see chi-square
+tests in Lesson 4). But the problem is that each couple (each father in
+this case) contributes multiple embryos and we cannot simply do a
+chi-square counting embryos, as we would again run into a non-independence
+problem. A simple approach, especially if each father contributes the same
+number of embryos, is to calculate, for each father, the proportion of
+embryos with aneuploidies. And then, to examine if that per-father
+proportion of aneuplodies differs between older and younger fathers with,
+say, an independent samples t-test (possibly of suitably transformed data)
+or a two-samples Wilcoxon test.
 
 
 
@@ -1783,7 +1790,6 @@ transformed data) or a two-samples Wilcoxon test.
 %% t.test(myc.nc, myc.cancer, paired = TRUE)
 %% @ 
 
-%% Of course, this \textbf{crucially assumes} that the data are ordered the
 %% same way by patient: the first myc.cancer is the same patient as the same
 %% myc.nc, etc. This is the case in our data, but need not be. We can check
 %% it:
@@ -2305,7 +2311,7 @@ This is the default parameterization in R. But is is not the only one available.
 
 \begin{enumerate}
 \item Enter the data.
-\item Recode the factor (the dependent variable), if needed.
+\item Recode the factor (the independent variable), if needed.
 \item Run the model.
 \item Assess model diagnostics (see section \ref{diagnostics}).
 \item Carry out comparisons between pairs of means with appropriate
@@ -3517,7 +3523,7 @@ by the model) and what they represent in models like:
 
 
 
-Let us see a
+Let us now see a
 simple example:
 
 <<>>=
