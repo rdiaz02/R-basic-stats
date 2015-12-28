@@ -1,4 +1,8 @@
 ## This was prompted by some emails in R-sig-teaching
+## My answer is available here:
+## https://stat.ethz.ch/pipermail/r-sig-teaching/2015q1/000604.html
+
+
 ## From: Richard M. Heiberger <rmh@temple.edu>
 ## To: Steven Stoline <sstoline@gmail.com>
 ## Cc: R-sig-teaching <R-sig-teaching@r-project.org>

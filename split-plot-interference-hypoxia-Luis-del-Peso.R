@@ -13,7 +13,7 @@
 
 ## In other words, we take one cultivo, split it into two, one of the two
 ## gets one level of I and the other the other level. Once grown, we split
-## each of them into two again, and to each one we give on level of H.
+## each of them into two again, and to each one we give one level of H.
 
 
 ## some unbalance
