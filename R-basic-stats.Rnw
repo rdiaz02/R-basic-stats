@@ -2181,7 +2181,26 @@ into account.
 
 \subsubsection{This is a mess. What figures do I use?}
 That is up to you :-). But this can work: present both the original means
-and the plot with the contrasts. %% You can just copy and paste code
+and the plot with the contrasts. 
+
+
+I would actually modify slightly the title of both figures, so that they
+look better:
+
+<<out.width='7cm', out.height='7cm', fig.show='hold'>>=
+plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
+@ 
+
+<<out.width='7cm', out.height='7cm'>>=
+.Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
+tmp <- cld(.Pairs) ## silent assignment 
+plot(confint(.Pairs), 
+     main = "95% family-wise confidence interval using Tukey contrasts")
+@ 
+
+
+
+%% You can just copy and paste code
 %% judiciously.
 %% Note that I modify slightly the title of the first figure, so
 %% that the usage of Tukey contrasts is explicit and I modify the title of
@@ -2874,6 +2893,22 @@ not) of the Diet or Drug term. In general, \textbf{in the presence of
   III, can make sense, but are not always of interest. See also footnote
   \ref{fn:2} in section \ref{orderfactors} for some entries and
   references.}.
+
+
+\subsection{An ANOVA without interactions}\label{anovanoint}
+Could we fit a model without interactions? Yes, of course. The idea is to
+change the ``*'' by a ``+'' (and we will see that again when we deal with
+multiple regression et al. in section \ref{regr-int}).
+
+<<>>=
+amodelnoint <- (lm(y ~ Diet + Drug, data=dcholest))
+Anova(amodelnoint)
+@ 
+
+
+There are, however, good reasons to start fitting a model \textbf{with}
+interactions first, and \textbf{only} if there are no interactions, fit a
+simpler, additive model.
 
 
 
