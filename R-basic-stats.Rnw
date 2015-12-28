@@ -28,6 +28,17 @@
 \usepackage[copyright]{ccicons} %% for the CC license icons
 \usepackage{gitinfo2}
 
+%% I could not get the first \part to be after a \clearpage without it
+%%  giving weird errors.
+
+\usepackage{titlesec}
+\titleformat{\part}[display]
+  {\itshape\rmfamily\raggedright}{\LARGE Part \thepart}{0mm}{\Huge}{}
+\titlespacing*{\part}{0mm}{30mm}{30mm}
+\titleclass{\part}{top}
+\newcommand\partbreak{\clearpage}
+
+
 %% For using listings, so as to later produce HTML
 %% uncommented by the make-knitr-hmtl.sh script
 %%listings-knitr-html%%\usepackage{listings}
@@ -54,6 +65,9 @@ BiocStyle::latex()
 %% Modify margins; must issue after BioC style
 \geometry{verbose,a4paper,tmargin=23mm,bmargin=23mm,lmargin=28mm,rmargin=28mm}
 
+
+
+
 \begin{document}
 
 %% Only takes effect after begin document
@@ -76,6 +90,8 @@ BiocStyle::latex()
 
 
 \date{\gitAuthorDate\ {\footnotesize (Release\gitRels: Rev: \gitAbbrevHash)}}
+
+
 
 \maketitle
 
@@ -653,7 +669,7 @@ idea of using each subject as its own control.
 
 
 
-How can we check the above?
+How can we check the above? 
 
 <<>>=
 all(with(dmyc, table(id, cond)) == 1)
@@ -661,7 +677,7 @@ all(with(dmyc, table(id, cond)) == 1)
 
 
 
-\subsection{Paired t-test}
+\subsection{Paired t-test}\label{ptr}
 Let's do the paired t-test.
 
 <<>>=
@@ -1135,8 +1151,9 @@ for(i in unique(dmyc$id))
 
 
 
-Alternatively (though I do not see much of a gain here):
-<<>>=
+Alternatively (though I do not see much of a gain here) we could have done:
+%% <<>>=
+<<echo=TRUE,results='hide',eval=FALSE>>=
 stripchart(myc ~ cond, vertical = TRUE, data = dmyc)
 f1 <- function(x) {
     segments(x0 = 1, x1 = 2, 
@@ -1249,20 +1266,17 @@ next part!
 %% summary(aov(myc ~ cond + Error(cond), data = dmyc))
 %% @ 
 
-
-
 \section{One-sample t-test}\label{sec:one-sample-t}
 We have already used the one-sample t-test (section
 \ref{paired-single}). You can of course compare the mean against a null
 value of 0, but you can also compare against any other value that might
-make sense. %% (``Null hypothesis mu'' in R commander).
-Issues about assumptions are as for the two-sample (except, of course,
-there are no considerations of differences in variances among groups,
-since there is only one group). One-sample tests are probably not as
-common in many cases, as we are often interested in comparing two
-groups. But when you want to compare one group against a predefined value,
-the one-sample t-test is what you want.
-
+make sense (``Null hypothesis mu'' in R commander). Issues about
+assumptions are as for the two-sample (except, of course, there are no
+considerations of differences in variances among groups, since there is
+only one group). One-sample tests are probably not as common in many
+cases, as we are often interested in comparing two groups. But when you
+want to compare one group against a predefined value, the one-sample
+t-test is what you want.
 
 
 
@@ -1811,7 +1825,7 @@ or a two-samples Wilcoxon test.
 
 
 
-\clearpage
+%% \clearpage
 %% \subsection{The paired t-test directly from R}\label{ptr}
 %% We can directly use our dmyc data set from R, without any need for
 %% reshaping. We will do things step by step (though we could just combine
@@ -1845,6 +1859,7 @@ or a two-samples Wilcoxon test.
 
 
 \part{Linear models: ANOVA, regression, ANCOVA}
+
 \section{Introduction to ANOVAs, regression, and linear models}
 
 Linear models and their extensions (which include logistic regression, but
@@ -2657,6 +2672,8 @@ Some summaries of data:
 (means <- with(df1, tapply(y, list(A, B), mean)))
 @ 
 
+And now, several ANOVA models. We will explain each of the terms in turn
+in class if this is not familiar to you:
 
 \subsubsection{No interaction model}
 <<>>=
@@ -3819,7 +3836,7 @@ We've said this: ANOVAs are a type of linear models. Thus, in R (and in
 most statistical packages) you can get the output for an ANOVA by
 different routes. Let us make sure we understand this, and can interpret
 the output from using the different routes available to us. In fact, we
-have jumped from using \Rfunction{aov} to \Rfunction{lm}.
+have jumped from using \Rfunction{aov} to \Rfunction{lm} several times by now.
 
 This is also a good time to recap and make sure we understand ideas we
 have used like ``more complex models'' and ``number of
@@ -4150,7 +4167,8 @@ How do things look?
 
 <<results='hide'>>=
 scatterplot(Maximum.longevity..yrs. ~ Body.mass..g. | Class, 
-            smooth = FALSE, data = anage_a_r)
+            smooth = FALSE, data = anage_a_r,
+            log = "xy", boxplots = 'xy')
 @ 
 
 <<echo=TRUE, results='hide'>>=
@@ -4388,15 +4406,15 @@ really correct.
 
 
 
-We will first use the two simple regression models we fitted in section
-\ref{regr}. %% Make the first one (\Robject{metab}) active and go to
-%% ``Models'', ``Graphs'', ``Basic diagnostic plots''. 
+%% We will first use the two simple regression models we fitted in section
+%% \ref{regr}. %% Make the first one (\Robject{metab}) active and go to
+%% %% ``Models'', ``Graphs'', ``Basic diagnostic plots''. 
 
-<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation '>>=
-oldpar <- par(mfrow = c(2,2))
-plot(metab)
-par(oldpar)
-@ 
+%% <<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation '>>=
+%% oldpar <- par(mfrow = c(2,2))
+%% plot(metab)
+%% par(oldpar)
+%% @ 
 
 Before looking at the plots, two concepts should be clear:
 \begin{description}
@@ -4591,17 +4609,22 @@ myAdditive2 <- lm(y ~ sex + drug, data = y.data1)
 myInteract2 <- lm(y ~ sex * drug, data = y.data1)
 summary(myAdditive2)
 summary(myInteract2)
+@ 
 
-dev.off()
+<<fig.cap='Additive model, myAdditive2,  when there is interaction'>>=
 par(mfrow = c(2, 3))
 plot(myAdditive2, which = c(1:5)) ## look at first plot
+@
 
-dev.off()
+<<fig.cap='Interaction model, myInteract2, when there is interaction'>>=
 par(mfrow = c(2, 3))
 plot(myInteract2, which = c(1:5))
+@
 
+\clearpage
+
+<<>>=
 ############
-
 ## Large cook's in anova
 set.seed(1)
 sex <- factor(rep(c("Male", "Female"), c(20, 20)))
@@ -4620,37 +4643,53 @@ myAdditive2b <- lm(y ~ sex + drug, data = y.data2)
 ## myInteract <- lm(y ~ sex * drug, data = y.data2)
 ## summary(myAdditive)
 ## summary(myInteract)
+@ 
 
+<<fig.cap='myAdditive2b: large Cook with balanced data'>>=
 ## ## diagnostics, all of them except 6th
 ## we actually have a large Cook's distance
 par(mfrow = c(2, 3))
 plot(myAdditive2b, which = 1:5)
+@
 
+\clearpage
+
+<<>>=
 ## model with and without first obs
 summary(lm(y ~ sex + drug, data = y.data2))
 summary(lm(y ~ sex + drug, data = y.data2[-1, ]))
+@ 
 
+<<fig.cap='myAdditive2b removing the large offending value'>>=
 #### Diagnostics if we remove the offending value
-dev.off()
 par(mfrow = c(2, 3))
 plot(lm(y ~ sex + drug, data = y.data2[-1, ]), which = 1:5)
+@
 
+\clearpage
+
+<<>>=
 ## The model with two observations missing
 ## create unbalance
 y.data3 <- y.data2[-c(35, 40), ]
 with(y.data3, tapply(y, list(sex, drug), mean))
-
-dev.off()
-par(mfrow = c(2, 3))
 myAdditive3 <- lm(y ~ sex + drug, data = y.data3)
-plot(myAdditive3, which = 1:5) ## see Cook's
+@ 
 
+<<fig.cap='myAdditive3: missing two observations'>>=
+par(mfrow = c(2, 3))
+plot(myAdditive3, which = 1:5) ## see Cook's
+@ 
+\clearpage
+
+<<echo=TRUE,results='hide'>>=
 ## some details, from plot.lm
 (hii2b <- lm.influence(myAdditive2b, do.coef = FALSE)$hat) ## constant
 (hii3 <- lm.influence(myAdditive3, do.coef = FALSE)$hat) ##nope
+@ 
+<<>>=
 diff(range(hii2b))
 diff(range(hii3))
-
 @ 
 
 \subsection{Diagnostics: further issues}
@@ -4799,6 +4838,7 @@ For you to read and play around further:
 
 
 \section{Variable and model selection}
+
 You say you want to select variables? Select them for what? Prediction?
 Interpretation?  Variable selection is a touchy and delicate
 subject. First, procedures based purely in statistical criteria might
@@ -4818,26 +4858,40 @@ about comparing models.
 
 If you really need automated or semiautomated procedures, then reasonable
 strategies use model-comparison criteria such as AIC (e.g., with the
-\Rfunction{stepAIC} function from \CRANpkg{MASS}) and even better is then
-bootstrapping the whole process to get estimates of error, predictive
-ability, etc. Even better, of course, is subject-matter guidance on how to
-proceed and what are and are not candidates for deletion and in what
-order. The book by Frank Harrell, ``Regression modeling strategies''
-contains great discussions of these topics. The actual data set used here
-is discussed, also in the context of variable selection, by P.\ Dalgaard
-in chapter 11 of ``Introductory statistics with R''.
+\Rfunction{step} function) and even better is then bootstrapping the whole process
+to get estimates of error, predictive ability, etc. Even better, of
+course, is subject-matter guidance on how to proceed and what are and are
+not candidates for deletion and in what order. The book by Frank Harrell,
+``Regression modeling strategies'' contains great discussions of these
+topics. The actual data set used here is discussed, also in the context of
+variable selection, by P.\ Dalgaard in chapter 11 of ``Introductory
+statistics with R''.
 
 
 To give some examples (look at them carefully, and compare with what we
 did by hand, and with whether or not these are the models you would use):
 
-<<results='hide'>>=
-library(MASS)
-stepAIC(mcyst2, direction = "both")
-stepAIC(mcyst, direction = "both")
-stepAIC(longev_b_r, direction = "both")
-stepAIC(metab_b_r, direction = "both")
+<<>>=
+step(mcyst2, direction = "both")
 @ 
+
+<<>>=
+step(mcyst, direction = "both")
+@ 
+
+
+<<>>=
+## In metab, we drop the interaction
+step(metab_b_r, direction = "both")
+ 
+## But nothing can be dropped here
+step(longev_b_r, direction = "both")
+@ 
+
+%% Something is fucked up in the processing, as commenting or uncommenting
+%% some of the above leads to a non-compiling tex. Go figure. It seems
+%% some kind of interaction between knitr and something else. So leave the
+%% comments in the last chunk.
 
 
 \section{Experimental design matters}
