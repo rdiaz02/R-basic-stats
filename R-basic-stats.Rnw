@@ -2211,100 +2211,147 @@ there are many groups. As well, we could be interested in other types of
 contrasts, for instance, that the mean of groups 2 and 3 is different from
 the mean of group 4. Etc, etc. We will not get into this. 
 
-
-
 \subsubsection{t-test as ANOVA}
 Of course, in general, you can just carry out any two-group comparison as
 an ANOVA. There is nothing wrong with that (and there is a simple
 correspondence between a t statistic and an F statistic).
 
-\red{zz: FIXME} the next seems out of place. Look at the BM-1 notes, where
-I show this as ``Anova tables from lm et al'' and we reuse a simple
-example from cholesterlo, which makes for easier following.
-
-\subsection{One way-anova with three or more groups, and lm}
-
-And what if the categorical independent variable has three or more groups?
-Let us use a data set we will use below (section \ref{twoway}).  These
-data come from an experiment about the effects of three diets and two
-cholesterol-controlling drugs in the reduction of cholesterol levels
-(note: the response variable is change in cholesterol, so the larger the
-value, the larger the reduction of cholesterol). As usual, read the data
-and look at them. Since the author used names for the levels within each
-of the two factors, Diet and Drug, we do not need to transform them into
-factors, in contrast to what we did in section \ref{recode}. Call the data
-\Robject{dcholest}.
+\subsubsection{Several ways of obtaining summaries}
 
 
-<<create_chol, echo=FALSE, results='hide'>>=
-
-set.seed(45)
-n <- c(4, 7, 9, 5, 7, 8)
-m <- c(2.1, 1, 2, -.2, 4, 5)
-y <- round(unlist(mapply(function(x, y) rnorm(x, y), n, m)), 3)
-Drug <- c(rep("A", sum(n[1:3])),
-          rep("B", sum(n[4:6])))
-Diet <- rep(rep(c("HF", "M1", "M2"), 2), n)
-chol <- data.frame(y = y,
-                   Drug = Drug,
-                   Diet = Diet)
-rm(y, n, m, Drug, Diet)
-## lm1 <- lm(y ~ Drug * Diet, data = chol)
-## lm0 <- lm(y ~ Drug + Diet, data = chol)
-## anova(lm1)
-## Anova(lm1)
-## anova(lm0)
-## anova(lm(y ~ Diet + Drug, data = chol))
-## Anova(lm0)
-write.table(chol, file = "Cholesterol.txt", col.names = TRUE,
-            row.names = FALSE, sep = "\t", quote = FALSE)
-rm(chol)
-@ 
+For example with \Rfunction{aggregate}
 
 <<>>=
-dcholest <- read.table("Cholesterol.txt", header = TRUE)
-
+with(dmit, aggregate(activ, list(Training = ftraining), 
+                      function(x) c(mean = mean(x), 
+                                    sd = sd(x), 
+                                    n = sum(!is.na(x)))
+                      ))
 @ 
 
-
-Here, let us focus just on the effect of Diet. First a couple of figures:
+or \Rfunction{by}:
 <<>>=
-par(mfrow = c(1, 2))
-boxplot(y ~ Diet, data = dcholest)
-with(dcholest, plotMeans(y, Diet, error.bars = "se", 
-  xlab = "Diet", ylab = "Cholesterol reduction"))
-
+with(dmit, by(activ, ftraining, 
+              function(x) c(mean = mean(x), 
+                             sd = sd(x), 
+                             n = sum(!is.na(x)))
+              ))
 @ 
-Now, look at the output carefully:
+
+
+
+\subsubsection{Can you do an ANOVA with only one sample per group?}\label{anova-only-one}
+Why or why not?
+
+
+What happens here?
 <<>>=
-summary(aov(y ~ Diet, data = dcholest))
-anova(lm(y ~ Diet, data = dcholest))
-summary(lm(y ~ Diet, data = dcholest))
+y <- c(1, 2, 3)
+gr <- factor(c("g1", "g2", "g3"))
+anova(lm(y ~ gr))
+summary(aov(y ~ gr))
 @ 
 
-The first two give you the typical ANOVA table, whereas the third gives a
-kind of output you might be more familiar with from
-regression. Interpreting the numbers requires thinking about the
-parameterization. 
 
-Look at the means for each group:
-<<>>=
-with(dcholest, tapply(y, Diet, mean))
-@ 
 
-Now, notice how the \texttt{(Intercept)} term above corresponds to the
-mean of group HF, and the other two terms are the deviations of each mean
-from the intercept:
+And here?
+
 
 <<>>=
-means <- with(dcholest, tapply(y, Diet, mean))
-means[2] - means[1]
-means[3] - means[1]
-rm(means) ## let's remove it, so as not the leave
-          ## garbage around
-@ 
+y2 <- c(1, 2, 3, 4)
+gr2 <- factor(c("g1", "g2", "g3", "g3"))
+anova(lm(y2 ~ gr2))
+summary(aov(lm(y2 ~ gr2)))
+@
 
-This is the default parameterization in R. But is is not the only one available.
+
+%% \red{zz: FIXME} the next seems out of place. Look at the BM-1 notes, where
+%% I show this as ``Anova tables from lm et al'' and we reuse a simple
+%% example from cholesterlo, which makes for easier following.
+
+%% \subsection{One way-anova with three or more groups, and lm}
+
+%% And what if the categorical independent variable has three or more groups?
+%% Let us use a data set we will use below (section \ref{twoway}).  These
+%% data come from an experiment about the effects of three diets and two
+%% cholesterol-controlling drugs in the reduction of cholesterol levels
+%% (note: the response variable is change in cholesterol, so the larger the
+%% value, the larger the reduction of cholesterol). As usual, read the data
+%% and look at them. Since the author used names for the levels within each
+%% of the two factors, Diet and Drug, we do not need to transform them into
+%% factors, in contrast to what we did in section \ref{recode}. Call the data
+%% \Robject{dcholest}.
+
+
+%% <<create_chol, echo=FALSE, results='hide'>>=
+
+%% set.seed(45)
+%% n <- c(4, 7, 9, 5, 7, 8)
+%% m <- c(2.1, 1, 2, -.2, 4, 5)
+%% y <- round(unlist(mapply(function(x, y) rnorm(x, y), n, m)), 3)
+%% Drug <- c(rep("A", sum(n[1:3])),
+%%           rep("B", sum(n[4:6])))
+%% Diet <- rep(rep(c("HF", "M1", "M2"), 2), n)
+%% chol <- data.frame(y = y,
+%%                    Drug = Drug,
+%%                    Diet = Diet)
+%% rm(y, n, m, Drug, Diet)
+%% ## lm1 <- lm(y ~ Drug * Diet, data = chol)
+%% ## lm0 <- lm(y ~ Drug + Diet, data = chol)
+%% ## anova(lm1)
+%% ## Anova(lm1)
+%% ## anova(lm0)
+%% ## anova(lm(y ~ Diet + Drug, data = chol))
+%% ## Anova(lm0)
+%% write.table(chol, file = "Cholesterol.txt", col.names = TRUE,
+%%             row.names = FALSE, sep = "\t", quote = FALSE)
+%% rm(chol)
+%% @ 
+
+%% <<>>=
+%% dcholest <- read.table("Cholesterol.txt", header = TRUE)
+
+%% @ 
+
+
+%% Here, let us focus just on the effect of Diet. First a couple of figures:
+%% <<>>=
+%% par(mfrow = c(1, 2))
+%% boxplot(y ~ Diet, data = dcholest)
+%% with(dcholest, plotMeans(y, Diet, error.bars = "se", 
+%%   xlab = "Diet", ylab = "Cholesterol reduction"))
+
+%% @ 
+%% Now, look at the output carefully:
+%% <<>>=
+%% summary(aov(y ~ Diet, data = dcholest))
+%% anova(lm(y ~ Diet, data = dcholest))
+%% summary(lm(y ~ Diet, data = dcholest))
+%% @ 
+
+%% The first two give you the typical ANOVA table, whereas the third gives a
+%% kind of output you might be more familiar with from
+%% regression. Interpreting the numbers requires thinking about the
+%% parameterization. 
+
+%% Look at the means for each group:
+%% <<>>=
+%% with(dcholest, tapply(y, Diet, mean))
+%% @ 
+
+%% Now, notice how the \texttt{(Intercept)} term above corresponds to the
+%% mean of group HF, and the other two terms are the deviations of each mean
+%% from the intercept:
+
+%% <<>>=
+%% means <- with(dcholest, tapply(y, Diet, mean))
+%% means[2] - means[1]
+%% means[3] - means[1]
+%% rm(means) ## let's remove it, so as not the leave
+%%           ## garbage around
+%% @ 
+
+%% This is the default parameterization in R. But is is not the only one available.
 
 
 \subsection{One way ANOVA: summary of steps}
