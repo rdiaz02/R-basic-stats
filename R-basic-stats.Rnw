@@ -2619,14 +2619,14 @@ There are many reviews about multiple testing, FDR, etc. You might want to
 take a look at a three-page one by W.\ Noble, in \textit{Nature
   Biotechnology}, 2009, 27: 1135--1136, ``How does multiple testing work''.
 
-
+\clearpage
 
 % FIXME: start first without interactions!!! Use the data from orderfactors
 %% FIXME: change this, and make it like in BM-1 when we remove above
 %% section of lm and anova, and do it as in BM-1
 \section{Two-way ANOVA}\label{twoway}
 
-Let us use the cholesterol data again.
+%% Let us use the cholesterol data again.
 %% The following data come from an experiment about the effects of three
 %% diets and two cholesterol-controlling drugs in the reduction of
 %% cholesterol levels (note: the response variable is change in cholesterol,
@@ -2798,25 +2798,65 @@ options(opt)
 @ 
 
 
-\subsection{Fitting a two-way ANOVA}\label{twoway-fitting}
 
-%% As usual, go to ``Statistics'', ``Means'', and then ``Multiway
-%% ANOVA''. Call it ``cholanova''
+\subsection{Fitting a two-way ANOVA: cholesterol}\label{twoway}
+
+The following data come from an experiment about the effects of three
+diets and two cholesterol-controlling drugs in the reduction of
+cholesterol levels (note: the response variable is change in cholesterol,
+so the larger the value, the larger the reduction of cholesterol). As
+usual, read the data and look at them. Since the author used names for the
+levels within each of the two factors, Diet and Drug, we do not need to
+transform them into factors, in contrast to what we did in section
+\ref{recode}. Call the data \Robject{dcholest}.
+
+<<create_tooth, echo=FALSE, results='hide'>>=
+
+set.seed(45)
+n <- c(4, 7, 9, 5, 7, 8)
+m <- c(2.1, 1, 2, -.2, 4, 5)
+y <- round(unlist(mapply(function(x, y) rnorm(x, y), n, m)), 3)
+Drug <- c(rep("A", sum(n[1:3])),
+          rep("B", sum(n[4:6])))
+Diet <- rep(rep(c("HF", "M1", "M2"), 2), n)
+chol <- data.frame(y = y,
+                   Drug = Drug,
+                   Diet = Diet)
+rm(y, n, m, Drug, Diet)
+## lm1 <- lm(y ~ Drug * Diet, data = chol)
+## lm0 <- lm(y ~ Drug + Diet, data = chol)
+## anova(lm1)
+## Anova(lm1)
+## anova(lm0)
+## anova(lm(y ~ Diet + Drug, data = chol))
+## Anova(lm0)
+write.table(chol, file = "Cholesterol.txt", col.names = TRUE,
+            row.names = FALSE, sep = "\t", quote = FALSE)
+rm(chol)
+
+@ 
+<<>>=
+dcholest <- read.table("Cholesterol.txt", header = TRUE)
+@ 
+
+
+\subsection{Fitting a two-way ANOVA}\label{twowayfit}
+
 
 Look at the output, which I comment below
 <<>>=
 ## This fits the model. Pay attention to the "*"
-cholestanova <- (lm(y ~ Diet * Drug, data = dcholest))
+cholestanova <- (lm(y ~ Diet*Drug, data=dcholest))
 ## This shows the ANOVA table. Notice the "Type II"
 Anova(cholestanova)
 
 ## Now we are shown the 3 by 2 table of means, standard deviations, and number 
 ## of observations
-tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
-       mean, na.rm =TRUE) # means
-tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
-       sd, na.rm =TRUE) # std. deviations
-tapply(dcholest$y, list(Diet = dcholest$Diet, Drug = dcholest$Drug), 
+tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
+       mean, na.rm=TRUE) # means
+tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
+       sd, na.rm=TRUE) # std. deviations
+tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug), 
        function(x) sum(!is.na(x))) # counts
 @ 
 
@@ -3907,6 +3947,7 @@ cystfibr2$sex <- factor(cystfibr2$sex, labels = c('Male','Female'))
 <<>>=
 mcyst2 <- lm(pemax ~ age * sex, data = cystfibr2)
 summary(mcyst2)
+Anova(mcyst2)
 @ 
 
 Note we added a ``*'', so an interaction between a continuous and a
@@ -4605,9 +4646,10 @@ myAdditive3 <- lm(y ~ sex + drug, data = y.data3)
 plot(myAdditive3, which = 1:5) ## see Cook's
 
 ## some details, from plot.lm
-lm.influence(myAdditive2b, do.coef = FALSE)$hat ## constant
-lm.influence(myAdditive3, do.coef = FALSE)$hat ##nope
-diff(range(hii))
+(hii2b <- lm.influence(myAdditive2b, do.coef = FALSE)$hat) ## constant
+(hii3 <- lm.influence(myAdditive3, do.coef = FALSE)$hat) ##nope
+diff(range(hii2b))
+diff(range(hii3))
 
 @ 
 
