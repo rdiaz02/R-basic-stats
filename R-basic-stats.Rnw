@@ -101,7 +101,7 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014, 2015, 2016, Ramon Diaz-Uriarte,
+This work is Copyright, \copyright, 2014, 2015, 2016, 2017, Ramon Diaz-Uriarte,
 and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
 4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -1393,6 +1393,61 @@ wilcox.test(diff.nc.c)
 %% For versions of R Commander 2.1-0 or later you can run it directly from
 %% the menu (you will have to create a data frame of the within-subject
 %% differences).
+
+
+
+
+
+% Contrary to Conover, not really testing F(x)= G(x)
+
+% <<>>=
+% ## Will not reject
+% x <- rnorm(10000, mean = 0, sd = 1)
+% y <- rnorm(10000, mean = 0, sd = 20)
+% wilcox.test(x, y)
+% @ 
+
+
+% Not about medians or means either
+
+% <<>>=
+% ## Will reject, medians the same
+% x <- c(rep(10, 1000), 11, rep(12, 1000))
+% y <- c(rep(10, 1000), 11, rep(13, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+% ## Will reject, means the same
+% x <- seq(from = 10, to = 20, length.out = 1000)
+% y <- c(rep(0, 999), 15000)
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+% @ 
+
+
+
+% <<>>=
+
+% ## Will accept, medians differ
+% x <- c(rep(10, 1000), 11, rep(12, 1000))
+% y <- c(rep(10, 1000), 10.1, rep(12, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+
+% ## Will accept, means differ
+% x <- c(rep(10, 1000), 1e9, rep(1000, 1000))
+% y <- c(rep(10, 1000), -1e9, rep(1000, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+% @ 
+
+
 
 \subsection{Wilcoxon's paired test and interval data}\label{wpi}
 
