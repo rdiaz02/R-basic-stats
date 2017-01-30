@@ -15,8 +15,8 @@ repository](https://github.com/rdiaz02/BM-1), but those notes use [R
 Commander](http://socserv.mcmaster.ca/jfox/Misc/Rcmdr) whereas these notes
 do not (the intended audience is different).
 
-Where are some of the files?
-============================
+### Where are some of the files?
+
 
 Sometimes people say that files `P53.txt`, `MYC.txt`,  `BRCA2.txt`, and `MIT.txt` 
 are missing. Actually, they are not added to the repo explicitly, because
