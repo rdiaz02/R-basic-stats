@@ -4150,11 +4150,12 @@ anova(m12)
 summary(m12)
 @ 
 
+% Eh, bad example: this is an old df1b, not from the last df1!
+% What if we changed the reference?
+% <<>>=
+% summary(lm(y ~ A + B, data = df1b))
+% @ 
 
-What if we changed the reference?
-<<>>=
-summary(lm(y ~ A + B, data = df1b))
-@ 
 
 Return contrasts to usual state
 <<>>=
