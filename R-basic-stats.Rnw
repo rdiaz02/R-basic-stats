@@ -4041,6 +4041,49 @@ reference, we can see what each coefficient means.
 What about additive models? This is slightly more complicated:
 
 
+
+% Note about model matrix: there is a great explanation here
+% http://www.clayford.net/statistics/tag/sum-contrasts/
+% Now, we could do (nd using car it is even simpler)
+
+% <<>>=
+% contr.Treatment(3)
+% contr.Helmert(4)
+% @ 
+% or better
+
+% <<>>=
+% dummf <- factor(LETTERS[1:4])
+% contr.Treatment(dummf)
+% @ 
+
+% or whatever and recall this: ``the row values tell us what to plug in to
+% get the means of A, B and C, respectively''
+
+% for instance, above, to get under Helmer
+
+% <<>>=
+% contr.Helmert(dummf)
+% @ 
+
+% to get D I enter the intercept and 3 * the third coefficient in the model
+% and to get A I enter the intercept and -1 and -1 and -1.
+% or
+
+% <<>>=
+% contr.Treatment(dummf)
+% @ 
+% to get C I add the intercept to the T.C coefficient.
+
+
+% Interesting too: https://en.wikipedia.org/wiki/Categorical_variable
+% And this: http://www.unc.edu/courses/2006spring/ecol/145/001/docs/lectures/lecture26.htm
+% Of course, that the meaning of the intercept in, say, contr.Trt is the
+% first level comes from seeing that the first row has only zeroes.
+
+% Cna do the same for helmer and sum
+
+
 <<>>=
 summary(mxu <- lm(y ~ X  + U))
 model.matrix(mxu)
