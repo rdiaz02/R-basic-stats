@@ -1145,7 +1145,7 @@ segment connecting the two observations of a subject%% . For that, though, we
 %% need to use R code directly. For example this will do 
 (beware: this code does the job but it is not very efficient or elegant):
 
-<<fig.show='hold'>>=
+<<fig.show='hold', fig.width=5, fig.height=5>>=
 stripchart(myc ~ cond, vertical = TRUE, data = dmyc)
 for(i in unique(dmyc$id)) 
   segments(x0 = 1, x1 = 2, 
@@ -2024,7 +2024,7 @@ would be a disaster (look at the output in section \ref{nofactor}).
 You are advised to also plot the data. For instance, this
 will do:
 
-<<results='hide'>>=
+<<results='hide', fig.width=5, fig.height=5>>=
 Boxplot(activ ~ ftraining, data = dmit, id.method = "y")
 @ 
 
@@ -2246,8 +2246,12 @@ Morning. %% Incidentally, note that the whole process is done using ``Tests
 Sure. %%Go to ``Models'', ``Graphs'', ``Effects plots'':
 A simple way of doing it is using the \Rfunction{allEffects} function from
 the \CRANpkg{effects}:
-<<out.width='9cm'>>=
+
+<<>>=
 library(effects)
+@ 
+
+<<fig.width=5, fig.height=5>>=
 plot(allEffects(AnovaMIT), ask = FALSE)
 @ 
 
@@ -2266,13 +2270,15 @@ and the plot with the contrasts.
 I would actually modify slightly the title of both figures, so that they
 look better:
 
-<<out.width='7cm', out.height='7cm', fig.show='hold'>>=
+<<fig.width=5, fig.height=5, fig.show='hold'>>=
 plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
 @ 
 
-<<out.width='7cm', out.height='7cm'>>=
+<<>>=
 .Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 tmp <- cld(.Pairs) ## silent assignment 
+@ 
+<<fig.width=5, fig.height=5>>=
 plot(confint(.Pairs), 
      main = "95% family-wise confidence interval using Tukey contrasts")
 @ 
@@ -2989,7 +2995,8 @@ Finally, a boxplot can also help show the interaction. I will use two
 different ones, that differ by the order in which factors are specified
 (one or the other might be easier to decode visually):
 
-<<out.width='8cm', out.height='8cm', fig.show='hold'>>=
+<<fig.width=5, fig.height=10, fig.show='hold'>>=
+par(mfrow = c(2, 1))
 boxplot(y ~ Drug * Diet, data = dcholest, col = c("salmon", "gold"))
 boxplot(y ~ Diet * Drug, data = dcholest, 
         col = c("salmon", "gold", "lightblue"))
@@ -3847,7 +3854,7 @@ for predicting pmax is already contained in the height and weight. That
 age, height, and weigth are correlated is easy to check with a scatterplot
 matrix:
 
-<<results='hide'>>=
+<<results='hide', fig.width=6.5, fig.height=6.5>>=
 scatterplotMatrix( ~ age+height+pemax+weight, smooth = TRUE, 
                   spread = FALSE,  data = cystfibr2)
 @ 
@@ -4303,7 +4310,7 @@ would an interaction have looked like? Different slopes for each group.
 
 Look at the plots:
 
-<<results='hide'>>=
+<<results='hide',fig.width=5, fig.height=5>>=
 scatterplot(pemax ~ age | sex, smooth = FALSE, data = cystfibr2)
 @ 
 
@@ -4795,13 +4802,13 @@ summary(myAdditive)
 summary(myInteract)
 @ 
 
-<<fig.show='hold', fig.cap='Model diagnostics for designed experiment, additive model '>>=
+<<fig.show='hold', fig.width=6.5, fig.height=6.5, fig.cap='Model diagnostics for designed experiment, additive model '>>=
 oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
 plot(myAdditive)
 par(oldpar)
 @ 
 
-<<fig.show='hold', fig.cap='Model diagnostics for designed experiment, interaction model '>>=
+<<fig.show='hold', fig.cap='Model diagnostics for designed experiment, interaction model ', fig.width=6.5, fig.height=6.5>>=
 oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
 plot(myInteract)
 par(oldpar)
@@ -4842,7 +4849,7 @@ We will now use the two simple regression models we fitted in section
 \ref{regr}. Make the first one (\Robject{metab}) active and go to
 ``Models'', ``Graphs'', ``Basic diagnostic plots''. 
 
-<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation '>>=
+<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation ', fig.width=6.5, fig.height=6.5>>=
 oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
 plot(metab)
 par(oldpar)
@@ -4892,7 +4899,7 @@ Cook's distance (function \Rfunction{cooks.distance}).
 
 
 Now, repeat the above with the model that has taken logs:
-<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model after log transformation '>>=
+<<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model after log transformation ', fig.width=6.5, fig.height=6.5>>=
 oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
 plot(metablog)
 par(oldpar)
