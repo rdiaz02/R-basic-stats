@@ -31,12 +31,6 @@
 %% I could not get the first \part to be after a \clearpage without it
 %%  giving weird errors.
 
-\usepackage{titlesec}
-\titleformat{\part}[display]
-  {\itshape\rmfamily\raggedright}{\LARGE Part \thepart}{0mm}{\Huge}{}
-\titlespacing*{\part}{0mm}{30mm}{30mm}
-\titleclass{\part}{top}
-\newcommand\partbreak{\clearpage}
 
 
 %% For using listings, so as to later produce HTML
@@ -54,7 +48,6 @@ opts_knit$set(stop_on_error = 2L)
 ##listings-knitr-html%%render_listings()
 @ 
 
-
 %% BiocStyle needs to be 1.2.0 or above
 <<packages,echo=FALSE,results='hide',message=FALSE>>=
 require(BiocStyle, quietly = TRUE)
@@ -63,7 +56,14 @@ require(BiocStyle, quietly = TRUE)
 BiocStyle::latex()
 @
 %% Modify margins; must issue after BioC style
-\geometry{verbose,a4paper,tmargin=23mm,bmargin=23mm,lmargin=28mm,rmargin=28mm}
+%% \geometry{verbose,a4paper,tmargin=23mm,bmargin=23mm,lmargin=28mm,rmargin=28mm}
+
+\usepackage{titlesec}
+\titleformat{\part}[display]
+  {\itshape\rmfamily\raggedright}{\LARGE Part \thepart}{0mm}{\Huge}{}
+\titlespacing*{\part}{0mm}{30mm}{30mm}
+\titleclass{\part}{top}
+\newcommand\partbreak{\clearpage}
 
 
 
@@ -2874,7 +2874,7 @@ summary(m4)
 
 
 
-\subsection{Fitting a two-way ANOVA: cholesterol}\label{twoway}
+\subsection{Fitting a two-way ANOVA: cholesterol}\label{twoway-chol}
 
 The following data come from an experiment about the effects of three
 diets and two cholesterol-controlling drugs in the reduction of
@@ -4914,7 +4914,7 @@ However, it is not easy to tell, because of the relatively few
 points. This, of course, makes sense: if there are few points, we will
 only be able to detect if a model is a bad one if it really is very bad.
 
-\Robject{cholestanova}, from section \ref{twoway}, looks relatively OK
+\Robject{cholestanova}, from section \ref{twoway-chol}, looks relatively OK
 (remember, this is an ANOVA, and there were six combinations of levels,
 and thus the discrete values you observe in two of the plots). However,
 the qqplot of residuals is a little bit ugly, but it is hard to tell from
