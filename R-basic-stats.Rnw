@@ -888,6 +888,11 @@ and verify they have the same data.
 As it says, you could try doing the reshaping using \Rfunction{dcast} from
 \CRANpkg{reshape2}. Try it if you want to.
 
+%% Probably the preferred way now is tidyr
+
+%% dcast(dmyc, id ~ cond, value.var = "myc")
+
+%% see here for nice summary: http://www.cookbook-r.com/Manipulating_data/Converting_data_between_wide_and_long_format/
 
 \subsubsection{Reshaping et al: final comments}
 
@@ -1399,6 +1404,10 @@ wilcox.test(diff.nc.c)
 
 
 % Contrary to Conover, not really testing F(x)= G(x)
+%% Wikipedia entry much clearer: is a nonparametric test of the null
+%% hypothesis that it is equally likely that a randomly selected value
+%% from one sample will be less than or greater than a randomly selected
+%% value from a second sample.
 
 % <<>>=
 % ## Will not reject
@@ -3820,6 +3829,7 @@ You should be able to interpret all output without problems.
 %%           grid=TRUE, ellipsoid=FALSE))
 %% @ 
 
+%% or use fit = ``quad''
 
 Now, use ANOVA tables with Type I sums of squares and Type II sums of squares:
 
