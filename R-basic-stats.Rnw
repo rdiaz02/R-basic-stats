@@ -316,7 +316,7 @@ functionality. The \verb@op <- par(mfrow = c(1,2))@ and \verb@par(op)@ are a
 minor detail to restore options as they were.
 
 Likewise, I have used \Rfunction{Hist} and
-\Rfunction{plotMisc} from
+\Rfunction{plotMeans} from
 \CRANpkg{RcmdrMisc}. They are not strictly needed (you can get these plots
 by other means), but they are extremely convenient.
 
@@ -446,7 +446,7 @@ display the different (two, in this case) groups. %% Playing around, you
 %% histograms, though they are of questionable application here, with so few
 %% data).
 
-<<fig.width=8, fig.height=8,echo=FALSE>>=
+<<fig.width=8, fig.height=8>>=
 scatterplotMatrix( ~ brca1 + brca2 + p53 + pten | cond, 
                   reg.line = FALSE, 
                   smooth = FALSE, 
@@ -893,6 +893,13 @@ As it says, you could try doing the reshaping using \Rfunction{dcast} from
 %% dcast(dmyc, id ~ cond, value.var = "myc")
 
 %% see here for nice summary: http://www.cookbook-r.com/Manipulating_data/Converting_data_between_wide_and_long_format/
+
+
+%% another interesting entry
+%% http://www.milanor.net/blog/reshape-data-r-tidyr-vs-reshape2/
+
+%% and the data wrangling cheatsheet
+%% https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
 
 \subsubsection{Reshaping et al: final comments}
 
