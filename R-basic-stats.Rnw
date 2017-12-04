@@ -1139,6 +1139,14 @@ Boxplot( ~ diff.nc.c, data = merged3, xlab = "",
 @ 
 
 
+Of course, we could do something like this if we wanted, which shows the
+mean of the intra-subject differences and its standard error:
+
+<<>=
+plotMeans(diff.nc.c, factor(rep(1, 12)))
+@ 
+
+
 % <<fig.width=5, fig.height=5, echo=TRUE>>=
 % diffs <- dmyc$myc[1:12] - dmyc$myc[13:24]
 % Boxplot( ~ diffs, xlab = "", ylab = "Intra-subject difference", main = "MYC")
@@ -1727,7 +1735,8 @@ Now, let's do a t-test on the aggregated data. Pay attention to the
 degrees of freedom (and the statistic and p-values):
 
 <<>>=
-t.test(brca2 ~ cond, alternative = 'two.sided', conf.level = .95, var.equal = FALSE, 
+t.test(brca2 ~ cond, alternative = 'two.sided', conf.level = .95, 
+       var.equal = FALSE, 
   data = aggbrca)
 @ 
 
@@ -1738,6 +1747,38 @@ there is a strong effect when, really, there is no evidence of effect.
 
 What if the subjects had been measured a different number of times? What
 would be the problems of simply taking the averages over subjects?
+
+
+
+Of course, we could have done
+<<>>=
+
+(aggbrca3 <- aggregate(brca2 ~ cond + id, data = dbrca, 
+                      FUN = function(x) c(Mean = mean(x), N = length(x))))
+
+## the first not that useful immediately
+
+library(doBy)
+
+(aggbrca4 <- summaryBy(brca2 ~ cond + id, data = dbrca, 
+                      FUN = function(x) c(Mean = mean(x), N = length(x))))
+
+t.test(brca2.Mean ~ cond, 
+       var.equal = FALSE, 
+       data = aggbrca4)
+
+
+t.test(brca2[, "Mean"] ~ cond, 
+       var.equal = FALSE, 
+       data = aggbrca3)
+
+
+
+
+@
+
+
+
 
 
 
