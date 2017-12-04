@@ -10,7 +10,7 @@ clt1 <- function(n_pop, n_mean,  FUN, ...) {
                              function(u) mean(FUN(n_pop, ...)),
                              mc.cores = cores))
     op <- par(mfrow = c(2, 1))
-    hist(means)
+    hist(means, breaks = 50)
     abline(v = mean(means))
     qqnorm(means, pch = ".")
     qqline(means)
@@ -29,10 +29,20 @@ clt1(100, 10000, rexp, 0.1)
 
 clt1(200, 10000, rexp, 0.1)
 
+## cauchy always behaves poorly
+clt1(5, 10000, rcauchy, location = 5)
+clt1(20, 10000, rcauchy, location = 5)
+clt1(100, 10000, rcauchy, location = 5)
+clt1(1000, 10000, rcauchy, location = 5)
+clt1(2000, 10000, rcauchy, location = 5)
+
+
 ## What about a t distribution?
 library(limma)
 
-tdt1 <- function(n_pop, n_mean,  FUN, ...) {
+tdt1 <- function(n_pop, n_mean,
+                 truemean = NULL,
+                 FUN, ...) {
     cores <- detectCores()
 
     X <- mclapply(seq.int(n_mean),
@@ -43,10 +53,11 @@ tdt1 <- function(n_pop, n_mean,  FUN, ...) {
     ## or rbindlist (data.table) or dplyr::bind_rows, etc
     means <- rowMeans(Xmat)
 
-    bigmean <- mean(means)
+    if(is.null(truemean)) 
+        truemean <- mean(means)
     vars <- apply(Xmat, 1, var)
     se <- sqrt(vars/n_pop)
-    tstats <- (means - bigmean)/se
+    tstats <- (means - truemean)/se
 
     op <- par(mfrow = c(2, 1))
     hist(tstats, freq = FALSE)
@@ -55,13 +66,25 @@ tdt1 <- function(n_pop, n_mean,  FUN, ...) {
     abline(0, 1)
 }
 
-tdt1(2, 10000, rexp, 0.1)
+tdt1(2, 10000, 10, rexp, 0.1)
 
-tdt1(200, 10000, rexp, 0.1)
+tdt1(20, 10000, 10, rexp, 0.1)
 
-tdt1(500, 10000, rexp, 0.1)
+tdt1(50, 10000, 10, rexp, 0.1)
 
-tdt1(5000, 10000, rexp, 0.1)
+tdt1(100, 10000, 10, rexp, 0.1)
+
+tdt1(200, 10000, 10, rexp, 0.1)
+
+tdt1(500, 10000, 10, rexp, 0.1)
+
+tdt1(5000, 10000, 10, rexp, 0.1)
+
+
+tdt1(1000, 10000, 5, rcauchy, 5)
+
+tdt1(5000, 10000, 5, rcauchy, 5)
+
 
 
 ## we could plot the density
