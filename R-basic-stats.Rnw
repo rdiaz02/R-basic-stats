@@ -2231,14 +2231,17 @@ making sure to click on ``Pairwise comparisons of means''. However, that
 is just a detail that explains the names of the objects. The procedure
 using \Rfunction{glht} does not depend on R Commander.}
 
-<<tukey1,fig.cap='Plot of pairwise differences with Tukey contrasts', fig.lp='fig:', fig.width=5,fig.height=5, fig.show='hold', results='hide'>>=
 
+<<>>=
 library(multcomp) ## for glht
-## The next two lines carry out the multiple comparisons and the following
-## lines plot them
+## The next two lines carry out the multiple comparisons and the 
+## ones below plot them
 Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 summary(Pairs) # pairwise tests
 confint(Pairs) # confidence intervals
+@ 
+
+<<tukey1,fig.cap='Plot of pairwise differences with Tukey contrasts', fig.lp='fig:', fig.width=5,fig.height=5, fig.show='hold', results='hide'>>=
 cld(Pairs) # compact letter display
 old.oma <- par(oma = c(0,5,0,0))
 plot(confint(Pairs))
@@ -2326,7 +2329,7 @@ plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
 .Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 tmp <- cld(.Pairs) ## silent assignment 
 @ 
-<<fig.width=5, fig.height=5>>=
+<<fig.width=6, fig.height=6>>=
 plot(confint(.Pairs), 
      main = "95% family-wise confidence interval using Tukey contrasts")
 @ 
