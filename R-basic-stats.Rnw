@@ -305,8 +305,7 @@ plotMeans(dp53$p53, dp53$cond, error.bars = "se",
   xlab = "Condition", ylab = "P53 expression levels")
 stripchart(p53 ~ cond, vertical = TRUE, method = "jitter", 
   ylab = "p53", data = dp53)
-densityPlot(p53 ~ cond, data = dp53, bw = "SJ", adjust = 1, 
-  kernel = "gaussian")
+densityPlot(p53 ~ cond, data = dp53, adjust = 1)
 par(op)
 @ 
 
@@ -448,8 +447,6 @@ display the different (two, in this case) groups. %% Playing around, you
 
 <<fig.width=8, fig.height=8>>=
 scatterplotMatrix( ~ brca1 + brca2 + p53 + pten | cond, 
-                  reg.line = FALSE, 
-                  smooth = FALSE, 
                   data = dp53)
 @ 
 
@@ -505,9 +502,8 @@ non-independence is also referred to as ``pseudoreplication'' \footnote{A
 When comparing two means, \textbf{equality of variances} is also
 important. But detecting differences in variances is complicated. Two
 practical solutions are: Welch's test (the default in R) and using
-transformations (see also section \ref{transform}). However, think about
-the meaning of a comparison of means when variances are hugely different:
-do you really want to do that?
+transformations. However, think about the meaning of a comparison of means
+when variances are hugely different: do you really want to do that?
 
 
 What about normality? It matters, but not as much, especially as sample
@@ -574,45 +570,45 @@ A few ideas that should be clear after this section:
 If any one of the above is not clear, please ask it in class.
 
 
-\section{Data transformations}\label{transform}
+%% \section{Data transformations}\label{transform}
 
-(Look at this section briefly if we do not have a lot of time. Many things
-will be clearer after we play with transformations in linear models.)
+%% (Look at this section briefly if we do not have a lot of time. Many things
+%% will be clearer after we play with transformations in linear models.)
 
-Let us look at the boxplot for ``pten''. What does it look like? Take the
-log transformation: create a new variable. %% Yes, find this out; it is
-%% under ``Data'', ``Manage variables'', ``Compute new variable'' and you
-%% enter ``log(pten)'' as the ``Expression to compute''; take a look at
-%% Figure \ref{ucla} for an example; or you can be much faster and do it by
-%% typing code directly in the R Script or the RStudio console:
+%% Let us look at the boxplot for ``pten''. What does it look like? Take the
+%% log transformation: create a new variable. %% Yes, find this out; it is
+%% %% under ``Data'', ``Manage variables'', ``Compute new variable'' and you
+%% %% enter ``log(pten)'' as the ``Expression to compute''; take a look at
+%% %% Figure \ref{ucla} for an example; or you can be much faster and do it by
+%% %% typing code directly in the R Script or the RStudio console:
 
-<<>>=
-dp53$logpten <- log(dp53$pten)
-@
-
-
-Now, plot the log of pten. And do t-tests of the original and
-log-transformed variable.
-
-<<results='hide', fig.show='hold', fig.width=5, fig.height=5>>=
-op <- par(mfrow = c(1, 2))
-Boxplot(pten ~ cond, data = dp53, id.method = "y")
-Boxplot(logpten ~ cond, data = dp53, id.method = "y")
-par(op)
-@ 
+%% <<>>=
+%% dp53$logpten <- log(dp53$pten)
+%% @
 
 
-Do we expect multiplicative or additive effects? (With a two-group
-comparisons it isn't always easy to think this, but can be crucial in
-regression; we will see it later). 
+%% Now, plot the log of pten. And do t-tests of the original and
+%% log-transformed variable.
+
+%% <<results='hide', fig.show='hold', fig.width=5, fig.height=5>>=
+%% op <- par(mfrow = c(1, 2))
+%% Boxplot(pten ~ cond, data = dp53, id.method = "y")
+%% Boxplot(logpten ~ cond, data = dp53, id.method = "y")
+%% par(op)
+%% @ 
+
+
+%% Do we expect multiplicative or additive effects? (With a two-group
+%% comparisons it isn't always easy to think this, but can be crucial in
+%% regression; we will see it later). 
 
 
 
 
-<<>>=
-t.test(pten ~ cond, data = dp53)
-t.test(logpten ~ cond, data = dp53)
-@ 
+%% <<>>=
+%% t.test(pten ~ cond, data = dp53)
+%% t.test(logpten ~ cond, data = dp53)
+%% @ 
 
 
 \clearpage
@@ -2330,15 +2326,15 @@ look better:
 plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
 @ 
 
-<<>>=
+%% <<fig.width=6>>=
+<<out.width='12cm'>>= 
 .Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 tmp <- cld(.Pairs) ## silent assignment 
-@ 
-<<fig.width=6, fig.height=6>>=
+old.oma <- par(oma=c(0,5,0,0))
 plot(confint(.Pairs), 
      main = "95% family-wise confidence interval using Tukey contrasts")
+par(old.oma) ## restore graphics windows settings
 @ 
-
 
 
 %% You can just copy and paste code
@@ -3751,8 +3747,8 @@ might want to not show the spread \footnote{I find the spread
 
 <<out.width = '10cm', out.height = '10cm', results='hide'>>=
 scatterplot(Metabolic.rate..W. ~ Body.mass..g., 
-            smooth = TRUE, 
-            spread = FALSE,  data = anage_a)
+            smooth = FALSE, 
+            data = anage_a)
 @ 
 
 The second plot we will do requires you to load \CRANpkg{HH}%% can get from ``Models'', ``Confidence interval plot''
@@ -3799,7 +3795,7 @@ Now the two plots:
 <<fig.width=7, fig.height=7,results='hide'>>=
 
 scatterplot(Metabolic.rate..W. ~ Body.mass..g., log = "xy", 
-            smooth = TRUE, spread = FALSE, 
+            smooth = TRUE, boxplots = 'xy',
             data = anage_a)
 @ 
 
@@ -3911,8 +3907,8 @@ age, height, and weigth are correlated is easy to check with a scatterplot
 matrix:
 
 <<results='hide', fig.width=6.5, fig.height=6.5>>=
-scatterplotMatrix( ~ age+height+pemax+weight, smooth = TRUE, 
-                  spread = FALSE,  data = cystfibr2)
+scatterplotMatrix( ~ age+height+pemax+weight, 
+                  data = cystfibr2)
 @ 
 
 In fact, if you refit the model and now put height first, and do a
@@ -4367,7 +4363,12 @@ would an interaction have looked like? Different slopes for each group.
 Look at the plots:
 
 <<results='hide',fig.width=5, fig.height=5>>=
-scatterplot(pemax ~ age | sex, smooth = FALSE, data = cystfibr2)
+scatterplot(pemax~age | sex, 
+            boxplots='xy', 
+            smooth = FALSE,
+            by.groups=TRUE, 
+            data=cystfibr2)
+
 @ 
 
 (yes, the best fitting slopes are slightly different, but they are not
@@ -4533,8 +4534,10 @@ only removing the interaction, for which we already saw a test).
 Let's see the plots:
 \clearpage
 <<results='hide'>>=
-scatterplot(Metabolic.rate..W. ~ Body.mass..g. | Class, 
-            log = "xy", smooth = FALSE, data = anage_a_r)
+scatterplot(Metabolic.rate..W.~Body.mass..g. | Class, 
+            log="xy", smooth=FALSE, 
+            by.groups=TRUE, 
+            data=anage_a_r)
 @ 
 
 \clearpage
@@ -4559,9 +4562,11 @@ body mass is faster in reptiles than in birds (note the coefficient
 How do things look?
 
 <<results='hide'>>=
-scatterplot(Maximum.longevity..yrs. ~ Body.mass..g. | Class, 
-            smooth = FALSE, data = anage_a_r,
-            log = "xy", boxplots = 'xy')
+scatterplot(Maximum.longevity..yrs.~Body.mass..g. | Class, 
+            log="xy", smooth=FALSE, 
+            by.groups=TRUE, 
+            data=anage_a_r)
+
 @ 
 
 <<echo=TRUE, results='hide'>>=
