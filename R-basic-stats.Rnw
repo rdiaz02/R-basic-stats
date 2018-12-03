@@ -3947,7 +3947,7 @@ all.equal(
 all.equal(summary(mcyst)$sigma^2,
           sum(residuals(mcyst)^2)/21)
 
-## and where is the 4 from
+## and where is the (25 = 21 - 4) 4 from
 21 == (length(residuals(mcyst)) - length(coefficients(mcyst)))
 
 all.equal(
