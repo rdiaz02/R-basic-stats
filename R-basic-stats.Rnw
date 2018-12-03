@@ -1138,7 +1138,7 @@ Boxplot( ~ diff.nc.c, data = merged3, xlab = "",
 Of course, we could do something like this if we wanted, which shows the
 mean of the intra-subject differences and its standard error:
 
-<<>=
+<<>>=
 plotMeans(diff.nc.c, factor(rep(1, 12)))
 @ 
 
@@ -2092,7 +2092,7 @@ will allow us to test directly.
 %% Find you way around the menu and do a One-way ANOVA (``Statistics'',
 %% ``Means''). You'll see this in the R Script window:
 
-<<results='hide'>>=
+<<results='show'>>=
 AnovaMIT <- aov(activ ~ ftraining, data = dmit)
 summary(AnovaMIT)
 @ 
@@ -2973,7 +2973,7 @@ dcholest <- read.table("Cholesterol.txt", header = TRUE)
 @ 
 
 
-\subsection{Fitting a two-way ANOVA}\label{twowayfit}
+%% \subsection{Fitting a two-way ANOVA}\label{twowayfit}
 
 
 Look at the output, which I comment below
@@ -3151,8 +3151,7 @@ those for the term that enters last in the Type I (those produced via
 \Rfunction{anova}, without a capital ``A'').
 
 
-This sounds crazy, irrelevant, and a huge wast of time. But it ain't. This
-is an \textbf{extremely common phenomenon} when the design is not
+This is an \textbf{extremely common phenomenon} when the design is not
 perfectly balanced (with categorical independent variables) or there are
 correlations (with continuous covariates, as in regression). What is
 happening?
@@ -3929,7 +3928,33 @@ three variables, but those three variables are very highly correlated
 among themselves. Is this a common phenomenon: yes, it is rather common.
 
 
+\subsection{$R^2$ and Adjusted $R^2$}
+\label{r2}
 
+We will explain this class, in case it is not clear:
+
+<<>>=
+summary(mcyst)
+
+cor(fitted(mcyst), cystfibr2$pemax)^2
+
+all.equal(
+    cor(fitted(mcyst), cystfibr2$pemax)^2,
+    summary(mcyst)$r.squared
+)
+
+## 
+all.equal(summary(mcyst)$sigma^2,
+          sum(residuals(mcyst)^2)/21)
+
+## and where is the 4 from
+21 == (length(residuals(mcyst)) - length(coefficients(mcyst)))
+
+all.equal(
+(var(cystfibr2$pemax) - summary(mcyst)$sigma^2)/var(cystfibr2$pemax),
+summary(mcyst)$adj.r.squared)
+
+@ 
 
 
 
