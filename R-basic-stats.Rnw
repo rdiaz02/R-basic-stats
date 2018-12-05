@@ -1255,6 +1255,7 @@ Lets go and fit that model! %% Do it under ``Fit models'', ``Linear models'',
 <<>>=
 LinearModel.1 <- lm(myc ~ id + cond, data = dmyc)
 summary(LinearModel.1)
+t.test(myc ~ cond, data = dmyc, paired = TRUE)
 @ 
 
 Run it and look at the line that has ``cond'' (so, using your common
@@ -2627,19 +2628,22 @@ rate provide are mechanisms for ensuring that $Pr(V \geq 1)$ is below a
 number you specify (e.g., 0.05).
 
 
-Note that, in our usage of Tukey, we did not pre-specify that $Pr(V \geq
-1)$. The procedure is run, and it gives us ``adjusted p-values''. And what
-is an adjusted p-value?  The classical paper from Wright, 1992, ``Adjusted
-p-values for simultaneous inference'', \textit{Biometrics}, 48:
-1005--1013, has in p.\ 1006 this definition of adjusted p-value: ``The
-adjusted $P$-value for a particular hypothesis within a collection of
-hypotheses, then, is the smallest overall (i.e., 'experimentwise')
-significance level at which the particular hypothesis would be rejected.''
-This might sound like a mess, but it really ain't. Think about it. It is
-so nice that it makes comparisons very simple, as Wright explains: ``An
-adjusted $P$-value can be compared directly with any chosen significance
-level $\alpha$: If the adjusted $P$-value is less than or equal to
-$\alpha$, the hypothesis is rejected.''
+Note that, in our usage of Tukey, we did not pre-specify that
+$Pr(V \geq 1)$. The procedure is run, and it gives us ``adjusted
+p-values''. And what is an adjusted p-value?  The classical paper from
+Wright, 1992, ``Adjusted p-values for simultaneous inference'',
+\textit{Biometrics}, 48: 1005--1013, has in p.\ 1006 this definition of
+adjusted p-value: ``The adjusted $P$-value for a particular hypothesis
+within a collection of hypotheses, then, is the smallest overall (i.e.,
+'experimentwise') significance level at which the particular hypothesis
+would be rejected.''  This might sound like a mess, but it really
+ain't. Think about it. To get going, start reading the sentence covering
+``adjusted'' and ``collection of'' (i.e., think about a single p-value for
+an experiment where a single null is tested); then move on to the multiple
+p-values case. It is so nice that it makes comparisons very simple, as
+Wright explains: ``An adjusted $P$-value can be compared directly with any
+chosen significance level $\alpha$: If the adjusted $P$-value is less than
+or equal to $\alpha$, the hypothesis is rejected.''
 
 
 
@@ -4763,6 +4767,15 @@ it just fine: you see a strong interaction between slope and
 group. And, again, the analysis of ratios is misleading.
 
 
+Log-transforming the ratio, using non-parametric statistics, etc, won't
+help; the problem is using the ratio.
+<<>>=
+t.test(log(Ratio) ~ Group, data = data2)
+with(data2, plot(log(Ratio) ~ Group))
+wilcox.test(Ratio ~ Group, data = data2)
+@ 
+
+
 
 \subsection{Diagnostics et al.\ and other warning signs}
 
@@ -5129,7 +5142,7 @@ For you to read and play around further:
   \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
   comparison plots'').
 \item ``Component+Residual'' (or partial residual\footnote{These plots,
-    for each variable, shows a plot of the independent variable, say $x$, on the
+    for each variable, show a plot of the independent variable, say $x$, on the
     horizontal axis and, on the ordinates, the ``partial residuals'' $=
     residual + \hat{\beta}x$.}) plots allow us to
   examine, in models with multiple regressors, deviations from linearity
@@ -5308,7 +5321,6 @@ step(mcyst2, direction = "both")
 step(mcyst, direction = "both")
 @ 
 
-
 <<>>=
 ## In metab, we drop the interaction
 step(metab_b_r, direction = "both")
@@ -5321,6 +5333,47 @@ step(longev_b_r, direction = "both")
 %% some of the above leads to a non-compiling tex. Go figure. It seems
 %% some kind of interaction between knitr and something else. So leave the
 %% comments in the last chunk.
+
+
+
+
+A large pemax model:
+
+<<>>=
+mcystL <- lm(pemax ~ age * height * weight * sex, data = cystfibr2)
+summary(mcystL)
+Anova(mcystL)
+
+mcystL_r <- step(mcystL, direction = "both")
+summary(mcystL_r)
+Anova(mcystL_r)
+
+## Manually reducing it. Be careful here!!!
+mcystL_r2 <- update(mcystL_r, . ~ . -age:weight:sex - height:sex - age:weight)
+Anova(mcystL_r2)
+anova(mcystL_r2, mcystL_r)
+@ 
+
+
+A final one, with another type of data
+
+<<>>=
+data(Prestige)
+## do ?Prestige
+
+mI <- lm(prestige ~ women * income * education * type, data = Prestige)
+
+## Notice degrees of freedome
+Anova(mI)
+lm(mI)
+## check model!!! This could probably be improved?
+plot(mI)
+
+mI_r <- step(mI, direction = "both")
+Anova(mI_r)
+summary(mI_r)
+@ 
+
 
 
 \section{Experimental design matters}
