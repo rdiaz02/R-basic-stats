@@ -1,6 +1,6 @@
 %\VignetteEngine{knitr::knitr}
-\documentclass[a4paper,11pt]{article}
 \synctex=1
+\documentclass[a4paper,11pt]{article}
 %% not if using BiocStyle
 %% \usepackage[authoryear,round,sort]{natbib}
 %% \usepackage{hyperref} 
@@ -40,7 +40,7 @@
 
 <<setup,include=FALSE,cache=FALSE>>=
 require(knitr)
-library(patchSynctex)
+## library(patchSynctex)
 opts_knit$set(concordance = TRUE)
 opts_knit$set(stop_on_error = 2L)
 ## next are for listings, to produce HTML
@@ -101,7 +101,7 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014, 2015, 2016, 2017, Ramon Diaz-Uriarte,
+This work is Copyright, \copyright, 2014, 2015, 2016, 2017, 2018, 2019, Ramon Diaz-Uriarte,
 and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
 4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
