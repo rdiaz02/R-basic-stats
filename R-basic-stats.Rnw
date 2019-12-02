@@ -3958,7 +3958,26 @@ all.equal(
 (var(cystfibr2$pemax) - summary(mcyst)$sigma^2)/var(cystfibr2$pemax),
 summary(mcyst)$adj.r.squared)
 
+
+## Also could see as
+
+ssresid <- sum(residuals(mcyst)^2)
+sstot   <- sum( (cystfibr2$pemax - mean(cystfibr2$pemax))^2 )
+
+## Multiple R^2
+1 - (ssresid/sstot)
+length(resid(mcyst))
+## Adjusted R^2
+1 - ( (ssresid/(25 - 4))/(sstot/(25 - 1)) )
+
+
+
 @ 
+
+
+
+
+
 
 
 
