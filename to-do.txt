@@ -1,0 +1,4 @@
+- finish diagnostics
+- trabajo
+- collinearity examples
+- ratios
