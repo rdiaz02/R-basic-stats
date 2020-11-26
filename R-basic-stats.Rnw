@@ -84,7 +84,7 @@ BiocStyle::latex()
   Instituto de Investigaciones Biom\'edicas ``Alberto Sols'' (UAM-CSIC)\\
   Madrid, Spain{\footnote{ramon.diaz@iib.uam.es, rdiaz02@gmail.com}} \\
 %% {\footnote{rdiaz02@gmail.com}} \\
-{\small \Burl{http://ligarto.org/rdiaz}} \\
+{\small \Burl{https://ligarto.org/rdiaz}} \\
  }
 
 
