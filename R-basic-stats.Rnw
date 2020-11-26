@@ -101,7 +101,7 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014, 2015, 2016, 2017, 2018, 2019, Ramon Diaz-Uriarte,
+This work is Copyright, \copyright, 2014-2021, Ramon Diaz-Uriarte,
 and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
 4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -710,6 +710,7 @@ t.test(myc.nc, myc.cancer, paired = TRUE)
 
 \subsection{Reshaping the data for a paired t-test}
 
+
 \subsubsection{The shape of the data}\label{datashape}
 Often, when you know you are only going to do a paired test you can
 organize your data in a table structure like the one in Table 
@@ -763,6 +764,18 @@ here.
 %% could also do this outside R if you want and then import the data so that
 %% the two values of myc expression for a subject are on the same row but
 %% that is ugly.
+
+
+\textbf{This is optional reading, and not a key part. This is about the
+  mechanics of how to do the reshaping}. So what follow are some general
+explanations. There is also a different summary available in the
+R-bioinfo-intro notes: \Burl{https://github.com/rdiaz02/R-bioinfo-intro},
+in this file:
+\Burl{https://github.com/rdiaz02/R-bioinfo-intro/blob/master/reshape-long-wide.R}. \textbf{I
+  will, at least initially, skip this section about the mechanics in
+  class. }
+
+
 
 So that is what we want: the values of myc of the same subject to be on
 the same row. We will do this reshaping in several different ways.
