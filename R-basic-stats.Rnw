@@ -3178,13 +3178,14 @@ happening?
 \begin{itemize}
 \item Type II sums of squares (similar to t-statistics from a linear
   model) show what that term contributes, \textbf{given all the rest} are
-  already in the model. In other words, given all the other terms (that do
-  not include this term) have already been taken into account. This is
-  actually the output we would get from comparing two models, one with all
-  terms, and one with all terms except the term in question. (Always
-  assuming interactions with the term in question are zero). The package
-  \CRANpkg{car}, by default, gives you this via \Rfunction{Anova}. I
-  routinely use \Rfunction{Anova}.
+  already in the model (``given all the rest'': all the rest that do not
+  include this term, so no interactions with this term). In other words,
+  given all the other terms (that do not include this term) have already
+  been taken into account. This is actually the output we would get from
+  comparing two models, one with all terms, and one with all terms except
+  the term in question. (Always assuming interactions with the term in
+  question are zero). The package \CRANpkg{car}, by default, gives you
+  this via \Rfunction{Anova}. I routinely use \Rfunction{Anova}.
   
 \item Type I (or sequential) sums of squares do not. They are sequential,
   in the order shown in the output. R, by default, gives you this via
@@ -3222,8 +3223,7 @@ discuss this in class.
 
 \subsubsection{Type I, Type II, Type III: a few technical notes}\label{ssI-to-III}
 (Skip this if you want. I leave it here in case you want to get back to
-it. And yes, we have not mentioned Type III, though I give a piece of
-output in section \ref{regr-int}).
+it. And yes, we have not mentioned Type III much (but see \ref{2way-int}
 
 % %% This is too complex, as the SS(A, B, AB) is the sum of the SS of the
 % %% model.
@@ -3272,9 +3272,9 @@ output in section \ref{regr-int}).
 % predictors in models with continuous predictors).
 
 
-I take this from \Burl{http://www.utstat.utoronto.ca/reid/sta442f/2009/typeSS.pdf}:
+I take this from Nancy Reid's \Burl{http://www.utstat.utoronto.ca/reid/sta442f/2009/typeSS.pdf}:
 
-``Let R(·) represent the residual sum of squares for a model, so for
+``Let R(.) represent the residual sum of squares for a model, so for
 example R(A,B,AB) is the residual sum of squares fitting the whole model,
 R(A) is the residual sum of squares fitting just the main effect of A, and
 R(1) is the residual sum of squares fitting just the mean.''
@@ -3287,6 +3287,8 @@ B:  SS(B|A) = R(A) - R(A, B)
 AB: SS(AB|A, B) = R(A, B) - R(A, B, AB) 
 \end{verbatim}
 
+\vspace*{15pt}
+
 
 \textbf{Type II}
 
@@ -3297,6 +3299,10 @@ AB: SS(AB|A, B) = R(A, B) - R(A, B, AB)
 \end{verbatim}
 
 We assume no significant interaction
+
+
+\vspace*{15pt}
+
 
 \textbf{Type III}
 
@@ -3311,10 +3317,15 @@ interpretable. (And beware of the contrasts you use ---section
 \ref{othercontrasts}--- if you want to take a look at coefficients. Note
 also possible issues related to changes in results if you center the
 predictors in models with continuous predictors). We will not use Type III
-in this notes. (Search the paper by Bill Venables ``Exegeses on linear
+in this notes. (Why? Read the paper by Bill Venables ``Exegeses on linear
 models'', or Oyvind Langsrud, 2003, ``ANOVA for unbalanced data: Use Type
 II instead of Type III sums of squares'', Statistics and Computing, Volume
-13, Number 2, pp. 163-167, or the many debates about Type III SS.)
+13, Number 2, pp. 163-167, or the many debates about Type III SS. There
+are a few ways to obtain Type III in R, the easiest by using
+\texttt{Anova(x, type = ``III'')}, and also by using \texttt{drop1} with
+the right contrasts).
+
+\vspace*{15pt}
 
 
 And some numbers here:
@@ -4146,9 +4157,9 @@ hyperplane)\footnote{If you want to play around with a regression plane or
   our brains do not seem ready for 4D and higher.}.
 
 
-How do we interpret coefficients? Just a few hints here. Suppose we have
-$y = \alpha + \beta_1 x_1 + \beta_2 x_22 + \beta_{1,2} x_1 x_2 + \epsilon$ (where the
-last term is literally the product of $\beta_{1,2}$ times the product of
+How do we interpret coefficients? Just a few hints here. Suppose we have\\
+$y = \alpha + \beta_1 x_1 + \beta_2 x_22 + \beta_{1,2}\ x_1\ x_2 + \epsilon$ (where the
+term $\beta_{12}\ x_1\ x_2$ is literally the product of $\beta_{1,2}$ times the product of
 $x_1$ and $x_2$). Now, in a table of coefficients, what is the meaning of
 $\beta_1$? That is a table that ``shows everything when everything else is
 also in the model'' (and that includes the interaction).  You can think of
@@ -4157,7 +4168,11 @@ $\beta_1$ as just the best term that solves the above equation ($y =
 \epsilon$). But think about the interpretation of ``a coefficient tells me
 how fast the response changes when the predictor changes by one
 unit''. Let's do that: $\frac{\partial y}{\partial x_1} = \beta_1 +
-\beta_{1,2}\ x_2$; see how $x_2$ is there. This contrasts with the model without interaction:
+\beta_{1,2}\ x_2$; see how $x_2$ is there. How fast $y$ changes with $x_1$
+is also a function of $x_2$. 
+
+
+This differs from the model without interaction where we have:
 $\frac{\partial y}{\partial x_1} = \beta_1$. 
 
 And a simple numerical example:
@@ -4196,6 +4211,21 @@ anova(lm(lm(pemax ~ height + age, data = cystfibr2)))
 % options(opt)
 
 % (For Type III SS: see section \ref{ssI-to-III}).
+
+
+% <<>>=
+% mahs <- lm(pemax ~ scale(age, scale = FALSE) + scale(height, scale = FALSE), data = cystfibr2)
+% mahis <- lm(pemax ~ scale(age, scale = FALSE) * scale(height, scale = FALSE), data = cystfibr2)
+
+% summary(mahs)
+% summary(mahis)
+
+% ## mahis coeff for age
+% coefficients(mahi)["age"] + coefficients(mahi)["age:height"] * mean(cystfibr2$height)
+% ## mahis coeff for height
+% coefficients(mahi)["height"] + coefficients(mahi)["age:height"] * mean(cystfibr2$age)
+% @ 
+
 
 
 \clearpage
@@ -4970,6 +5000,7 @@ summary(lm(Y ~ Z * Group, data = data1))
 t.test(Ratio ~ Group, data = data1)
 ## This is the equivalent to the t-test, except the
 ## t-test used by default by R does not assume equal variances
+## You could also use t.test(...., var.equal = TRUE)
 summary(aov(Ratio ~ Group, data = data1))
 @ 
 
@@ -5569,8 +5600,10 @@ initial and final models is always a necessity.
 
 
 
-To give some examples (look at them carefully, and compare with what we
-did by hand, and with whether or not these are the models you would use):
+Let's give some examples (look at them carefully, and compare with what we
+did by hand, and with whether or not these are the models you would
+use). We are using AIC ($AIC = -2 \log(\hat{L}) + 2\ k$, where $k$ is the
+number of parameters, so we want to minimize AIC):
 
 <<>>=
 step(mcyst2, direction = "both")
