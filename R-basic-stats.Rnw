@@ -2507,12 +2507,12 @@ there are many groups. As well, we could be interested in other types of
 contrasts, for instance, that the mean of groups 2 and 3 is different from
 the mean of group 4. Etc, etc. We will not get into this. 
 
-\subsubsection{t-test as ANOVA}
+\subsection{t-test as ANOVA}
 Of course, in general, you can just carry out any two-group comparison as
 an ANOVA. There is nothing wrong with that (and there is a simple
 correspondence between a t statistic and an F statistic).
 
-\subsubsection{Several ways of obtaining summaries}
+\subsection{Several ways of obtaining summaries}
 
 
 For example with \Rfunction{aggregate}
@@ -2536,7 +2536,7 @@ with(dmit, by(activ, ftraining,
 
 
 
-\subsubsection{Can you do an ANOVA with only one sample per group?}\label{anova-only-one}
+\subsection{Can you do an ANOVA with only one sample per group?}\label{anova-only-one}
 Why or why not?
 
 
@@ -3042,7 +3042,7 @@ summary(m4)
 
 
 
-\subsection{Fitting a two-way ANOVA: cholesterol}\label{twoway-chol}
+\subsection{Loading the cholesterol data set}\label{twoway-chol}
 
 The following data come from an experiment about the effects of three
 diets and two cholesterol-controlling drugs in the reduction of
