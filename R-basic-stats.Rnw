@@ -4440,11 +4440,12 @@ scatterplot(Metabolic.rate..W. ~ Body.mass..g., log = "xy",
 %% for the rest of scatterplots)
 
 
-<<fig.width=7, fig.height=7,out.width = '12cm', out.height = '12cm'>>=
-ci.plot(metablog)
-@ 
+% <<fig.width=7, fig.height=7,out.width = '12cm', out.height = '12cm'>>=
+% library(HH)
+% ci.plot(metablog)
+% @ 
 
-These are both much, much better. We will address this issue more formally
+This is much, much better. We will address this issue more formally
 below (section \ref{diagnostics}). Notice that the call to
 \Rfunction{scatterplot} uses the original variables but the axis are in
 log-scale, which is nicer than directly plotting (in linear scale) the
