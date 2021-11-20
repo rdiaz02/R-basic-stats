@@ -4388,16 +4388,16 @@ scatterplot(Metabolic.rate..W. ~ Body.mass..g.,
             data = anage_a)
 @ 
 
-The second plot we will do requires you to load \CRANpkg{HH}%% can get from ``Models'', ``Confidence interval plot''
-%% (you need to have the \CRANpkg{RcmdrPlugin.HH} loaded) which will show
-%% something like
+% The second plot we will do requires you to load \CRANpkg{HH}%% can get from ``Models'', ``Confidence interval plot''
+% %% (you need to have the \CRANpkg{RcmdrPlugin.HH} loaded) which will show
+% %% something like
 
-<<out.width = '12cm', out.height = '12cm'>>=
-library(HH)
-ci.plot(metab)
-@
+% <<out.width = '12cm', out.height = '12cm'>>=
+% library(HH)
+% ci.plot(metab)
+% @
  
-(and this shows confidence and prediction intervals for the linear model).
+% (and this shows confidence and prediction intervals for the linear model).
 
 
 \subsubsection{Transforming the data}
