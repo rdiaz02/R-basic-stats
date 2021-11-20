@@ -651,6 +651,101 @@ from them, what to do, etc.
 
 \clearpage
 
+
+
+
+\section{Power of a test}
+How likely we are to detect a difference that really exists (power)
+depends on:
+
+\begin{itemize}
+\item The threshold ($\alpha$ level, or Type I error).
+\item The sample size.
+\item The size of the effect (difference in means).
+\item The standard deviation.
+\end{itemize}
+
+
+Do you understand each one of these? We will not get into details. If you
+want, install \CRANpkg{Rcmdr} and play with the ``Teaching demos: Power of
+a test'' (from the \CRANpkg{RcmdrPlugin.TeachingDemos}).
+
+
+%% \begin{figure}[h!]
+%%  \begin{center}
+%%  \includegraphics[width=0.80\paperwidth,keepaspectratio]{power.png}
+%%  \caption{\label{power} Playing with power, from the
+%%    \CRANpkg{RcmdrPlugin.TeachingDemos}, Power of the test.}
+%%  \end{center}
+%%  \end{figure}
+
+
+
+There are simple, standard ways of figuring out the power. But they
+require you to specify the above values. Not always known (or easy to
+guess). The \CRANpkg{IPSUR} and \CRANpkg{RcmdrPlugin.IPSUR} packages
+provide some extra tools.
+
+
+%% \begin{figure}[h!]
+%%  \begin{center}
+%%  \includegraphics[width=0.40\paperwidth,keepaspectratio]{ipsur-power.png}
+%%  \caption{\label{ipsurpower} Entry window for \CRANpkg{RmcdrPlugin.IPSUR}:
+%%    Power for t-test, under ``Statistics'', ``Power (IPSUR)''.}
+%%  \end{center}
+%%  \end{figure}
+
+
+
+
+Power can be computed before hand to:
+
+\begin{itemize}
+\item Know if we are likely to find a difference if there is one (given
+  our sample size and estimated effect sizes and standard deviations).
+\item Figure out if our sample size is OK given the desired power (and
+  estimated effect sizes and standard deviations).
+\end{itemize}
+
+
+Please note: \textbf{it makes little sense} to compute the power of a test
+after the fact. It tells you nothing valuable\footnote{The paper by Hoenig
+and Heisey, ``The abuse of power: the pervasive fallacy of power
+calculations for data analysis'', \textit{The American Statistician},
+2001, 55: 19--24, explains this in more detail.}
+
+
+
+(A slightly more technical note: as is common in many stats intro texts, we have
+been mixing ideas that derive from Fisher's null hypothesis testing with ideas
+from Neyman and Pearson's alternative hypothesis and acceptance-rejection
+framework; we will not get further into this).
+
+\subsection{An analogy: should I take the umbrella?}
+
+\red{If the trade-off between Type I and Type II errors is not clear, remember
+  the analogy we used in class with respect to the umbrella (well, the behavior
+  of taking or not the umbrella, as a function of meteorological predictions
+  ---withe the \textbf{major} caveat that a p-value is \textbf{not} the
+  probability of the null, whereas meteorological predictions are often the
+  probability of, say, rain).}
+
+\subsection{The winner's curse}
+
+When studies have low power, estimates of effects from tests that yield
+  ``significant'' results are biased up (i.e., they are larger than they should
+  be). In other words, for a given particular phenomenon, with low power studies,
+  if you focus only on those papers with significant p-values, the effect
+  estimates are too large (in absolute sense). So publication bias together with
+  low power yields overestimates of effect sizes. If this is not clear, we will
+  explain it in class.
+
+Here is a interesting and recent example where the winner's curse can be
+  playing a role: the possible use of botox as an antidepressant treatment   \Burl{https://www.science.org/news/2021/06/can-botox-ease-depression-eliminating-frowns-researchers-have-doubts}.
+
+\clearpage
+
+
 \section{Paired tests}\label{pairedt}
 
 Load now the data set called \Robject{MYC.txt}. As before, give it a
@@ -1605,67 +1700,6 @@ There are several problems with the above procedure, among them:
   face value (as it is conditional on the normality test).
 \end{itemize}
 
-
-
-\section{Power of a test}
-How likely we are to detect a difference that really exists (power)
-depends on:
-
-\begin{itemize}
-\item The threshold ($\alpha$ level, or Type I error).
-\item The sample size.
-\item The size of the effect (difference in means).
-\item The standard deviation.
-\end{itemize}
-
-
-Do you understand each one of these? We will not get into details. If you
-want, install \CRANpkg{Rcmdr} and play with the ``Teaching demos: Power of
-a test'' (from the \CRANpkg{RcmdrPlugin.TeachingDemos}).
-
-
-%% \begin{figure}[h!]
-%%  \begin{center}
-%%  \includegraphics[width=0.80\paperwidth,keepaspectratio]{power.png}
-%%  \caption{\label{power} Playing with power, from the
-%%    \CRANpkg{RcmdrPlugin.TeachingDemos}, Power of the test.}
-%%  \end{center}
-%%  \end{figure}
-
-
-
-There are simple, standard ways of figuring out the power. But they
-require you to specify the above values. Not always known (or easy to
-guess). The \CRANpkg{IPSUR} and \CRANpkg{RcmdrPlugin.IPSUR} packages
-provide some extra tools.
-
-
-%% \begin{figure}[h!]
-%%  \begin{center}
-%%  \includegraphics[width=0.40\paperwidth,keepaspectratio]{ipsur-power.png}
-%%  \caption{\label{ipsurpower} Entry window for \CRANpkg{RmcdrPlugin.IPSUR}:
-%%    Power for t-test, under ``Statistics'', ``Power (IPSUR)''.}
-%%  \end{center}
-%%  \end{figure}
-
-
-
-
-Power can be computed before hand to:
-
-\begin{itemize}
-\item Know if we are likely to find a difference if there is one (given
-  our sample size and estimated effect sizes and standard deviations).
-\item Figure out if our sample size is OK given the desired power (and
-  estimated effect sizes and standard deviations).
-\end{itemize}
-
-
-Please note: \textbf{it makes little sense} to compute the power of a test
-after the fact. It tells you nothing valuable\footnote{The paper by Hoenig
-and Heisey, ``The abuse of power: the pervasive fallacy of power
-calculations for data analysis'', \textit{The American Statistician},
-2001, 55: 19--24, explains this in more detail.}
 
 
 
