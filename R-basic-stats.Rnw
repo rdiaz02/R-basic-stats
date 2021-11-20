@@ -3799,23 +3799,405 @@ program. Or maybe \ldots.
 
 
 \subsection{Multiple comparisons of means in two-way ANOVA}
-Can they be done? Yes. You can use the \Rfunction{glht} or the TukeyHDS
-functions directly. Or you fit the model using \Rfunction{aov} (not
-\Rfunction{lm}), and use the package \CRANpkg{HH}, and ask for
-the ``MMC plot''. We will not pursue this any further here (among other
-questions you should ask yourself, at what levels of one variable will you
-be comparing the other? How does lack of balance affect the contrasts? Do
-you really want all possible contrasts?) A good place to start reading on
-these issues is chapter 14 (and section 5.3.2) of Everitt and Hothorn's
-``A handbook of statistical analysis using R, 2nd ed''.
+% Can they be done? Yes. You can use the \Rfunction{glht} or the TukeyHDS
+% functions directly. Or you fit the model using \Rfunction{aov} (not
+% \Rfunction{lm}), and use the package \CRANpkg{HH}, and ask for
+% the ``MMC plot''. We will not pursue this any further here (among other
+% questions you should ask yourself, at what levels of one variable will you
+% be comparing the other? How does lack of balance affect the contrasts? Do
+% you really want all possible contrasts?) A good place to start reading on
+% these issues is chapter 14 (and section 5.3.2) of Everitt and Hothorn's
+% ``A handbook of statistical analysis using R, 2nd ed''.
 
-%% For instance, this would work. But this is not necessarily what you might
-%% really want:
+% %% For instance, this would work. But this is not necessarily what you might
+% %% really want:
 
-%% <<>>=
-%% cholaov <- aov(y ~ Diet * Drug, data = dchol)
-%% chol_tukey <- TukeyHSD()
-%% @ 
+% %% <<>>=
+% %% cholaov <- aov(y ~ Diet * Drug, data = dchol)
+% %% chol_tukey <- TukeyHSD()
+% %% @ 
+
+
+This section is way too long for this course. We will cover it quickly, focusing
+on the key conceptual issues. But we leave the code, examples, and more advanced
+comments for your future reference. Why is this that long, then? Because we want
+to emphasize that \textbf{``p values are just not enough''}: in many/most cases,
+you will want to look at confidence intervals and other measures of uncertainty
+around the parameters you have estimated and the contrasts (differences in means)
+of interest. And, of course, you will need to correct for multiple testing when
+you, well, conduct multiple tests.
+
+
+In two-way and, more generally, multi-way ANOVA, this is more complicated. Among
+other questions you should ask yourself, at what levels of one variable will you
+be comparing the other? How does lack of balance affect the contrasts? Do you
+really want all possible contrasts? A good place to start reading on these issues
+is chapter 14 (and section 5.3.2) of Everitt and Hothorn's ``A handbook of
+statistical analysis using R, 2nd ed'', and then the documentation of \CRANpkg{multcomp}.
+
+\subsubsection{Multiple comparisons in multi-way ANOVA: main messages}
+\label{sec:mult-comp-multi}
+
+\begin{itemize}
+\item In two-way (or three-way or \ldots, generally, multi-way) ANOVA
+  \textbf{without interactions} carrying out multiple comparisons between pairs
+  of means is straightforward.
+  \begin{itemize}
+  \item You might need to pay attention to which procedure (function) you use
+    when the data are unbalanced.
+  \end{itemize}
+\item When there are interactions, this is more complicated. For example, at what
+  level of each variable do you want to estimate the differences in the other? A
+  very simple numerical example illustrating the problem is shown in \qref{ci-two-way-int-example}.
+\item Finally, in both cases, you might want to think if carrying out comparisons
+  between \textbf{all} pairs of means is what you really want to do. (Of course,
+  you \textbf{must} report what you really did: carrying out comparisons between
+  all pairs and reporting only a few is incorrect).
+\end{itemize}
+
+
+\paragraph{Comparisons between means when there are interactions: a simple
+  example of why we need to specify at what level of the other variable/of the
+  interaction}\label{ci-two-way-int-example}
+
+
+This is an intuitive explanation of the problem (which is what we want for this
+class). Suppose we have the model
+
+\verb@Y ~ A * B@
+
+where both A and B have two levels (A: a1, a2; B: b1, b2)
+
+
+Now, suppose these are the means of each of the cells (e.g., 3 is the average of
+observations that have a1 and b1):
+
+
+\begin{tabular}[h]{c|c|c}
+  \hline
+  Level of A & Level of B & Mean \\
+  \hline
+  a1 & b1 & 3 \\
+a1 & b2 &  5 \\
+a2 & b1 &  8 \\
+a2 & b2 &  2\\
+  
+  \hline
+\end{tabular}
+
+Please, draw a figure (by hand) with those means, like any of the interaction
+plots we have seen in class.  Please, \textbf{really draw that figure}. Actually,
+\textbf{draw 2 figures}: the first will have A in the X (abscissas) axis, the
+second will have B in the X axis. You will see that in both plots the lines
+clearly cross.
+
+
+Now, suppose we want this: "95\% confidence interval for the difference between the
+means of a1 and a2". Sounds simple enough but ...
+
+... at what level of B do you want that? Because, even without thinking about the
+confidence interval, the difference between the means of a1 and a2 (a1 - a2) is:
+
+\begin{verbatim}
+3 - 8 = -5   at b1
+5 - 2 =  3   at b2
+\end{verbatim}
+
+
+Now, please repeat the above for B. \textbf{Really, do it now}: compute the
+difference between b1 - b2 at each level of A.
+
+
+
+So "what is the difference between a1 and a2" depends on the level of B (and this
+is not news: this is because there is interaction). Thus, returning a confidence
+interval (CI) for that difference requires us to specify at what level of B we
+want the CI. And the same thing happens if we want a CI for the difference
+between the two levels of B (at what level of A do we want it?).
+
+
+But then, how do we even see plots for CI under interactions
+(\qref{mult-comp-2-way-int})?  Because it is possible to return that CI at
+different levels of the other factors. We just need to say "at this level of the
+other factor". For example at "the average" (because we can define the "average
+effect of A" and "the average effect of B", and "the average effect of the
+interaction", in a model with interactions). But computing the CI at this
+"average" might not be what you want to do. With data that look like the one
+above, with such extreme crossing of lines, that might not make much sense.
+Alternatively, you might compute the difference and confidence interval at some
+other level of the other factor that is more relevant for your question.  Whether
+or not it makes sense to compute the CI at the average level of the interaction,
+or at what level it makes sense to do it is \textbf{highly context dependent}:
+this depends on how the interactions are, and what your scientific question is.
+Regardless, how that average of B/average of A/average of the interaction is
+defined and computed, how the average difference at the average of the other
+variable is computed, how that is done in R, how to specify other levels, etc, do
+not matter to us here.
+
+
+What matters is understanding that, with interactions, asking a question about
+"the difference between levels of A" (or "a confidence interval around the
+difference between levels of A") cannot be answered without saying something
+about the level of B at which we want to compute that difference.
+
+
+
+
+\subsubsection{Multiple comparisons in two-way ANOVA: example with no
+  interactions}\label{mult-comp-2-way-no-int}
+
+I will show a few examples below. % Let us show confidence intervals for the
+% comparisons of all pairs of means.
+We will use function \Rfunction{mmc} from package \CRANpkg{HH} as well as
+function \Rfunction{glht} from package \CRANpkg{multcomp}. I will skip most of
+the syntax here. 
+
+% [We could try doing some of the stuff below with menus, but they quickly become
+% limiting, so I'll directly write R commands (that you can evaluate from R
+% commander, or from RStudio or from the R console itself). (If you wanted to use
+% the R commander menus for some of the stuff below, you might want to fit the
+% model using \Rfunction{aov}, not \Rfunction{lm}, and you will use the package
+% \CRANpkg{RcmdrPlugin.HH}, and ask for the ``MMC plot''.)]
+
+
+For the sake of illustration, let's pretend (even when we know it is wrong!!!)
+that there is no interaction between Drug and Diet in the cholesterol data.
+
+<<>>=
+## We must make sure we are using factors with mmc
+dc2 <- dcholest
+dc2$Drug <- as.factor(dc2$Drug)
+dc2$Diet <- as.factor(dc2$Diet)
+clmA <- lm(y ~ Diet + Drug, data = dc2)
+cholA_mmc <- mmc(clmA, focus = "Diet")
+cholA_mmc
+
+mmcplot(cholA_mmc)
+@ 
+
+In this two-way ANOVA we might want to compare, simultaneously, the levels of
+Diet and Drug (see the documentation of \CRANpkg{multcomp} (in particular,
+\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+
+
+<<>>=
+KA1 <- glht(clmA, mcp(Diet = "Tukey"))$linfct
+KA2 <- glht(clmA, mcp(Drug = "Tukey"))$linfct
+clmA_glh <- glht(clmA, linfct = rbind(KA1, KA2))
+
+summary(clmA_glh)
+
+## Note that these are wider than the ones above, as we should expect.
+confint(clmA_glh)
+
+plot(clmA_glh)
+@
+
+You can also obtain the above using \Rfunction{TukeyHSD} (there are further
+comments about the differences below ---bottom line here: when sample sizes are
+not very unbalanced, the results will be very, very similar)\footnote{Though the
+  plots might not look as nice or you might need to do more work to put all plots
+  on the same page}. % We need to use an
+% ``aov'' model.
+
+% <<>>=
+% clmAaov <- aov(y ~ Diet + Drug, data = dc2)
+% plot(TukeyHSD(clmAaov, which = c("Diet", "Drug")))
+% @ 
+
+
+You can stop reading here, but remember that there is extra material below if you
+needed it. 
+
+
+\subsubsection{Multiple comparisons in two-way ANOVA: example with interactions}\label{mult-comp-2-way-int}
+
+But we know there are interactions. Let us use that model to compare levels of Diet.
+
+
+<<>>=
+clm <- lm(y ~ Diet*Drug, data = dc2)
+chol_mmc <- mmc(clm, focus = "Diet")
+
+chol_mmc
+mmcplot(chol_mmc)
+@ 
+
+What is happening with the interactions? If you read the help of \Rfunction{mmc}
+you will see it mentions options \texttt{interaction\_average} and
+\texttt{covariate\_average}.
+
+What if we set those to false? Notice the warning, and see the differences!
+
+<<>>=
+chol_mmc2 <- mmc(clm,
+                 linfct = mcp(Diet = "Tukey",
+                              `interaction_average`= FALSE,
+                              `covariate_average` = FALSE))
+chol_mmc2
+
+mmcplot(chol_mmc2)
+@ 
+
+
+
+Using directly \Rfunction{glht} to compare both Diets and Drugs:
+
+<<>>=
+K1 <- glht(clm, mcp(Diet = "Tukey"))$linfct
+K2 <- glht(clm, mcp(Drug = "Tukey"))$linfct
+
+K1B <- glht(clm, mcp(Diet = "Tukey",
+                     interaction_average = TRUE,
+                     covariate_average = TRUE))$linfct
+
+K2B <- glht(clm, mcp(Drug = "Tukey",
+                     interaction_average = TRUE,
+                     covariate_average = TRUE))$linfct
+
+
+confint(glht(clm, linfct = rbind(K1, K2)))
+confint(glht(clm, linfct = rbind(K1B, K2B)))
+
+## Compare with previously computed ones
+## A few change sign as we do HF - M1 instead
+## of M1 - HF
+## chol_mmc2
+## chol_mmc
+@ 
+
+
+
+
+% Of course, life is a lot simpler in models without interactions. For the sake of
+% illustration (even when we know this is wrong!)
+
+
+% <<>>=
+% clmA <- lm(y ~ Diet + Drug, data = dc2)
+% cholA_mmc <- mmc(clmA, focus = "Diet")
+
+% cholA_mmc2 <- mmc(clmA,
+%                  linfct = mcp(Diet = "Tukey",
+%                               `interaction_average`= FALSE,
+%                               `covariate_average` = FALSE))
+
+% cholA_mmc
+% cholA_mmc2
+% @ 
+
+
+%% Kind of trivial, as it is the output of the model itself
+% First we use the data set where we removed HF. Now, we compare Drug.
+
+% <<>>=
+% dc3 <- dcholest2
+% dc3$Drug <- as.factor(dc3$Drug)
+% dc3$Diet <- as.factor(dc3$Diet)
+
+% clmA <- lm(y ~ Diet + Drug, data = dc3)
+% cholA_mmc <- mmc(clmA, focus = "Diet")
+
+% cholA_mmc2 <- mmc(clmA,
+%                  linfct = mcp(Diet = "Tukey",
+%                               `interaction_average`= FALSE,
+%                               `covariate_average` = FALSE))
+
+% cholA_mmc
+% cholA_mmc2
+
+% @ 
+
+
+But in models with interactions, we might be interested in doing other
+things. For example, comparing the levels of Drug within levels of Diet. There
+are examples in the documentation of \CRANpkg{multcomp} (see
+\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+
+Or comparing, simultaneously, the levels of Diet and Drug (again, see the
+vignette):
+
+
+<<>>=
+
+K1 <- glht(clm, mcp(Diet = "Tukey"))$linfct
+K2 <- glht(clm, mcp(Drug = "Tukey"))$linfct
+
+
+K1A <- glht(clm, mcp(Diet = "Tukey",
+                     interaction_average = TRUE,
+                     covariate_average = TRUE))$linfct
+
+K2A <- glht(clm, mcp(Drug = "Tukey",
+                     interaction_average = TRUE,
+                     covariate_average = TRUE))$linfct
+
+
+summary(glht(clm, linfct = rbind(K1, K2)))
+summary(glht(clm, linfct = rbind(K1A, K2A)))
+
+## Compare with previously computed one
+chol_mmc2
+chol_mmc
+@ 
+
+
+Note that many of those can be obtained, too, using the \Rfunction{TukeyHSD}
+function. For example, as simple as this:
+<<tukey_multcomp,fig.width=7, fig.height=5,out.width = '12cm', out.height = '10cm'>>=
+## Fit as aov
+clmaov <- aov(y ~ Diet * Drug, data = dc2)
+
+## Compare to, for example, chol_mmc
+TukeyHSD(clmaov, which = "Diet")
+
+## We want all possible contrasts for all combinations
+TukeyHSD(clmaov, which = "Diet:Drug")
+
+## Plot them
+## But make sure y-axis labels are horizontal
+## and y-axis labels fit
+op <- par(las = 1, mar = c(5, 8, 4, 4))
+plot(TukeyHSD(clmaov, which = "Diet:Drug"))
+par(op) ## return graphical parameters to previous stage
+
+## Though if we only care about the contrasts
+## between all factor combinations maybe we really just want this?
+TukeyHSD(aov(y ~ Diet:Drug, data = dc2))
+
+
+## Diet and Drug. Compare to summary(glht(clm, linfct = rbind(K1A, K2A)))
+TukeyHSD(clmaov, which = c("Diet", "Drug"))
+
+@ 
+
+
+
+A virtue of \Rfunction{TukeyHSD} is its simplicity. In models without
+interactions, results of these procedures are often very, very similar, though
+not necessarily identical (with unbalanced designs, specially heavily unbalanced,
+\Rfunction{glht} is often preferable --- see for example the discussion in
+Everitt and Hothorn, chapters 5 and 14).
+
+In models with interactions, \Rfunction{glht} allows us to control what to do
+with averaging over interactions and it will not necessarily give the same
+results as \Rfunction{TukeyHSD} (if there is no unbalance in sample sizes,
+results will often be very similar if we use \texttt{interaction\_average =
+  TRUE}). See further discussion, for example, here:
+\Burl{https://stat.ethz.ch/pipermail/r-help/2012-January/299623.html}. But this
+is, as we anticipated, a complicated issue. What comparisons are you interested
+in when there are interactions?
+
+
+Finally, another package that might be worth checking is \CRANpkg{emmeans}
+(\Burl{https://cran.r-project.org/web/packages/emmeans/index.html}). In many
+cases, or in other types of models, not covered in this course (e.g.,
+mixed-effects, generalized linear models, etc) it might be easier or more
+flexible than the packages used above (see, for instance,
+\Burl{https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html}). The
+latest edition of Fox and Weisberg's ``An R companion to applied regression''
+makes extensive use of \CRANpkg{emmeans} (to obtain confidence intervals and many
+other things).
 
 
 
