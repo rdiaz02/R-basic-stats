@@ -5880,7 +5880,7 @@ For you to read and play around further:
   \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
   comparison plots'').
 \item ``Component+Residual'' (or partial residual\footnote{These plots,
-    for each variable, show a plot of the independent variable, say $x$, on the
+    for each variable, shows a plot of the independent variable, say $x$, on the
     horizontal axis and, on the ordinates, the ``partial residuals'' $=
     residual + \hat{\beta}x$.}) plots allow us to
   examine, in models with multiple regressors, deviations from linearity
@@ -5900,11 +5900,34 @@ For you to read and play around further:
   \CRANpkg{car}. 
 \item A variety of numerical tests and diagnostics are also available
   (e.g., tests for nonlinearity or for homoscedasticity).
-\item Package \CRANpkg{car} and the accompanying book ``An R companion to
-  applied regression'' contain excellent and detailed comments about those
-  and other diagnostics, and several functions. Take also a look, for a
-  summary, at the very nice sections 8.3 to 8.5 in Kabakoff's ``R in
-  action.''
+  
+\item Package \CRANpkg{car} and the accompanying book by Fox and Weisberg ``An R
+  companion to applied regression, 3rd ed'' contain excellent and detailed
+  comments about those and other diagnostics, and examples of how to use the
+  functions in the \CRANpkg{car} package. Read chapter 8 of that book. It will
+  explain you how to use them as well as possible remedial measures. Actually,
+  read the complete book. In the meantime, you can also take a look, for a
+  summary, at the very nice sections 8.3 to 8.5 in Kabakoff's ``R in action.''
+
+\item There is in CRAN a very interesting package, \CRANpkg{gvlma}
+  (\Burl{https://cran.r-project.org/web/packages/gvlma/}), by Pe\~{n}a and Slate,
+  that implements the methods in their paper ``Global Validation of Linear Model
+  Assumptions'', \textit{J. American Statistical Association},
+  101(473):341-354. This offers a global testing procedure that allows further
+  examination of each of the key assumptions. Here, I have preferred to start by
+  looking carefully at each one of the traditional diagnostic plots. But you will
+  most likely want to take a look at this package.
+
+\item What if diagnostics identify a problem? The usual procedures are making
+  sure the model is right, and possibly transforming either the response or some
+  of the predictors, and maybe using more complex models (e.g., for modeling the
+  variance, etc). But \textbf{before} fitting a model, think about it carefully
+  and what is an appropriate biological model of the phenomenon. That might
+  dictate, for example, reasonable \textit{a priori} transformations of the
+  response or predictors, or what the functional form should be. (For example,
+  modeling metabolic rate as a function of body mass was a bad idea; there are
+  many strong arguments to suggest a log-log relationship is the way to go).
+  
 \end{itemize}
 
 
