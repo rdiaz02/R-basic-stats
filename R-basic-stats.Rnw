@@ -2208,6 +2208,27 @@ By the way, notice how we created a ``Model'' which is called
 \Robject{AnovaMIT}. But we could have named it differently.
 
 
+\subsection{Confidence intervals for the parameters of the model}
+
+We can easily do
+
+<<>>=
+confint(AnovaMIT)
+@ 
+
+For one thing, we are all well aware that simply looking at p-values is not the
+only thing we want to do.
+
+Sometimes \Rfunction{confint} will give us a lot of insight. But often it will
+not be easy to relate it back to our original scientific question. One of the
+reasons is that the actual parameters of the fitted model depend, well, on the
+parameterization (see details in section \nameref{anovaaslm}, or just take it on
+faith). So, often, we will want to explicitly ask ``Which means are different'',
+and that is what we do next.
+
+
+
+
 \subsection{So which means are different? Multiple comparisons}
 \label{multcomp1}
 That small p-value leads us to reject the null hypothesis $\mu_{Morning}  = 
