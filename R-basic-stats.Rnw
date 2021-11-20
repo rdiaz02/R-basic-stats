@@ -4535,6 +4535,7 @@ intercept?)
 \clearpage
 \section{Multiple regression}\label{multreg}
 
+\subsection{Introduction to multiple regression and the cystfibr data}\label{introcystfib}
 In the previous section we had
 
 \[Y = \alpha + \beta X + \epsilon\]
@@ -4577,6 +4578,7 @@ verbatim from the help of the original dataset):
 \end{verbatim}
 
 
+\subsection{Multiple regression example}\label{multregr-example}
 For the multiple regression we model
 
 \[pemax = \alpha + \beta_1 age + \beta_2 height + \beta_3 weight + \epsilon\]
@@ -4846,13 +4848,12 @@ by the model) and what they represent in models like:
 
 
 
-Note: the details about the exact numerical value of the coefficients can
-be skipped in a first reading. What you definitely need to understand is
-how many parameters we are estimating.
+Note: the details about the exact numerical value of the coefficients can be
+skipped in a first reading (or in a second reading, or for the exam :-) ). What
+you definitely need to understand is how many parameters we are estimating.
 
 
-Let us now see a
-simple example:
+If you want to continue, then let us now see a simple example:
 
 <<>>=
 asAnova <- aov(activ ~ ftraining, data = dmit)
