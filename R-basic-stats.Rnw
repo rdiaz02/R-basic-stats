@@ -4161,7 +4161,7 @@ How do we interpret coefficients? Just a few hints here. Suppose we have\\
 $y = \alpha + \beta_1 x_1 + \beta_2 x_22 + \beta_{1,2}\ x_1\ x_2 + \epsilon$ (where the
 term $\beta_{12}\ x_1\ x_2$ is literally the product of $\beta_{1,2}$ times the product of
 $x_1$ and $x_2$). Now, in a table of coefficients, what is the meaning of
-$\beta_1$? That is a table that ``shows everything when everything else is
+$\beta_1$? That is a table that ``shows every variable when everything else is
 also in the model'' (and that includes the interaction).  You can think of
 $\beta_1$ as just the best term that solves the above equation ($y =
 \alpha + \beta_1 x_1 + \beta_2 x_22 + \beta_{1,2} x_1 x_2 +
