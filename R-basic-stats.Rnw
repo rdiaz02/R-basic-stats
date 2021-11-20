@@ -585,26 +585,27 @@ from them, what to do, etc.
 
 
 
-\subsection{Ideas that should be clear from the t-test part}
-A few ideas that should be clear after this section:
 
-\begin{enumerate}
-\item The difference between a sample and a population
-\item What a statistic is
-\item What a t-statistic is
-\item That statistics have distributions
-\item The difference between standard deviation and standard error
-\item That sampling introduces variability
-\item That some procedures ``ask more from the data'' (e.g., interval data)
-\item p-values
-\item Null hypothesis
-\item Distribution of the statistic under the null hypothesis
-\item The logic behind a statistical test
-\item The difference between estimation and hypothesis testing
-\end{enumerate}
+% \subsection{Ideas that should be clear from the t-test part}
+% A few ideas that should be clear after this section:
+
+% \begin{enumerate}
+% \item The difference between a sample and a population
+% \item What a statistic is
+% \item What a t-statistic is
+% \item That statistics have distributions
+% \item The difference between standard deviation and standard error
+% \item That sampling introduces variability
+% \item That some procedures ``ask more from the data'' (e.g., interval data)
+% \item p-values
+% \item Null hypothesis
+% \item Distribution of the statistic under the null hypothesis
+% \item The logic behind a statistical test
+% \item The difference between estimation and hypothesis testing
+% \end{enumerate}
 
 
-If any one of the above is not clear, please ask it in class.
+% If any one of the above is not clear, please ask it in class.
 
 
 %% \section{Data transformations}\label{transform}
