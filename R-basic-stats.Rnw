@@ -488,6 +488,38 @@ Repeat the above with brca1.
 
 
 
+
+\subsection{Ideas that should be clear from the t-test part}
+A few ideas that should be clear after this section:
+
+\begin{enumerate}
+\item The difference between a sample and a population
+\item What a statistic is; estimators (for example, the sample mean is an
+  estimator) are a type of statistic \footnote{Briefly: a statistic is
+    number that can be computed from a sample. An estimator is a function
+    used to calculate, or estimate, a quantity of a probability
+    distribution. The sample mean, with the function $\sum x/N$ is a
+    function of the data and is used to estimate the true mean of a
+    distribution.}
+\item What a t-statistic is (a t-statistic is a test statistic used in
+  hypothesis testing; a test statistic is a statistic used in hypothesis
+  testing).
+\item That statistics (and, thus, estimators) have distributions
+\item The difference between standard deviation and standard error
+\item That sampling introduces variability
+\item That some procedures ``ask more from the data'' (e.g., interval data)
+\item p-values
+\item Null hypothesis
+\item Distribution of the statistic under the null hypothesis
+\item The logic behind a statistical test
+\item The difference between estimation and hypothesis testing
+\end{enumerate}
+
+
+If any one of the above is not clear, please ask it in class. Most of this,
+though, is material you have surely been taught before :-)
+
+
 \subsection{Assumptions of the t-test}
 
 One key assumption is \textbf{independence} of the data. This is the case
