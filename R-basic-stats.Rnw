@@ -741,7 +741,7 @@ When studies have low power, estimates of effects from tests that yield
   explain it in class.
 
 Here is a interesting and recent example where the winner's curse can be
-  playing a role: the possible use of botox as an antidepressant treatment   \Burl{https://www.science.org/news/2021/06/can-botox-ease-depression-eliminating-frowns-researchers-have-doubts}.
+  playing a role: the possible use of botox to relieve depression   \Burl{https://www.science.org/news/2021/06/can-botox-ease-depression-eliminating-frowns-researchers-have-doubts}.
 
 \clearpage
 
