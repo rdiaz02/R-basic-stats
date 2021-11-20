@@ -4772,6 +4772,52 @@ anova(lm(lm(pemax ~ height + age, data = cystfibr2)))
 
 
 
+\subsection{Confidence intervals, confidence bands}\label{mult-regr-ci-pred}
+
+(This is also provided so that you have it in here if you need it, but you can
+skip it.)
+
+With multiple regression, visualizing confidence intervals and prediction
+intervals becomes much harder (we are no longer in 2D). There are ways of
+visualizing 3D plots (see \nameref{regr-int}), but you will probably need to decide
+what exactly you want to plot and for what. For example, predictions with respect
+to each variable in different panels. You can easily obtain, for each
+observation, its predicted (fitted) value and its confidence or prediction
+values. For example (showing just the first five values)
+
+<<>>=
+predict(mcyst, interval = "confidence", level = 0.95)[1:5, ]
+predict(mcyst, interval = "prediction", level = 0.95)[1:5, ]
+@ 
+
+(Note the warning: the predictions should not be used to assess how well the
+model predicts the data used for the fitting itself.)
+
+With those values, you could then construct the plots you might want.
+
+
+
+Similar comments apply to plots of confidence intervals for the parameters:
+visualizing the multidimensional ellipses will not be easy. Obtaining the
+confidence intervals and the matrix of correlations is simple, though:
+
+<<>>=
+confint(mcyst)
+round(cov2cor(vcov(mcyst)), 3)
+@ 
+
+(Note: we already knew that the mcyst is probably not a great model!!)
+
+
+\subsubsection{Confidence intervals, confidence bands: the bootstrap}\label{mult-regr-ci-pred-boot}
+
+A final comment: for real, one might want to use confidence intervals using the
+bootstrap instead of \Rfunction{confint}. See section 5.1.3 in Fox and Weisberg's
+``An R companion to applied regression, 3rd ed.'' or section 3.6 in Faraway's
+``Linear models with R, 2nd ed.''
+
+
+
 \clearpage
 \section{Anova tables from \Rfunction{lm} et al.: understanding the
   coefficients and parameters}\label{anovaaslm}
