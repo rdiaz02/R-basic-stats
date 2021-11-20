@@ -4462,6 +4462,76 @@ try to identify transformations, including some diagnostic plots that can
 help (e.g., component+residual plots, section \ref{diagnostics}).
 
 
+\subsection{Confidence intervals and predictions intervals or prediction and
+  confidence bands}\label{ci-regression}
+
+
+<<fig.width=7, fig.height=7,out.width = '12cm', out.height = '12cm'>>=
+library(HH)
+ci.plot(metablog)
+@ 
+
+What are the bands?
+
+
+Maybe an example with more noise will help:
+
+<<ci_bands_reg_2,fig.width=7, fig.height=7,out.width = '12cm', out.height = '12cm'>>=
+N <- 20
+x <- runif(N, min = 10, max = 30)
+y <- 3 + 5 * x + rnorm(N, sd = 10)
+dummy_data <- data.frame(y = y, x = x)
+rm(y, x)
+lm_cib_2 <- lm(y ~ x, data = dummy_data)
+ci.plot(lm_cib_2)
+@ 
+
+You can run the previous code changing the value of \texttt{N}, to get an
+intuition of the difference between the two bands.
+
+
+
+\subsection{Confidence intervals for the parameters}\label{ci-regr-params}
+
+For this course, what follows is of much less interest, but just so that you have
+it here. You can skip it if you want.
+
+You can of course obtain confidence intervals for the parameters of the model:
+
+<<>>=
+confint(metablog)
+@ 
+
+Those are confidence intervals for the parameters themselves. The estimates of
+the parameters, however, are correlated. This means that testing each parameter
+on its own can lead to different answers from testing both at once. Let us show a
+joint confidence ellipse. I follow here Faraway's ``Linear models with
+R'' and Fox and Weisberg's ``An R companion to applied regression''. (There is no need for you to try to replicate this)
+
+<<ci_ellipse,fig.width=7, fig.height=7,out.width = '6cm', out.height = '6cm'>>=
+## Correlation of estimated coefficients
+round(cov2cor(vcov(metablog)), 3)
+
+## Plot of joint and each-at-time CIs
+library(ellipse)
+plot(ellipse(metablog), type = "l")
+points(coef(metablog)[1], coef(metablog)[2], pch = 1, cex = 2)
+abline(v = confint(metablog)[1, ], lty = 2)
+abline(h = confint(metablog)[2, ], lty = 2)
+@ 
+
+An alternative to \Rfunction{ellipse} is \CRANpkg{car}'s
+\Rfunction{confidenceEllipse}. 
+
+
+(And no, there is nothing wrong with this correlation. It actually makes a lot of
+sense.  Think about tilting the regression line, keeping the center of mass
+fixed, so play with increasing or decreasing the slope: what happens with the
+intercept?)
+
+
+
+
 \clearpage
 \section{Multiple regression}\label{multreg}
 
