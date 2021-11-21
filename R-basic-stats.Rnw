@@ -5521,6 +5521,74 @@ There is nothing conceptually new here. Go back to section \ref{anovaaslm}
 and make sure things make sense with these new models: how we interpret
 coefficients and how many parameters we have.
 
+
+
+
+
+\section{Covariate adjustment and a few comments about causal
+  inference}\label{causal_covar}
+
+Should we use all covariates available to us in our models? It depends on what we
+want to do. If all we care is prediction, then maybe yes. If we care about
+interpretation, probably not. In particular, variables that are effects of the
+outcome variable (i.e., variables that are, causally, downstream from our ``y'')
+are often variables we do not want to adjust for. Likewise for
+variables that are downstream from both the ``y'' and other predictor variables.
+
+
+We have been using language a bit to casually (I wrote ``casually'', not
+``causally'' :-). But sometimes we will read our models as saying ``a unit increase
+in variable X1 is associate with these many units change in Y''. At other times,
+we will want (and even be able to say) ``a unit increase in variable X1 causes
+these many units change in Y''. These differences in wording also emphasize the
+possible difficulties in understanding the meaning of phrases like ``holding
+variable X2 constant, a unit change in variable X1 causes whatever''.
+
+
+That said, it is possible sometimes to use data, both experimental and
+observational, to make causal claims. Yes, we wrote observational, too. And it is
+actually good news that we can (sometimes, and under certain assumptions)
+estimate the effects of causes, since many important questions that concern us
+are inherently causal. For example ``will doing X minimize the risks of being
+infected by the coronavirus?''. An many of these questions (or aspects of these
+questions) are ones for which gathering experimental data is just not possible
+(ethically, logistically, etc).
+
+
+
+% If we have time, we will briefly touch upon
+% these issues in class. Some specific issues we will mention are:
+% \begin{itemize}
+% \item Counterfactuals
+% \item DAGs (directed acyclic graphs) for representing our assumptions. (We have
+%   already done so in some examples).
+% \item The do operator and the interventionist account of causality and how it
+%   relates to DAGs.
+% \end{itemize}
+
+The literature on causal inference has grown quite a bit in the last 10
+years. Some recommended readings, in approximate order of increasing difficulty
+(of the reading itself, or of working through all of the material) are:
+
+\begin{itemize}
+\item Pearl and Mackenzie, 2018, ``The book of why''.
+\item Rosenbaum, 2017, ``Observation and experiment. An introduction to causal inference'' (Rosenbaum does not use
+  DAGs)
+\item Pearl, Glymour, Jewell, 2016, ``Causal inference in statistics: a primer''
+  [Beware with errata: avoid early printings of the book and make sure to look at
+  the errata page anyway!]
+\item Hern\'an and Robins. 2020. ``Causal inference: what if''. Available from \Burl{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
+\item Morgan and Winship, ``Counterfactuals and causal inference: methods and
+  principles for social research'' [Yes, basically all examples are from
+  sociology and political science, but that should not be a problem.]
+\end{itemize}
+
+A separate PDF is available for this topic, \texttt{covars-interpr-causal.pdf},
+and we will cover it at the end of this lesson.
+
+
+
+
 \section{Dealing with ratios}\label{ratios}
 
 %% FIXME: 
