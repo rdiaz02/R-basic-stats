@@ -2188,7 +2188,15 @@ Can you interpret the output?
 
 
 We will cover this in more detail in class, in case you do not remember
-ANOVA. Things to notice:
+ANOVA. Read now the 2 and a half pages from Peter Dalgaard's book available in
+Moodle (\texttt{anova-basic-theory.pdf}), then read
+\texttt{anova-theory-even-simpler}, and then re-read Dalgaard's. If there are
+questions, we will cover them in class.
+
+
+
+
+Now, things to notice about the output:
 \begin{itemize}
 \item The two rows; one of them is the effect you are interested in (ftraining)
 \item The ``Df'' column: those are the degrees of freedom (three groups -
