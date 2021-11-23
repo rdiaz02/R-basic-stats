@@ -583,8 +583,8 @@ from them, what to do, etc.
 
 \subsection{Confidence intervals and p-values: a longer discussion}
 
-\red{Make sure you remember to look at the notes you took for the file
-  \texttt{confidence-intervales-p-values-interpretation.pdf}}.
+Make sure you remember to look at the notes you took for the file
+  \texttt{confidence-intervals-p-values-interpretation.pdf}.
 
 
 
