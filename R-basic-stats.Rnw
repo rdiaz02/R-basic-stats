@@ -2513,7 +2513,8 @@ understand this!!! (But we have discussed this already).
 
 
 \subsubsection{Multiple comparisons, other contrasts,
-  etc} \label{othercontrasts} There is a wide literature on methods for
+  etc} \label{othercontrasts_multcomp}
+There is a wide literature on methods for
 adjusting for multiple comparisons in ANOVA and linear models. And
 sometimes a distinction is made between pre-planned and post-hoc
 comparisons. Tukey's approach is a widely accepted one (though there are
@@ -3379,7 +3380,7 @@ AB: SS(AB|A, B) = R(A,B) - R(A, B, AB)
 
 Interaction need not be absent. But this does not mean these SS are
 interpretable. (And beware of the contrasts you use ---section
-\nameref{othercontrasts}--- if you want to take a look at coefficients. Note
+\nameref{othercontrasts_param}--- if you want to take a look at coefficients. Note
 also possible issues related to changes in results if you center the
 predictors in models with continuous predictors). We will not use Type III
 in this notes. Why? Read the paper by Bill Venables ``Exegeses on linear
@@ -6575,7 +6576,7 @@ mean(df1$y) -
 @ 
 
 
-\subsection{Other contrasts}\label{othercontrasts}
+\subsection{Other contrasts}\label{othercontrasts_param}
 We are using \texttt{contr.treatment}, the default in R. There are other
 types. In particular, and when we want to estimate effects in the presence
 of interactions, we probably want to use \texttt{contr.sum}. We will not
@@ -6637,7 +6638,6 @@ with a computer.
 
 
 \subsection{Three way anovas, factors with more than two classes, etc}
-\label{sec:three-way-anovas}
 There is nothing conceptually new, but the accounting gets more complicated.
 
 
