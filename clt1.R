@@ -1,4 +1,4 @@
-
+## Some rudimentary code to play with the central limit theorem
 
 
 
