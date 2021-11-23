@@ -729,12 +729,12 @@ framework; we will not get further into this).
 
 \subsection{An analogy: should I take the umbrella?}
 
-\red{If the trade-off between Type I and Type II errors is not clear, remember
+If the trade-off between Type I and Type II errors is not clear, remember
   the analogy we used in class with respect to the umbrella (well, the behavior
   of taking or not the umbrella, as a function of meteorological predictions
   ---withe the \textbf{major} caveat that a p-value is \textbf{not} the
   probability of the null, whereas meteorological predictions are often the
-  probability of, say, rain).}
+  probability of, say, rain).
 
 \subsection{The winner's curse}
 
