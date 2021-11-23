@@ -83,7 +83,7 @@ BiocStyle::latex()
 \author{Ramon Diaz-Uriarte\\
   Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\ 
   Instituto de Investigaciones Biom\'edicas ``Alberto Sols'' (UAM-CSIC)\\
-  Madrid, Spain{\footnote{ramon.diaz@iib.uam.es, rdiaz02@gmail.com}} \\
+  Madrid, Spain{\footnote{r.diaz@uam.es, rdiaz02@gmail.com}} \\
 %% {\footnote{rdiaz02@gmail.com}} \\
 {\small \Burl{https://ligarto.org/rdiaz}} \\
  }
@@ -541,17 +541,20 @@ transformations. However, think about the meaning of a comparison of means
 when variances are hugely different: do you really want to do that?
 
 
-What about normality? It matters, but not as much, especially as sample
-size gets larger. Deviations from normality because of skewness
-(asymmetry) can have a large effect. Deviations because of kurtosis (tails
-heavier than the normal) have very minor effects. That is why we often say
-``data are sufficiently close to normality''. And in the ``sufficiently
-close'' we worry mainly about asymmetries. And things tend to get
-``sufficiently close'' as sample size grows larger (a consequence of the
-central limit theorem); how large is large enough? Oh, it depends on how
-far the distribution of the data is from the normal distribution, but
-often 10 is large enough, and 50 is generally well large enough (but in
-certain cases 100 might not be even close to large enough).
+What about normality? It matters, but not as much, especially as sample size gets
+larger. Deviations from normality because of skewness (asymmetry) can have a
+large effect. Deviations because of kurtosis (tails heavier than the normal) have
+very minor effects. That is why we often say ``data are sufficiently close to
+normality''. And in the ``sufficiently close'' we worry mainly about
+asymmetries. And things tend to get ``sufficiently close'' as sample size grows
+larger (a consequence of the central limit theorem); how large is large enough?
+Oh, it depends on how far the distribution of the data is from the normal
+distribution, but often 10 is large enough, and 50 is generally well large enough
+(but in certain cases 100 might not be even close to large enough). (And if you
+want to play with the central limit theorem, there is a very nice demo available
+from R commander. It is the teaching demos, and once you load it, it will be
+available as ``central limit theorem''. There is also code in the repo to
+directly play with the central limit theorem; see file \texttt{central-limit-theorem-ex.R}).
 
 Of course, although this should be obvious: when we talk about symmetry,
 normality, etc, we are talking about the data distribution of \textbf{each
@@ -660,7 +663,9 @@ How likely we are to detect a difference that really exists (power)
 depends on:
 
 \begin{itemize}
-\item The threshold ($\alpha$ level, or Type I error).
+\item The threshold we use for saying ``the means differ'' ($\alpha$ level, or
+  Type I error). (Note: remember to ask me to explain the differences between
+  $\alpha$ level and Type I error and p-value).
 \item The sample size.
 \item The size of the effect (difference in means).
 \item The standard deviation.
@@ -1450,13 +1455,13 @@ t-test is what you want.
 
 \subsection{Why and what}\label{non-par-rationale}
 
-Non-parametric procedures refer to methods that do not assume any
-particular probability distribution for the data. These methods often
-proceed by replacing the original data by their ranks. They offer some
-protection against deviations from some assumptions (e.g., deviations from
-normality).  But some times they might be testing a slightly different
-null hypothesis. Whether or not to use them is a contentious issue. Some
-considerations that come into play are:
+Non-parametric procedures refer to methods that do not assume any particular
+probability distribution for the data. These methods often proceed by replacing
+the original data by their ranks. They offer some protection against deviations
+from some assumptions (e.g., deviations from normality).  But some times they
+might be testing a slightly different null hypothesis. Whether or not to use them
+can sometimes be a contentious issue. Some considerations that come into play
+are:
 
 \begin{itemize}
 \item Do the data look bad enough that a parametric procedure will lead to
@@ -1517,6 +1522,56 @@ For example:
 <<>>=
 wilcox.test(p53 ~ cond, alternative = "two.sided", data = dp53)
 @ 
+
+
+% Contrary to Conover, not really testing F(x)= G(x)
+
+% <<>>=
+% ## Will not reject
+% x <- rnorm(10000, mean = 0, sd = 1)
+% y <- rnorm(10000, mean = 0, sd = 20)
+% wilcox.test(x, y)
+% @ 
+
+
+% Not about medians or means either
+
+% <<>>=
+% ## Will reject, medians the same
+% x <- c(rep(10, 1000), 11, rep(12, 1000))
+% y <- c(rep(10, 1000), 11, rep(13, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+% ## Will reject, means the same
+% x <- seq(from = 10, to = 20, length.out = 1000)
+% y <- c(rep(0, 999), 15000)
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+% @ 
+
+
+
+% <<>>=
+
+% ## Will accept, medians differ
+% x <- c(rep(10, 1000), 11, rep(12, 1000))
+% y <- c(rep(10, 1000), 10.1, rep(12, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+
+
+% ## Will accept, means differ
+% x <- c(rep(10, 1000), 1e9, rep(1000, 1000))
+% y <- c(rep(10, 1000), -1e9, rep(1000, 1000))
+% summary(x)
+% summary(y)
+% wilcox.test(x, y)
+% @ 
 
 
 
