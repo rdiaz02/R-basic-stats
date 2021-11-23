@@ -31,7 +31,7 @@
 %% I could not get the first \part to be after a \clearpage without it
 %%  giving weird errors.
 
-
+\newcommand*{\qref}[1]{\hyperref[{#1}]{\textit{``\nameref*{#1}'' (section \ref*{#1})}}}
 
 
 %% For using listings, so as to later produce HTML
