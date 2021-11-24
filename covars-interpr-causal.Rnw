@@ -1599,8 +1599,8 @@ adjust for the covariate.
 
 
 {\small
-  %% \bibliography{extracted-bib}
-  \bibliography{refs}
+  \bibliography{covars-causal}
+  %% \bibliography{refs}
   \bibliographystyle{myplainnat}
   %% \bibliographystyle{mybibwithurl} %% not compatible with author-year
 }
