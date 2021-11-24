@@ -64,7 +64,7 @@
 \usepackage[authoryear, round, sort]{natbib}
 %% \usepackage[square,numbers,sort&compress]{natbib}
 
-\usepackage{gitinfo}
+\usepackage{gitinfo2}
 
 
 \setlength{\parskip}{0.35em}
