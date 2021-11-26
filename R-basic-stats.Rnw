@@ -674,8 +674,10 @@ depends on:
 
 Do you understand each one of these? We will not get into details. If you
 want, install \CRANpkg{Rcmdr} and play with the ``Teaching demos: Power of
-a test'' (from the \CRANpkg{RcmdrPlugin.TeachingDemos}).
-
+a test'' (from the \CRANpkg{RcmdrPlugin.TeachingDemos}). Or directly use
+\CRANpkg{TeachingDemos} and run \Rfunction{run.power.examp(hscale = 1.5, vscale =
+  1.5, wait = FALSE)}.
+ 
 
 %% \begin{figure}[h!]
 %%  \begin{center}
