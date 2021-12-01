@@ -521,6 +521,9 @@ If any one of the above is not clear, please ask it in class. Most of this,
 though, is material you have surely been taught before :-)
 
 
+%% Welch, Sattherwite: really neat:
+%% https://math.stackexchange.com/questions/1746329/proof-and-precise-formulation-of-welch-satterthwaite-equation
+
 
 \subsubsection{What p-values and hypothesis testing are and are not}
 \label{sec:what-p-values}
