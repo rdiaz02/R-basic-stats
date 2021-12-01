@@ -521,6 +521,25 @@ If any one of the above is not clear, please ask it in class. Most of this,
 though, is material you have surely been taught before :-)
 
 
+
+\subsubsection{What p-values and hypothesis testing are and are not}
+\label{sec:what-p-values}
+
+These ideas should be clear:
+\begin{itemize}
+\item We do not ``confirm the null hypothesis'': we fail to reject (and failing
+  to reject can be something trivial to achieve)
+\item The p-value is not the probability of the null hypothesis
+\item The p-value is not the probability of the alternative hypothesis
+\item The p-value can be used as a measure of strength of evidence
+  \textbf{against} the null hypothesis. Remember the logic ``either the null is
+  false or something as (un)likely as the p-value happened''
+\item p-values are computed using models that make some assumptions
+\item Using p-values is often a much more sensible idea than saying ``signficant''
+\item Hair-splitting over, say, $p = 1e-13$ and $p = 1e-16$ makes no sense
+\item p-values are not the only tool we can use: do not forget confidence intervals!!
+\end{itemize}
+
 \subsection{Assumptions of the t-test}
 
 One key assumption is \textbf{independence} of the data. This is the case
@@ -531,7 +550,8 @@ independence is a serious and pervasive problem (and one form of
 non-independence is also referred to as ``pseudoreplication'' \footnote{A
   major paper, a long while ago, in the journal \textit{Ecological
     Monographs} by Hurlbert dealt with this and made ``pseudoreplication''
-  a well known term.}).
+  a well known term: Hurlbert, S.H. 2004. Psudoreplication and the design of
+  ecological field experiments. \textit{Ecological Monographs}, 54, 187--211}).
 
 
 When comparing two means, \textbf{equality of variances} is also
@@ -553,8 +573,10 @@ distribution, but often 10 is large enough, and 50 is generally well large enoug
 (but in certain cases 100 might not be even close to large enough). (And if you
 want to play with the central limit theorem, there is a very nice demo available
 from R commander. It is the teaching demos, and once you load it, it will be
-available as ``central limit theorem''. There is also code in the repo to
-directly play with the central limit theorem; see file \texttt{central-limit-theorem-ex.R}).
+available as ``central limit theorem''; you can also use directly, without R
+commander, the \CRANpkg{TeachingDemos} package, and call function
+\texttt{clt.examp}. There is also code in the repo to directly play with the
+central limit theorem; see file \texttt{central-limit-theorem-ex.R}).
 
 Of course, although this should be obvious: when we talk about symmetry,
 normality, etc, we are talking about the data distribution of \textbf{each
@@ -689,10 +711,10 @@ a test'' (from the \CRANpkg{RcmdrPlugin.TeachingDemos}). Or directly use
 
 
 
-There are simple, standard ways of figuring out the power. But they
-require you to specify the above values. Not always known (or easy to
-guess). The \CRANpkg{IPSUR} and \CRANpkg{RcmdrPlugin.IPSUR} packages
-provide some extra tools.
+There are simple, standard ways of computing power. But they require you to
+specify the above values, which are not always known (or easy to guess). The
+\CRANpkg{IPSUR} and \CRANpkg{RcmdrPlugin.IPSUR} packages provide some extra
+tools for power computations.
 
 
 %% \begin{figure}[h!]
@@ -720,7 +742,7 @@ Please note: \textbf{it makes little sense} to compute the power of a test
 after the fact. It tells you nothing valuable\footnote{The paper by Hoenig
 and Heisey, ``The abuse of power: the pervasive fallacy of power
 calculations for data analysis'', \textit{The American Statistician},
-2001, 55: 19--24, explains this in more detail.}
+2001, 55: 19--24, explains this in more detail.}.
 
 
 
@@ -734,7 +756,7 @@ framework; we will not get further into this).
 If the trade-off between Type I and Type II errors is not clear, remember
   the analogy we used in class with respect to the umbrella (well, the behavior
   of taking or not the umbrella, as a function of meteorological predictions
-  ---withe the \textbf{major} caveat that a p-value is \textbf{not} the
+  ---with the \textbf{major} caveat that a p-value is \textbf{not} the
   probability of the null, whereas meteorological predictions are often the
   probability of, say, rain).
 
@@ -749,9 +771,11 @@ When studies have low power, estimates of effects from tests that yield
   explain it in class.
 
 Here is a interesting and recent example where the winner's curse can be
-  playing a role: the possible use of botox to relieve depression   \Burl{https://www.science.org/news/2021/06/can-botox-ease-depression-eliminating-frowns-researchers-have-doubts}.
+  playing a role: the possible use of botox to relieve depression
+  \Burl{https://www.science.org/news/2021/06/can-botox-ease-depression-eliminating-frowns-researchers-have-doubts}.
 
-\clearpage
+  The winner's curse is a \textbf{serious problem} (related to a bunch of others,
+  such as reporting/publication bias and the reproducibility crisis.).
 
 
 \section{Paired tests}\label{pairedt}
@@ -1438,16 +1462,15 @@ next part!
 %% @ 
 
 \section{One-sample t-test}\label{sec:one-sample-t}
-We have already used the one-sample t-test (section
-\ref{paired-single}). You can of course compare the mean against a null
-value of 0, but you can also compare against any other value that might
-make sense (``Null hypothesis mu'' in R commander). Issues about
-assumptions are as for the two-sample (except, of course, there are no
-considerations of differences in variances among groups, since there is
-only one group). One-sample tests are probably not as common in many
-cases, as we are often interested in comparing two groups. But when you
-want to compare one group against a predefined value, the one-sample
-t-test is what you want.
+We have already used the one-sample t-test (section \ref{paired-single}). You can
+of course compare the mean against a null value of 0, but you can also compare
+against any other value that might make sense (\texttt{mu} argument of the
+\texttt{t.test} function). Issues about assumptions are as for the two-sample
+(except, of course, there are no considerations of differences in variances among
+groups, since there is only one group). One-sample tests are probably not as
+common in many cases, as we are often interested in comparing two groups. But
+when you want to compare the mean of one group against a predefined value, the
+one-sample t-test is what you want.
 
 
 
@@ -3156,7 +3179,7 @@ bunch of two-by-two boxes with the sample sizes in each cell):
 \end{enumerate}
 
 
-Some of this might still seem mysterious after the above exercise. Think about
+Some of this might still seem unclear after the above exercise. Think about
 doing a regression of body height on the length of both the left and right arms
 (we will actually do something very similar later: \qref{multregr-example}). And
 think about how unbalanced data, with categorical independent variables, is
@@ -3291,7 +3314,7 @@ discuss this in class.
 
 \subsubsection{Type I, Type II, Type III: a few technical notes}\label{ssI-to-III}
 (Skip this if you want. I leave it here in case you want to get back to
-it. And yes, we have not mentioned Type III much (but see \nameref{2way-int}
+it. And yes, we have not mentioned Type III much (but see \nameref{2way-int}).
 
 % %% This is too complex, as the SS(A, B, AB) is the sum of the SS of the
 % %% model.
@@ -4508,9 +4531,9 @@ An alternative to \Rfunction{ellipse} is \CRANpkg{car}'s
 
 
 (And no, there is nothing wrong with this correlation. It actually makes a lot of
-sense.  Think about tilting the regression line, keeping the center of mass
-fixed, so play with increasing or decreasing the slope: what happens with the
-intercept?)
+sense.  Think about changing the slope of the regression line, keeping the center
+of mass fixed, so play with increasing or decreasing the slope: what happens with
+the intercept?)
 
 
 
