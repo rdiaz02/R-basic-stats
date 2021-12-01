@@ -536,7 +536,7 @@ These ideas should be clear:
   false or something as (un)likely as the p-value happened''
 \item p-values are computed using models that make some assumptions
 \item Using p-values is often a much more sensible idea than saying ``signficant''
-\item Hair-splitting over, say, $p = 1e-13$ and $p = 1e-16$ makes no sense
+\item Hair-splitting over, say, $p = 10^{-13}$ and $p = 10^{-16}$ makes no sense
 \item p-values are not the only tool we can use: do not forget confidence intervals!!
 \end{itemize}
 
