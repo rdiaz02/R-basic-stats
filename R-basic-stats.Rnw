@@ -523,7 +523,7 @@ though, is material you have surely been taught before :-)
 
 %% Welch, Sattherwite: really neat:
 %% https://math.stackexchange.com/questions/1746329/proof-and-precise-formulation-of-welch-satterthwaite-equation
-
+%% Others: https://statisticaloddsandends.wordpress.com/2020/07/03/welchs-t-test-and-the-welch-satterthwaite-equation/
 
 \subsubsection{What p-values and hypothesis testing are and are not}
 \label{sec:what-p-values}
