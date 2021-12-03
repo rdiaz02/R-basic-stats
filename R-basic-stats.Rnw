@@ -2542,17 +2542,22 @@ understand this!!! (But we have discussed this already).
 
 \subsubsection{Multiple comparisons, other contrasts,
   etc} \label{othercontrasts_multcomp}
-There is a wide literature on methods for
-adjusting for multiple comparisons in ANOVA and linear models. And
-sometimes a distinction is made between pre-planned and post-hoc
-comparisons. Tukey's approach is a widely accepted one (though there are
-others) and the distinction between pre-planned and post-hoc does not
-arise when researchers directly want to do all possible pairs right from
-the beginning. However, many of these issues can become important if you
-know, from the start, that some comparisons do not matter to you, and/or
-there are many groups. As well, we could be interested in other types of
-contrasts, for instance, that the mean of groups 2 and 3 is different from
-the mean of group 4. Etc, etc. We will not get into this. 
+
+There is a wide literature on methods for adjusting for multiple comparisons in
+ANOVA and linear models. And sometimes a distinction is made between pre-planned
+and post-hoc comparisons. Tukey's approach is a widely accepted one (though there
+are others) and the distinction between pre-planned and post-hoc does not arise
+when researchers directly want to do all possible pairs right from the
+beginning. However, many of these issues can become important if you know, from
+the start, that some comparisons do not matter to you, and/or there are many
+groups. As well, we could be interested in other types of contrasts, for
+instance, that the mean of groups 2 and 3 is different from the mean of group 4,
+or comparing specific treatments against a control. Etc, etc. We will not get
+into this. A very good introduction, in addition to other references already
+mentioned, is chapter 3 of the on-line book `` ANOVA and Mixed Models: A Short
+Intro Using R '': \Burl{https://stat.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html}
+
+
 
 \subsection{t-test as ANOVA}
 Of course, in general, you can just carry out any two-group comparison as
@@ -2997,6 +3002,43 @@ summary(m4)
 %% FIXME: should use an example with, say, four diets and 2 or 3 drugs
 %% so that when I do not use a model with  interaction, some terms
 %% more than 1 df
+
+\subsubsection{Parameters and degrees of freedom}\label{param-df}
+
+It should be clear how many parameters we are fitting and, thus, how many degrees
+of freedom we are using:
+
+\begin{itemize}
+\item One-way ANOVA
+\item Two-way ANOVA, with and without interactions
+\item Three-way ANOVA, with and without interactions
+\end{itemize}
+
+<<eval=FALSE, echo=FALSE, results='hide'>>=
+
+## We use a large N to avoid randomly aliasing terms
+set.seed(1)
+f1 <- sample(letters[1:4], 1000, replace = TRUE)
+f2 <- sample(LETTERS[10:12], 1000, replace = TRUE)
+f3 <- sample(LETTERS[22:26], 1000, replace = TRUE)
+dfdf <- data.frame(y = rnorm(1000),
+                   f1 = factor(f1),
+                   f2 = factor(f2),
+                   f3 = factor(f3))
+
+## 4 * 3 * 5 = 60
+anova(lm(y ~ f1 * f2 * f3, data = dfdf))
+summary(lm( y ~ f1 * f2 * f3, data = dfdf))
+
+## 4 * 3
+anova(lm(y ~ f1 * f2, data = dfdf))
+
+## 3 * 5
+anova(lm(y ~ f2 * f3, data = dfdf))
+
+
+
+@ 
 
 
 \subsection{Loading the cholesterol data set}\label{twoway-chol}
@@ -6302,11 +6344,17 @@ implemented. To begin with, look at the great book by Fox and Weisberg ``An R
 companion to applied regression'' (now in its third edition) and Faraway's
 ``Linear models with R'' (in its second edition). Take also a look at chapters 6
 and 7 of Dalgaard's ``Introductory statistics with R'' and chapters 8 and 9 of
-Kabakoff's ``R in action''. This should get you going. From here, you will
-probably want to look at generalized linear models, mixed effects models,
-nonlinear models, generalized additive models, and survival analysis, which are
-some key extensions of linear models that you might want to use with your own
-data.
+Kabakoff's ``R in action''. The on-line book ``ANOVA and Mixed Models: A Short
+Intro Using R'' (\Burl{https://stat.ethz.ch/~meier/teaching/anova/index.html})
+includes ANOVA and mixed models, and includes discussion of experimental designs
+we have not covered (though sometimes mentioned) such as split-plot designs and
+complete and incomplete block designs.
+
+
+This should get you going. From here, you will probably want to look at
+generalized linear models, mixed effects models, nonlinear models, generalized
+additive models, and survival analysis, which are some key extensions of linear
+models that you might want to use with your own data.
 
 
 \appendix
