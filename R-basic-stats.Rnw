@@ -543,6 +543,12 @@ These ideas should be clear:
 \item p-values are not the only tool we can use: do not forget confidence intervals!!
 \end{itemize}
 
+
+%% FIXME:
+%% -bayesian, and idea is distribution of parameters (not just bayesian p-value)
+%% - Bioequivalence testing
+%% 
+
 \subsection{Assumptions of the t-test}
 
 One key assumption is \textbf{independence} of the data. This is the case
