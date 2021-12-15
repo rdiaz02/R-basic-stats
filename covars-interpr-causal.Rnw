@@ -1160,8 +1160,8 @@ making stronger assumptions.
 (By the way, we have not touched at all here on topics such as trying to measure
 the causes of an effect and finding \textbf{sufficient causes}, nor on trying to
 find the causal DAGs from a set of data. We have focused ``just'' on measuring
-the effects of causes. For more on those topics, go to \citealp{hernan2020},
-\citealp{morgan_counterfactuals_2015}, \citealp{neal_causality_2020}).
+the effects of causes. For more on those topics, go to \citealp{hernan2020};
+\citealp{morgan_counterfactuals_2015}; \citealp{neal_causality_2020}).
 
 %% ZZ FIXME  what variables to add to a DAG
 
@@ -1473,13 +1473,13 @@ figures above.
 Some explanations of the backdoor criterion and the use of DAGs to find
 dependencies and independencies make use of \textit{d-separation}.  But you can
 explain and use the backdoor criterion without introducing more jargon, as we
-have seen above (for example, \citealp{morgan_counterfactuals_2015} only use the
-term d-separation in one footnote, though their procedure, which we have copied
-above, actually implicitly uses the definition of d-separation). Anyway,
-d-separation is well explained in Definition 2.4.1, p.\ 46 of
-\citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
-\citet{hernan2020} and is very useful if you want to find all the
-independencies and conditional independencies implied by a DAG.
+have seen above (for example, \citealp{morgan_counterfactuals_2015}, only use the
+term d-separation in one footnote in their 490 pages book, though their
+procedure, which we have copied above, actually implicitly uses the definition of
+d-separation). Anyway, d-separation is well explained in Definition 2.4.1, p.\ 46
+of \citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
+\citet{hernan2020} and is very useful if you want to find all the independencies
+and conditional independencies implied by a DAG.
 
 
 % With what we have
@@ -1559,7 +1559,7 @@ covariates. % But then,
   % itself nor to the treatment actually received.
 
 
-\subsection{Randomization, exchangeability, counterfactuals and potential
+\subsection{Randomization, exchangeability, counterfactuals, and potential
   outcomes}\label{counterf}
 
 I have not used the words counterfactuals or potential outcomes. But
