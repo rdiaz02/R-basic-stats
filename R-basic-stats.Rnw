@@ -796,6 +796,7 @@ reasonable name.
 <<create_myc, echo=FALSE, results = 'hide'>>=
 set.seed(15)
 s <- rnorm(12, 4, 25)
+
 s <- c(s, s)
 cond <- rep(c(0, .5), c(12, 12))
 y <- rnorm(24) + s + cond
