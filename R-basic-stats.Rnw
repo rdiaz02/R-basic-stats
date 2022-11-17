@@ -1530,13 +1530,13 @@ Wilcoxon as with the t-test. Nonparametric tests are not
 ``assumption-free'' tests!!! (there is no such thing, in statistics or in life).
 
 
-An excellent non-parametrics book is Conover's ``Practical nonparametric
-statistics'', in its 3rd edition (it is so awesome, I have two copies, one
-at home and one at the office ---you can get one from Amazon for about 20
-euros). (For more general categorical data analysis, Agresti's
-``Categorical data analysis'' is a must. It is now also in its third
-edition. There is, by the same author, a smaller ``Introduction to
-categorical data analysis'').
+% An excellent non-parametrics book is Conover's ``Practical nonparametric
+% statistics'', in its 3rd edition (it is so awesome, I have two copies, one
+% at home and one at the office ---you can get one from Amazon for about 20
+% euros). (For more general categorical data analysis, Agresti's
+% ``Categorical data analysis'' is a must. It is now also in its third
+% edition. There is, by the same author, a smaller ``Introduction to
+% categorical data analysis'').
 
 
 
@@ -1611,6 +1611,80 @@ wilcox.test(p53 ~ cond, alternative = "two.sided", data = dp53)
 % wilcox.test(x, y)
 % @ 
 
+
+\subsection{What a two-sample Wilcoxon is not}
+
+Many people say ``I'll use a Wilcoxon test to compare the means''. Well \ldots the \textbf{Wilcoxon test is not a test of means}. It is often not even a test of medians.  The Wilcoxon test can reject the null even if the medians are the same, and the Wilcoxon test can fail to reject the null even if the medians differ.
+
+How is this possible? Please, make sure you read this:
+
+\Burl{https://www.graphpad.com/guides/prism/latest/statistics/stat_nonparametric_tests_dont_compa.htm}
+
+%% in the directory as  graph-pad-link.png
+
+More details are available here: \Burl{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1120984/} and in the Wikipedia entry for the Mann-Whitney U test. Many more details about permutation tests not testing what you might think they are testing are available, for example, from Christensen \& Zabriskie, 2022. When Your Permutation Test is Doomed to Fail. \textit{The American Statistician}, 76. \Burl{https://doi.org/10.1080/00031305.2021.1902856}
+
+
+A few examples? Sure. Run the following in R:
+
+<<>>=
+
+## Will accept, medians differ
+x <- c(rep(10, 1000), 11, rep(200, 1000))
+y <- c(rep(10, 1000), 100,  rep(200, 1000))
+summary(x)
+summary(y)
+wilcox.test(x, y)
+
+
+## Will accept, means differ
+x <- c(rep(10, 1000), 1e9, rep(1000, 1000))
+y <- c(rep(10, 1000), -1e9, rep(1000, 1000))
+summary(x)
+summary(y)
+wilcox.test(x, y)
+@ 
+
+
+
+
+<<>>=
+## Will reject, medians the same
+x <- c(rep(10, 1000), 11, rep(12, 1000))
+y <- c(rep(10, 1000), 11, rep(13, 1000))
+summary(x)
+summary(y)
+wilcox.test(x, y)
+
+## Will reject, means the same
+x <- seq(from = 10, to = 20, length.out = 1000)
+y <- c(rep(0, 999), 15000)
+summary(x)
+summary(y)
+wilcox.test(x, y)
+
+@ 
+
+
+
+<<>>=
+## Will not reject so
+## contrary to Conover, not really testing F(x)= G(x)
+x <- rnorm(10000, mean = 0, sd = 1)
+y <- rnorm(10000, mean = 0, sd = 20)
+wilcox.test(x, y)
+@
+
+<<fig.height=5, fig.width=5>>=
+stripchart(c(x, y) ~ c(rep("x", 10000), rep("y", 10000)), vertical = TRUE,
+           method = "jitter", ylab = "Value")
+@ 
+
+
+What is the Wilcoxon test testing? As the Wikipedia entry says ``the null hypothesis that, for randomly selected values X and Y from two populations, the probability of X being greater than Y is equal to the probability of Y being greater than X.''
+
+
+Summary: do not use a Wilcoxon expecting it to test for mean differences. And below we will emphasize another related message: do not use a Wilcoxon because of some ill-motivated fear of using the t-test.
 
 
 
