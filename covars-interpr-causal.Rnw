@@ -128,7 +128,7 @@ opts_knit$set(stop_on_error = 2L)
 
 
 \section*{License and copyright}\label{license}
-This work is Copyright, \copyright, 2021, Ramon Diaz-Uriarte, and is
+This work is Copyright, \copyright, 2022, Ramon Diaz-Uriarte, and is
 licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -213,7 +213,7 @@ an effect of red wine on health'' is, precisely, because we are trying to use a
 model that has causal interpretations. We are trying to answer questions such as
 ``Is red wine really good for your health?''  or ``Is switching from not
 consuming red wine to consuming moderates amount of it a good idea?''. See
-\citet[][p.\ 84]{hernan2020} for similar comments.
+\citet[][p.\ 84, for similar comments]{hernan2020}.
 
 
 So someone using expressions like ``spurious associations'' is actually revealing
@@ -344,7 +344,7 @@ The process above generate data that look like this:
     \end{minipage}
   % \includegraphics[width=0.50\paperwidth,keepaspectratio]{chol-ex1.pdf}
   % \includegraphics[width=0.50\paperwidth,keepaspectratio]{chol-ex2.pdf}
-   \caption{\label{fig:chol-exercise-pearl-et-al}. Relationships between
+   \caption{\label{fig:chol-exercise-pearl-et-al} Relationships between
      Cholesterol and Exercise, by age and over the complete population. From
      \citet{pearl_causal_2016}, Figures 1.1. and 1.2 (which are the same as
      Figure 6.6 in \citealp{pearl2018}; a preview of chapter 1 of
@@ -517,8 +517,7 @@ and a few derived ones.
 
 (But before we leave this example: what should we have done? Include in the model
 Treatment, which is the variable we are interested in, and also Plot, to decrease
-variability of the estimates. If we could we could have adjusted for U it would
-have been good, but we can't; anyway, not including U in the model will increase
+variability of the estimates.  If we could have adjusted for U, we would have adjusted for it, but we can't adjust for U; anyway, not including U in the model will increase
 the variability, but will not lead to bias. The bad idea was adjusting for
 Fungus.)
 
@@ -895,7 +894,7 @@ These are the consequences:
   
 \item Conditioning on W will not render X and Y independent. Notice also that \textbf{now Z is
   a collider with respect to X and W}. So conditioning on Z will induce an
-association between Z and W.
+association between X and W.
 
 In addition:
   \begin{enumerate}[label=\arabic*.]
@@ -918,6 +917,7 @@ In addition:
 
 \item Now Z is a collider with respect to all three pairs of variables X, Y, W. 
   \begin{enumerate}[label=\arabic*.]
+     \item X and Y are independent (we saw this before).
   \item X and W are independent.
   \item Y and W are independent.
   \item X and W are associated if we condition on Z (Z is a collider).
@@ -1160,8 +1160,8 @@ making stronger assumptions.
 (By the way, we have not touched at all here on topics such as trying to measure
 the causes of an effect and finding \textbf{sufficient causes}, nor on trying to
 find the causal DAGs from a set of data. We have focused ``just'' on measuring
-the effects of causes. For more on those topics, go to \citealp{hernan2020};
-\citealp{morgan_counterfactuals_2015}; \citealp{neal_causality_2020}).
+the effects of causes. For more on those topics, go to \citealp{hernan2020},
+\citealp{morgan_counterfactuals_2015}, \citealp{neal_causality_2020}).
 
 %% ZZ FIXME  what variables to add to a DAG
 
@@ -1353,7 +1353,7 @@ Using the backdoor criterion is very well explained in, for example:
 \end{itemize}
 
 They are all saying the same thing: how to look for sets of variables that block
-what are called backdoor paths.  For completeness, here are the details.
+what are called backdoor paths.  For completeness, here are full details.
 
 
 \subsection{Backdoor path}\label{backdoor-path}
@@ -1474,7 +1474,7 @@ Some explanations of the backdoor criterion and the use of DAGs to find
 dependencies and independencies make use of \textit{d-separation}.  But you can
 explain and use the backdoor criterion without introducing more jargon, as we
 have seen above (for example, \citealp{morgan_counterfactuals_2015}, only use the
-term d-separation in one footnote in their 490 pages book, though their
+term d-separation in one footnote, though their
 procedure, which we have copied above, actually implicitly uses the definition of
 d-separation). Anyway, d-separation is well explained in Definition 2.4.1, p.\ 46
 of \citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
@@ -1600,8 +1600,9 @@ adjust for the covariate.
 
 {\small
   \bibliography{covars-causal}
+  \bibliographystyle{jss2} 
   %% \bibliography{refs}
-  \bibliographystyle{myplainnat}
+  %% \bibliographystyle{myplainnat}
   %% \bibliographystyle{mybibwithurl} %% not compatible with author-year
 }
 
