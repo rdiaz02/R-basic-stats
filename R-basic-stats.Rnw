@@ -6,7 +6,7 @@
 %% \usepackage{hyperref} 
 %%\usepackage{geometry}
 %%\geometry{verbose,a4paper,tmargin=23mm,bmargin=26mm,lmargin=28mm,rmargin=28mm}
-
+\usepackage{wasysym}%% smileys
 \usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash]{caption}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -102,7 +102,7 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014-2021, Ramon Diaz-Uriarte,
+This work is Copyright, \copyright, 2014-2022, Ramon Diaz-Uriarte,
 and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
 4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -480,6 +480,7 @@ t.test(p53 ~ cond, data = dp53)
   \end{itemize}
 \item Do results agree with the figures? What figures?
 \item Oh, in fact: can we interpret the results?
+  \item The output gives a confidence interval: what is that?
 \end{itemize}
 
 (We will spend time in class making sure all this is understood if you
@@ -499,9 +500,9 @@ A few ideas that should be clear after this section:
   estimator) are a type of statistic \footnote{Briefly: a statistic is
     number that can be computed from a sample. An estimator is a function
     used to calculate, or estimate, a quantity of a probability
-    distribution. The sample mean, with the function $\sum x/N$ is a
+    distribution. The sample mean, with the function $\sum x/N$, is a
     function of the data and is used to estimate the true mean of a
-    distribution.}
+    distribution using the data from a given sample.}
 \item What a t-statistic is (a t-statistic is a test statistic used in
   hypothesis testing; a test statistic is a statistic used in hypothesis
   testing).
@@ -518,7 +519,7 @@ A few ideas that should be clear after this section:
 
 
 If any one of the above is not clear, please ask it in class. Most of this,
-though, is material you have surely been taught before :-)
+though, is material you have surely been taught before  \smiley{} .  So if any of this is unclear, please ask in class after having looked a the notes from your previous stats classes and, maybe, the Wikipedia.
 
 
 %% Welch, Sattherwite: really neat:
@@ -544,10 +545,20 @@ These ideas should be clear:
 \end{itemize}
 
 
-%% FIXME:
-%% -bayesian, and idea is distribution of parameters (not just bayesian p-value)
-%% - Bioequivalence testing
-%% 
+
+\subsection{Confidence intervals}
+
+If this is not obvious to you, ask it in class: a figure that shows an
+estimate (e.g., a mean) and a 95\% confidence interval, where the interval
+goes from, say, 1 to 2, \textbf{should not} be interpreted as saying that
+there is a 95\% probability that the mean is between 1 and 2. That is not
+the correct interpretation of a confidence interval. Make sure you
+understand this!!!
+
+
+In class we will very briefly cover how the confidence interval is constructed. In this case, it involves kind of turning around the logic of the p-value. 
+
+
 
 \subsection{Assumptions of the t-test}
 
@@ -612,9 +623,49 @@ contains a great discussion of assumptions, consequences of deviations
 from them, what to do, etc.
 
 
-\subsection{Confidence intervals and p-values: a longer discussion}
 
-Make sure you remember to look at the notes you took for the file
+
+
+\section{(Bio)equivalence testing and turning things around}
+We have set things up so that we \textbf{need strong enough evidence to reject the null} and we \textbf{use p-values of measures of strength of evidence AGAINST the null}. This is often what we want in science (why? think about how many papers with claims that are trivially generated under the null you want to read). But not always. And in many cases, in particular in issues related to public health, we might want to follow a precautionary principle (\Burl{https://en.wikipedia.org/wiki/Precautionary_principle}).
+
+For example, we might want to say ``We will only allow you to dump chlorine in the river if there is strong enough evidence that such action will not cause harm, for instance, will not increase fish mortality''. This is not something you can settle with p-values as we have used them. \red{Why??}
+
+What can we do? We want to turn the process around. You would want a procedure for answering the following question: ``Is there strong enough evidence that, if chlorine has an effect, the effect is no larger than an increase in fish mortality of 1\%?''. This is like inverting the burden of proof: it is as if now we want evidence in favor of a hypothesis that says that things do not differ by more than a given, small, value (i.e., it seems we now want evidence in favor of what is often the null). In other words, we want strong evidence that the true value is inside the equivalence bounds, the bounds that say that ``things are similar, or equivalent'' (we have simplified things here, by just worrying about increases in fish mortality, but often we worry about deviations both up and down).
+
+We can approach this problem as one of finding evidence against the (new null) hypothesis that things differ by more of the specified tolerance, in our case that 1\% increase in fish mortality; in other words, that the true value falls outside the equivalence bounds. If we can reject our new null that the groups differ by more than a given threshold (that the true difference falls outside the equivalence bounds), we have established that they are equivalent.  In some cases it is relatively straightforward to do this (such as with the TOST procedure), in many others it is not.
+
+We will not pursue this any further. But, please, think of other examples of similar cases. Examples involving, for example, human disease and certain environmental changes, or secondary effects of drugs, or that two drugs (say, brand and generic) are for all practical purposes identical.
+
+Oh, and, of course, this section emphasizes another idea: a large p-value is not evidence in favor of the null!!!
+
+
+
+
+  
+
+
+
+\section{Bayesian inference}
+
+We will quickly review the following issues (please, make sure to look at your intro probability/stats notes):
+\begin{itemize}
+\item What is Bayes rule (or Bayes theorem)
+\item Using Bayes rule to obtain the posterior probability of a hypothesis given data. Why this is a very attractive idea.
+\item The problems of trying to do that: where is the prior for the hypothesis coming from?
+\item Why we will not spend more time on this.
+\item That Bayes rule is \textbf{NOT} controversial at all: it is \textbf{the procedure to use} in many cases, for example diagnostic testing (probability of having disease X, given that you got a positive test result). But using Bayes rule can be controversial or complicated for the cases we discuss here.
+\item That most of the p-values you see in the literature are, in fact, not ``Bayesian p-values'' but rather use frequentist statistics, so you must know how to use and interpret them.
+\item (And that we do not have conceptual or philosophical problems with at least many Bayesian approaches, and use them when we think appropriate; it is just that for this class we do not deem it appropriate to go in that direction).
+\end{itemize}
+
+
+
+
+
+\section{Confidence intervals and p-values: a longer discussion}
+
+Make sure  to look at the notes you took for the file
   \texttt{confidence-intervals-p-values-interpretation.pdf}.
 
 
@@ -695,8 +746,7 @@ depends on:
 
 \begin{itemize}
 \item The threshold we use for saying ``the means differ'' ($\alpha$ level, or
-  Type I error). (Note: remember to ask me to explain the differences between
-  $\alpha$ level and Type I error and p-value).
+  Type I error)\footnote{There is, actually, a difference between p-value and $\alpha$ level; the p-value is a function of the data, is something you compute with a given procedure for a given data set; the $\alpha$ level or Type I error rate is a property of the procedure.}.
 \item The sample size.
 \item The size of the effect (difference in means).
 \item The standard deviation.
@@ -785,6 +835,8 @@ Here is a interesting and recent example where the winner's curse can be
 
   The winner's curse is a \textbf{serious problem} (related to a bunch of others,
   such as reporting/publication bias and the reproducibility crisis.).
+
+    Oh, and the winner's curse is something that \textbf{can affect you too}; in other words, the winner's curse is not something that only happens to other researchers \smiley{}.
 
 
 \section{Paired tests}\label{pairedt}
@@ -883,6 +935,10 @@ t.test(myc.nc, myc.cancer, paired = TRUE)
 
 \subsection{Reshaping the data for a paired t-test}
 
+The purpose of this section is to show you several different ways of reshaping
+data, but we will skip the details in class, unless you run intro problems. In
+class we will definitely cover section \ref{datashape}, \ref{reshaping} and read section
+\ref{reshapefinal}. The rest is left here so that you can refer to it when you need to do it with your own data, but, again, we will \textbf{not} cover it in class: you need to understand the source of the problem but the syntax for the solutions is not important (you have it here, and can refer to it when you need it).
 
 \subsubsection{The shape of the data}\label{datashape}
 Often, when you know you are only going to do a paired test you can
@@ -1085,7 +1141,7 @@ As it says, you could try doing the reshaping using \Rfunction{dcast} from
 %% and the data wrangling cheatsheet
 %% https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
 
-\subsubsection{Reshaping et al: final comments}
+\subsubsection{Reshaping et al: final comments}\label{reshapefinal}
 
 A few comments:
 \begin{itemize}
@@ -1788,7 +1844,7 @@ does require interval data. This is left as a simple exercise.
 
 
 
-\subsection{A bad way to choose between nonparametric and parametric
+\subsection{A bad (very bad, terrible!) way to choose between nonparametric and parametric
   procedures}
 
 Don't do the following:
@@ -1817,7 +1873,7 @@ There are several problems with the above procedure, among them:
 \end{itemize}
 
 Even if this procedure is (or was) common in some circles, you now know why it is
-a bad idea. 
+a bad idea.  Please, do not do this.
 
 
 \clearpage
@@ -2305,7 +2361,7 @@ Can you interpret the output?
 
 
 We will cover this in more detail in class, in case you do not remember
-ANOVA. Read now the 2 and a half pages from Peter Dalgaard's book available in
+ANOVA. Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
 Moodle (\texttt{anova-basic-theory.pdf}), then read
 \texttt{anova-theory-even-simpler}, and then re-read Dalgaard's. If there are
 questions, we will cover them in class.
@@ -2430,6 +2486,22 @@ look at each one of the three p-values and keep any with a p-value $\leq
 
 
 
+Understanding what we just said is crucial. So we will use another two examples, a depressing and an uplifting one. If you understand them, you understand why we need multiple comparisons:
+
+\begin{itemize}
+\item Russian roulette. (Important note: we of course strongly discourage playing Russian roulette!). Suppose you have two friends, ``A'' and ``B''. ``A'' intends to play Russian roulette once a year, ``B'' intends to play it ten times a year\footnote{We say ``intends to'': obviously, the first time that the gun fires is the last time the player plays the game}. Whose funeral are you likely to attend first?
+\item Lottery: we can give you either one lottery ticket or 20 lottery tickets (each with a different number). Assuming you have no problem with becoming rich, what option do you prefer?
+\end{itemize}
+
+
+Now, the following should be clear:
+\begin{itemize}
+\item If you test, say, 3 null hypotheses, and each one is true, and you reject any of the hypothesis at the 0.05 level, the probability that you will reject one or more null hypotheses when you shouldn't is larger than 0.05.
+\item If instead of testing 3 null hypotheses you test 20, the probability of rejecting one or more when you shouldn't is much larger than if you were just testing 3 null hypotheses.
+\end{itemize}
+
+If the above is still unclear, think about why it is more likely ``B'' will get killed first. Or why it is more likely you will become richer if we give you 20 different lottery tickets.
+
 
 %% To carry out all pairs of tests and control for multiple testing, carry
 %% out the ANOVA again, but now make sure to click on ``Pairwise comparisons
@@ -2457,6 +2529,9 @@ look at each one of the three p-values and keep any with a p-value $\leq
 
 %% The next I comment out
 %% numSummary(dmit$activ , groups=dmit$ftraining, statistics=c("mean", "sd"))
+
+Back to our Anova.
+
 
 So we will get both a plot and textual output\footnote{If you have used R
   Commander, you will see a lot of resemblance with the output produced by
@@ -2496,6 +2571,25 @@ Given how far two of the contrasts are from 0.0, it seems those are highly
 significant differences. %% Let's go to the numerical output.
 
 
+
+Now, answer these questions (we will discuss them in class):
+
+\begin{itemize}
+\item If we had constructed \textbf{only} one of the confidence intervals (i.e., if we had not adjusted for multiple testing), that confidence interval would have been:
+  \begin{itemize}
+  \item narrower
+  \item wider
+  \end{itemize}
+
+\item If we had constructed, and adjusted for multiple testing 10 confidence intervals instead of three they would have been
+  \begin{itemize}
+  \item narrower
+  \item wider
+  \end{itemize}
+\end{itemize}
+
+
+
 %% \subsubsection{The numerical output}
 
 %% This
@@ -2504,6 +2598,8 @@ significant differences. %% Let's go to the numerical output.
 %% .Pairs <- glht(AnovaMIT, linfct = mcp(ftraining = "Tukey"))
 %% summary(.Pairs)
 %% @ 
+
+Back to the numerical output.
 
 The numerical output explicitly shows that we are using Tukey's method and
 it shows the p-values of each contrast (each comparison), and it makes it
@@ -2794,7 +2890,8 @@ an experiment where a single null is tested); then move on to the multiple
 p-values case. It is so nice that it makes comparisons very simple, as
 Wright explains: ``An adjusted $P$-value can be compared directly with any
 chosen significance level $\alpha$: If the adjusted $P$-value is less than
-or equal to $\alpha$, the hypothesis is rejected.''
+or equal to $\alpha$, the hypothesis is rejected.'' (If you find this too advanced for now, don't worry. But remember this once you feel more comfortable with these issues. And no, this paragraph will not be in the exam.)
+
 
 
 
@@ -2971,6 +3068,8 @@ things? %% And how do we interpret the
 %% here, but that is not just the first cell; see below if you want). As I
 %% said, we will get back to this later (\nameref{anovaaslm}).
 
+We will not emphasize understanding the coefficients in this class; we just wanted to show them to you, so you can see we are actually estimating three things. More details in \nameref{anovaaslm}, but those details \textbf{are not} needed.
+
 
 
 \subsubsection{Interaction model}
@@ -2997,26 +3096,37 @@ means[2, 2] -
 @ 
 
 
-\subsubsection{One observation per cell}
-\label{sec:one-observation-per}
+Again: we will not emphasize understanding the coefficients in this class; we just wanted to show them to you, so you can see we are actually estimating four things (in the previous example, we were estimating three). More details in \nameref{anovaaslm}, but those details \textbf{are not} needed.
 
 
-What if we only had one observation per cell?
 
-We can fit the additive model (but only 1 df left)
-<<>>=
-df2 <- df1[1:4, ]
-m3 <- lm(y ~ A + B, data = df2)
-anova(m3)
-summary(m3)
-@ 
+But let's do the following thought experiment. Suppose you have a two-way ANOVA. The first factor has four levels, the second factor has seven levels.
+\begin{itemize}
+\item How many coefficients will you be estimating in a model without interactions?
+\item How many coefficients will you be estimating in a model with interactions?
+\end{itemize}
 
-But we can't really fit the interaction model:
-<<>>=
-m4 <- lm(y ~ A * B, data = df2)
-anova(m4)
-summary(m4)
-@ 
+
+% \subsubsection{One observation per cell}
+% \label{sec:one-observation-per}
+
+
+% What if we only had one observation per cell?
+
+% We can fit the additive model (but only 1 df left)
+% <<>>=
+% df2 <- df1[1:4, ]
+% m3 <- lm(y ~ A + B, data = df2)
+% anova(m3)
+% summary(m3)
+% @ 
+
+% But we can't really fit the interaction model:
+% <<>>=
+% m4 <- lm(y ~ A * B, data = df2)
+% anova(m4)
+% summary(m4)
+% @ 
 
 
 
@@ -3251,12 +3361,13 @@ of one factor), it makes little sense to report any global main effects
 and we would rarely be interested in interpreting the significance (or
 not) of the Diet or Drug term. In general, \textbf{in the presence of
   interactions, we often refrain from interpreting main
-  effects}\footnote{Properly formulated, which also generally involves
+  effects; this is one consequence of what is often referred to as the ``marginality principle''}\footnote{Properly formulated, which also generally involves
   using other types of contrasts ---such as contr.sum, in R parlance---
   marginal tests in the presence of interactions, what are called Type
   III, can make sense, but are not always of interest. See also footnote
   \ref{fn:2} in section \nameref{orderfactors} for some entries and
-  references.}.
+  references.}. We return to this later in \qref{more-than-two}.
+
 
 
 \subsection{An ANOVA without interactions}\label{anovanoint}
@@ -3282,7 +3393,7 @@ The next section introduces a common phenomenon that is sometimes surprising. We
 will try to provide some intuition about why this phenomenon happens.
 
 These are the key steps of the argument (take a piece of paper, and draw a
-bunch of two-by-two boxes with the sample sizes in each cell):
+bunch of two-by-two boxes with the sample sizes in each cell; \textbf{really, do this now}):
 
 \begin{enumerate}
 \item Suppose you do a two-way ANOVA where the dependent variable (Y) is ``awake
@@ -3943,12 +4054,53 @@ Do you understand what is going on?
 
 
 
-\subsection{ANOVA/linear models with more than two factors}
+\subsection{ANOVA/linear models with more than two factors}\label{more-than-two}
 We will present no examples, but life is filled with them. Think about
 cholesterol: to the experiment with drug and diet add a third factor:
 an exercise program. Or maybe a fourth factor too: a stress reduction
 program. Or maybe \ldots.
 
+
+So let us gain some practice with them. Suppose we have a model with three factors, so a three-way ANOVA, with factors U, V, W. Before we continue, please write down the rows of the ANOVA table; do not fill up the numbers of SS, etc, but write down the rows. For example, one row will have ``V'', another ``U:V:W'', etc, etc. Fill up also the column with degrees of freedom (d.f.), assuming that U has two levels ($U_1$, $U_2$), V has three, and W has four. Really, write down that table.
+
+Make sure you can understand why we have this table and what each row would be testing.
+
+
+Suppose we find out that:
+\begin{itemize}
+\item There is no evidence of three-way interaction.
+\item There is no evidence of interaction U-V.
+\item There is no evidence of interaction U-W.
+\item Only the interaction V-W is significant.
+\end{itemize}
+
+So that the next exercise is easy to do, make an annotation as ``highly significant'' or ``obviously not significant'' in the interactions according to what we wrote above (e.g., the row with the U-V-W interaction with be labelled ``obviously not significant''.)
+
+
+Now, following what explained before (``the marginality principle''), where we said (\qref{2way-int}) ``in the 
+presence of interactions, we often refrain from interpreting main effects'', we will not test main effects that are marginal to any significant interaction. This means that:
+
+\begin{itemize}
+\item We will only examine the main effect of U.
+\item We will not examine the main effect of V, because there is a significant interaction V-W; in other words, the effect of V changes with the level of W.
+\item We will not examine the main effect of W, because there is a significant interaction V-W; in other words, the effect of W changes with the level of V. (This is exactly the same as in the previous line).
+\end{itemize}
+
+
+Let us repeat what we just did to make sure we understand what is going on. Write down what rows we would see in the ANOVA tables for the following cases; write down the terms and the d.f. Yes, \textbf{really, do this now}:
+
+\begin{itemize}
+\item An experiment with three factors, A, B, C. A has 3 levels, B has four, C has five. We fit a model without any interactions.
+\item As above, but the model is one with all possible interactions.
+\item As in the first case, but the model is one with interactions between A and B, and interactions between A and C, and interactions between B and C (but no three-way interaction).
+  \begin{itemize}
+  \item Now, suppose the A-C interaction is NOT at all significant. What main effects can you test?
+  \item Now, suppose the A-C and A-B interactions are NOT at all significant. What main effects can you test?
+  \end{itemize}
+\end{itemize}
+
+
+Finally, repeat once more on your own. An experiment with four factors, the first with 2 levels, the second with 7 levels, the third with 4 levels, the fourth with 5 levels. Write the table, degrees of freedom, and think about hypotheses you can test depending on what interactions are or not significant.
 
 
 \subsection{Multiple comparisons of means in two-way ANOVA}\label{multcomp-two-way}
@@ -3990,6 +4142,8 @@ statistical analysis using R, 2nd ed'', and then the documentation of \CRANpkg{m
 
 \subsubsection{Multiple comparisons in multi-way ANOVA: main messages}
 \label{sec:mult-comp-multi}
+
+Again, it is the main messages that you need to understand. You can skip sections \ref{mult-comp-2-way-no-int} and \ref{mult-comp-2-way-int} and use them as reference when you need it. (Nope, those two sections will not be in the exam).
 
 \begin{itemize}
 \item In two-way (or three-way or \ldots, generally, multi-way) ANOVA
@@ -4081,7 +4235,7 @@ Alternatively, you might compute the difference and confidence interval at some
 other level of the other factor that is more relevant for your question.  Whether
 or not it makes sense to compute the CI at the average level of the interaction,
 or at what level it makes sense to do it is \textbf{highly context dependent}:
-this depends on how the interactions are, and what your scientific question is.
+this depends on how strong the interactions are (e.g., are effects being reverted, as in this example?), and what your scientific question is.
 Regardless, how that average of B/average of A/average of the interaction is
 defined and computed, how the average difference at the average of the other
 variable is computed, how that is done in R, how to specify other levels, etc, do
@@ -4094,6 +4248,9 @@ difference between levels of A") cannot be answered without saying something
 about the level of B at which we want to compute that difference.
 
 
+And this, by the way, is strongly related to the ``marginality principle'' we have already discussed twice (\ref{2way-int}, \ref{more-than-two}).
+
+Now you can skip sections \ref{mult-comp-2-way-no-int} and \ref{mult-comp-2-way-int} and continue to section \ref{nonparanova}.
 
 
 \subsubsection{Multiple comparisons in two-way ANOVA: example with no
@@ -4354,7 +4511,7 @@ other things).
 
 
 
-\subsection{Nonparametric alternatives}
+\subsection{Nonparametric alternatives}\label{nonparanova}
 Are there nonparametric versions of the above procedures? For the one-way
 ANOVA the Kruskal-Wallis test is popular. For two-way designs with one
 observation per cell the Friedman test and the Quade test. But testing
@@ -4909,8 +5066,8 @@ anova(lm(lm(pemax ~ height + age, data = cystfibr2)))
 
 \subsection{Confidence intervals, confidence bands}\label{mult-regr-ci-pred}
 
-(This is also provided so that you have it in here if you need it, but you can
-skip it.)
+This is also provided so that you have it in here if you need it, but you can
+skip it.
 
 With multiple regression, visualizing confidence intervals and prediction
 intervals becomes much harder (we are no longer in 2D). There are ways of
@@ -4925,8 +5082,7 @@ predict(mcyst, interval = "confidence", level = 0.95)[1:5, ]
 predict(mcyst, interval = "prediction", level = 0.95)[1:5, ]
 @ 
 
-(Note the warning: the predictions should not be used to assess how well the
-model predicts the data used for the fitting itself.)
+Side note: pay attention to the warning: the predictions should not be used to assess how well the model predicts the data used for the fitting itself.
 
 With those values, you could then construct the plots you might want.
 
@@ -5787,7 +5943,8 @@ plot(tgd2lm)
 @
 \clearpage
 
-Some plots to try to understand  the above patterns (these are just some initial steps):
+Some plots to try to understand  the patterns in the last residual plots. These are just some initial steps, the sort of thing I'd do if I found the above patterns; what could be happening? And here, the next plots clearly show what is happening. Can you tell what is going on?
+
 
 <<f2d12ww,echo=FALSE, fig.pos = '!h',fig.width=5.8, fig.height=5.8, fig.cap='', fig.lp="fig:", fig.cap='Trying to make sense of those patterns, 1'>>=
 ## library(lattice)
@@ -5809,6 +5966,8 @@ boxplot(fitted(tgd2lm) ~ tgd2$drug)
 \clearpage
 
 \subsection{Diagnostics: more examples of non-constant variance (and other issues)}
+
+The next example presents fairly common patterns:
 
 <<f2d12z,echo=FALSE, fig.pos = '!h',fig.width=5.8, fig.height=5.8, fig.cap='', fig.lp="fig:", fig.cap='Another example with non-constant variance in a regression model.'>>=
 suppressWarnings(try(rm(x1, y1)))
@@ -5839,6 +5998,9 @@ rm(x1, y1, x1y1, x1y1lm)
 % rm(x1, y1, x1y1, x1y1lm)
 % @
 
+\clearpage
+
+The next is a contrived example, but one that shows things are clearly wrong (look at the bottom left).
 
 
 <<f2d77z,echo=FALSE, fig.pos = '!h',fig.width=5.8, fig.height=5.8, fig.cap='', fig.lp="fig:", fig.cap='Yet another example of non-constant variance (plus other issues)'>>=
