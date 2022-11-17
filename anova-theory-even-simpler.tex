@@ -20,7 +20,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{url}
-\usepackage[UKenglish]{isodate}
+
 
 \usepackage[begintext=\textquotedblleft,endtext=\textquotedblright]{quoting}
 
@@ -37,11 +37,10 @@
 
 
 \author{Ramon Diaz-Uriarte}
-% \date{\today}
-\cleanlookdateon
+\date{2022-07-27}
 %% \date{2021-09-24}
 \title{Anova theory even simpler}
-\subtitle{The 2 and a half pages from Peter Dalgaard, even more simplified.}
+\subtitle{The 2 and a half pages from Peter Dalgaard's ``Introductory Statistics with R'' even more simplified.}
 \hypersetup{
   pdfkeywords={},
   pdfsubject={},
@@ -77,11 +76,11 @@
   \item $MS_B$:
     \begin{itemize}
     \item If the null hypothesis is true (i.e., all group means are equal, i.e.,
-      $\mu_1 = \mu_2 = \mu_3 = \ldots$): $MS_B$ is also an estimate of the variance,
+      $\mu_1 = \mu_2 = \mu_3 = \ldots$): $MD_B$ is also an estimate of the variance,
       $\sigma^2$.
           \vspace*{10pt}
     \item If not all means are the same (i.e., at least one true mean is
-      different from the rest):  $MS_B$ is ``an estimate of the
+      different from the rest):  $MD_B$ is ``an estimate of the
       variance, $\sigma^2$, plus something else''
       \begin{itemize}
       \item That ``something else'' is the contribution that the differences
@@ -119,7 +118,7 @@
   \frametitle{What do SSD and MS stand for}
   \begin{itemize}
   \item The ``SSD'' stands for ``sum of squared deviations''. It is often written
-    (in computer output) as ``Sum Sq'' or ``sums of squares'' or ``SS''.
+    (as in much computer output) as ``Sum Sq'' or ``sums of squares'' or ``SS''.
   \item ``MS'': mean squares.
   \end{itemize}
 \end{frame}
