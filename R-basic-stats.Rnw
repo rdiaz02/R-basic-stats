@@ -28,6 +28,10 @@
 \usepackage[copyright]{ccicons} %% for the CC license icons
 \usepackage{gitinfo2}
 
+\newcommand*{\myhref}[1]{\href{#1}{#1}}
+\newcommand*{\externalf}{{\textcolor{blue}{[See other file:] }}}
+
+
 %% I could not get the first \part to be after a \clearpage without it
 %%  giving weird errors.
 
@@ -496,6 +500,7 @@ A few ideas that should be clear after this section:
 
 \begin{enumerate}
 \item The difference between a sample and a population
+  \item That (most of the time) we use samples to make inferences about populations
 \item What a statistic is; estimators (for example, the sample mean is an
   estimator) are a type of statistic \footnote{Briefly: a statistic is
     number that can be computed from a sample. An estimator is a function
@@ -737,10 +742,29 @@ Make sure  to look at the notes you took for the file
 
 \clearpage
 
-
-
+\section{FIXME: one vs two-tailed tests}
 
 \section{Power of a test}
+
+
+If there is a true difference in means we would like to detect it. Power refers to our ability to reject the null when it is false. This figure might help; rows refer to the true state of the Universe and columns to your decision. 
+
+
+\begin{table}[h!]
+\begin{tabular}{p{6.5cm}|>{\centering}p{2.5cm}|>{\centering}p{2.5cm}|}
+  \multicolumn{1}{c}{} & \multicolumn{1}{>{\centering}p{2.5cm}}{Null hypothesis not rejected} & 
+  \multicolumn{1}{>{\centering}p{2.5cm}}{Null hypothesis rejected}\tabularnewline
+  \cline{2-3} 
+  Means do not differ ($H_0$ \textit{is really true}) & Correct & Type I error\tabularnewline
+  \cline{2-3} 
+  Means differ ($H_0$ \textit{is really false}) & Type II error & Correct\tabularnewline
+  \cline{2-3} 
+\end{tabular}
+\end{table}
+Power is $1 - Type\ II\ error$. Power is the probability of rejecting the null hypothesis when the null hypothesis is false.
+
+
+
 How likely we are to detect a difference that really exists (power)
 depends on:
 
@@ -751,6 +775,8 @@ depends on:
 \item The size of the effect (difference in means).
 \item The standard deviation.
 \end{itemize}
+
+
 
 
 Do you understand each one of these? We will not get into details. If you
@@ -2342,7 +2368,7 @@ point that has been flagged as a potential outlier and we will silent that
 output from now on in these notes).
 
 
-\subsection{An ANOVA}\label{oneway}
+\subsection{An ANOVA; some basic theory and output}\label{oneway}
 
 We want to see if time of exercise makes any difference. Conducting three
 t-tests is not the best way to go here: our global null hypothesis is
@@ -2360,13 +2386,20 @@ summary(AnovaMIT)
 Can you interpret the output? 
 
 
+% We will cover this in more detail in class, in case you do not remember
+% ANOVA. Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
+% Moodle (\texttt{anova-basic-theory.pdf}), then read
+% \texttt{anova-theory-even-simpler}, and then re-read Dalgaard's. If there are
+% questions, we will cover them in class.
+
+
 We will cover this in more detail in class, in case you do not remember
-ANOVA. Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
-Moodle (\texttt{anova-basic-theory.pdf}), then read
-\texttt{anova-theory-even-simpler}, and then re-read Dalgaard's. If there are
-questions, we will cover them in class.
+ANOVA.
 
 
+\externalf Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
+Moodle (\myhref{anova-basic-theory.pdf}), then read
+\myhref{anova-theory-even-simpler.pdf}, and then re-read Dalgaard's. If there are questions, we will cover them in class.
 
 
 Now, things to notice about the output:
@@ -2557,6 +2590,17 @@ old.oma <- par(oma = c(0,5,0,0))
 plot(confint(Pairs))
 par(old.oma) ## restore graphics windows settings
 @ 
+
+
+Note that we can get some or most of that also from a call to
+\Rfunction{TukeyHSD}:
+<<>>=
+TukeyHSD(aov(activ ~ ftraining, data = dmit))
+@ 
+
+More details are provided in section \nameref{multcomp-two-way}. A quick explanation
+of what is happening with the p-values in
+\Burl{https://stats.stackexchange.com/a/488655}.
 
 
 %% \subsubsection{The plot of pairwise differences}
@@ -2978,7 +3022,7 @@ t-tests, but to any kind of test (comparing variances, correlations, etc).
 
 
 
-\subsection{Multiple comparisons: struck by lightning}
+\subsection{Multiple comparisons: struck by lightning, roulette, and lottery}
 
 This has been a short section, because we are skipping the technicalities
 and focus just on the big ideas. But this is a \textbf{VERY IMPORTANT}
@@ -2986,7 +3030,8 @@ section to remember. When you do many tests, some of them might have low
 p-values just by chance and you need to adjust for this. If any gene with
 a low p-value is declared significant (regardless of the size of the
 collection of tests) you will be likely to start claiming that many purely
-chance results are ``significant''. And you do not want that.
+chance results are ``significant''. And you do not want that. Again, go back to the examples of the lottery and the Russian roulette if this is not completely obvious.
+
 
 
 Remember that very rare events do happen, and they are almost certain to
@@ -3016,10 +3061,16 @@ take a look at a three-page one by W.\ Noble, in \textit{Nature
 \section{Two-way ANOVA}\label{twoway}
 
 A key issue in models with two or more predictor variables (such as two-way
-ANOVA) are interactions. What is an interaction? If this is not clear, we will
-explain it in class (but you might want to recall what ``epistasis'' is, for
-example, or what is the deal with the ``Interactions'' section in the leaflet
-(prospecto) of any drug you take).
+ANOVA) are interactions. What is an interaction? The phenomenon of interaction should be familiar to you: it is very common in life in general, and in biology you might have previously seen at as epistasis in genetics; or take a look at the `Interactions'' section in the leaflet (prospecto) of any drug you take.
+
+
+% If this is not clear, we will
+% explain it in class (but you might want to recall what ``epistasis'' is, for
+% example, or what is the deal with the ``Interactions'' section in the leaflet
+% (prospecto) of any drug you take).
+
+Before moving on, make sure you understand what interaction means. Interaction is also often referred to as non-additivity (and this will become clearer later).
+
 
 
 \subsection{A very simple two-way ANOVA}\label{simpletwo}
@@ -3281,6 +3332,8 @@ Look at the output, which I comment below
 ## This fits the model. Pay attention to the "*"
 cholestanova <- (lm(y ~ Diet*Drug, data=dcholest))
 ## This shows the ANOVA table. Notice the "Type II"
+## And notice we are using function Anova with capital A
+## which is a function from the car package.
 Anova(cholestanova)
 
 ## Now we are shown the 3 by 2 table of means, standard deviations, and number 
@@ -3294,6 +3347,20 @@ tapply(dcholest$y, list(Diet=dcholest$Diet, Drug=dcholest$Drug),
 @ 
 
 
+\subsubsection{\texttt{Anova}, \texttt{anova}, \texttt{aov}, \texttt{lm}, \texttt{summary}: what gives?}\label{what_gives}
+In R we often can use different ways of getting output from a linear model, including regression and ANOVA. This section briefly discusses issues specific to R. Most of this should be clear by the end of the course. These are they key messages. Refer to this section as needed while you use these notes.
+
+\begin{itemize}
+\item Function \texttt{lm} fits linear models, including regression and ANOVA's (most of them, not all).
+\item Function \texttt{aov} can also be used to fit ANOVA models. We do not use it to fit regression models. And most (not all, but not relevant for this course) of the models you can fit with \texttt{aov} you can fit with \texttt{lm}. As far as this course is concerned, their syntax is the same.
+\item \texttt{Anova} and \texttt{anova} give you ANOVA tables from models fitted with \texttt{lm}. The main difference between the two is that \texttt{Anova} gives, by default, what are called Type II sums of squares and tests, which we will use most of the time to deal with issues about order of factors. This will all be explained in detail.
+\item Function \texttt{anova} can also be used to compare models. We will see examples.
+\item Function \texttt{summary} on an object fitted with \texttt{aov} will also give you an ANOVA table. We will rarely use this (though it might be the code that some menus in R commander actually generate, and you might see it in other people's code).
+\item Function \texttt{summary} on an object fitted with \texttt{lm} will give, among others, a table of coefficients, not an ANOVA table.
+\end{itemize}
+
+Yes, this is a lot of terminology (jargon). And yes, it is potentially confusing. This should not be, though, an issue for understanding the conceptual and statistical issues discussed. 
+
 \subsection{Interactions}\label{2way-int}
 
 We will use an  ``Effects plot'' to look at interactions:
@@ -3303,8 +3370,7 @@ plot(allEffects(cholestanova), ask = FALSE)
 @ 
 
 
-What do you see? Do you understand what an interaction is? Do you see it
-in the plot? Basically, an interaction means that the effect of one
+What do you see? Do you see the interaction in the plot? Basically, an interaction means that the effect of one
 variable depends on the effect of the other. In this case, even if Drug B
 overall leads to a larger change (decrease) in cholesterol, its effects
 depend on the Diet. This has practical consequences: is Drug B a better
@@ -3316,7 +3382,7 @@ from a simple model like
 \[ y = Drug + Diet\]
 
 as the effect of Drug depends on the value of Diet (or the other way
-around). The phenomenon of interaction should be familiar to you: it is
+around). As we have said, the phenomenon of interaction should be familiar to you: it is
 very common in life in general, and in biology you might have previously
 seen at as epistasis in genetics.
 
@@ -3702,8 +3768,8 @@ that uses a slightly different notation.
 Nope. When the design is balanced, order does not
 matter\footnote{Technically, orthogonality of the design matrix does not
   require identical cell counts; if row/column counts are proportional,
-  for instance, we should be OK. But, for simplicity, we will use a nicely
-  balanced example here.}. 
+  for instance, we should be OK. But, for simplicity, many of our examples when order does not matter use 
+  balanced examples.}. 
 
 
 This is slightly more advanced material. Skip it on first reading. If you
@@ -4007,9 +4073,8 @@ residual standard errors, and thus the p-values.
 \subsection{One observation per cell}\label{one-obs-cell}
 
 
-Briefly: try not to do this. You will not be able to test interactions.
-
-
+Briefly: try not to do this. You will not be able to test interactions. And, of course \ldots that would be a tiny sample size anyway.
++
 So far, we have had more than one observation for each combination of
 levels (i.e., more than one observation per cell, where cell means each of
 the ``places'' or ``boxes'' in a table that shows the combinations of
@@ -4055,7 +4120,7 @@ Do you understand what is going on?
 
 
 \subsection{ANOVA/linear models with more than two factors}\label{more-than-two}
-We will present no examples, but life is filled with them. Think about
+We will not present detailed examples, but life is filled with them. Think about
 cholesterol: to the experiment with drug and diet add a third factor:
 an exercise program. Or maybe a fourth factor too: a stress reduction
 program. Or maybe \ldots.
@@ -4159,7 +4224,7 @@ Again, it is the main messages that you need to understand. You can skip section
 \item Finally, in both cases, you might want to think if carrying out comparisons
   between \textbf{all} pairs of means is what you really want to do. (Of course,
   you \textbf{must} report what you really did: carrying out comparisons between
-  all pairs and reporting only a few is incorrect).
+  all pairs and reporting only a few is incorrect, leads to biases, and is scientifically dishonest and poor practice).
 \end{itemize}
 
 
@@ -4517,7 +4582,8 @@ ANOVA the Kruskal-Wallis test is popular. For two-way designs with one
 observation per cell the Friedman test and the Quade test. But testing
 interactions is not easy; one needs to use more sophisticated approaches
 as in permutation tests conditioning on permuting only within rows or
-columns, etc. We will not pursue this any further.
+columns, etc. Moreover, as was the case with the Wilcoxon test, nonparametric and permutation procedures might not be testing what you think they are testing, and they can be sensitive to features you are not interested in, or insensitive to what you are really interested in. These procedures, of course, are sometimes what needs to be done, but you should really understand what they are really doing and why an ANOVA will not do. We will not pursue this any further. 
+ 
 
 \clearpage
 
@@ -4659,12 +4725,13 @@ need to know the units!). And the t-statistic tests if the slope is
 0. There is certainly strong evidence that Metabolic rate increases with
 body mass.
 
-Do you know what ``R-squared'' refers to? And the rest of the output?
+Do you know  what ``R-squared'' refers to  (we explain this in more detail in section \qref{r2})? And the rest of the output?
+ 
 
 By the way, did you see the note about missingness? Do you know what that
 means? 
 
-\subsection{And how does it look like}
+\subsection{And how does it look like: should have plotted the data!}
 Eh!!! We should probably have plotted the data as the first thing. First, let's do a scatterplot (you
 might want to not show the spread \footnote{I find the spread
   information to be confusing. But I like to leave the
@@ -4760,9 +4827,9 @@ library(HH)
 ci.plot(metablog)
 @ 
 
-What are the bands?
 
-
+What are the bands? Make sure you understand the difference between the confidence interval and the prediction interval bands.
+ 
 Maybe an example with more noise will help:
 
 <<ci_bands_reg_2,fig.width=7, fig.height=7,out.width = '12cm', out.height = '12cm'>>=
@@ -4778,6 +4845,17 @@ ci.plot(lm_cib_2)
 You can run the previous code changing the value of \texttt{N}, to get an
 intuition of the difference between the two bands.
 
+Basically:
+\begin{itemize}
+\item Confidence interval bands are for the regression line itself which is the same as saying that they are for the expected value of the response variable. (We are modeling $E[y] = \alpha + \beta x$). The more uncertain we are about the overall trend, about the line, the wider the confidence interval bands will be.
+  
+\item Prediction interval bands are for the observations; so, in addition to the uncertainty around the regression line, we have the $\sigma$, the variance of the observations around their mean value, around $E[y]$.
+\item To clarify the above, think about this: suppose you take a huge sample, say of size 10 million, of people and do a regression of body mass on body height. You will estimate the regression line with very little uncertainty. In other words, you will be very, very certain about where $E[body\_mass]$ is given $body\_height$. But \ldots no matter your sample size, there is quite a bit of variation in body mass for a given body height. So the prediction bands will be relatively wide, to accomodate this fact.
+
+  This is, by the way, the reason why you can be very certain about an overall trend (the expected value) and yet be unable to really predict any one specific individuals actual value.  It is crucial to understand the difference between predicting the mean and predicting a specific individual's value.
+
+  In contrast, if $\sigma$ is very, very, very tiny, then the prediction bands will be very, very close to the confidence interval bands. 
+\end{itemize}
 
 
 \subsection{Confidence intervals for the parameters}\label{ci-regr-params}
@@ -4929,10 +5007,35 @@ three variables, but those three variables are very highly correlated
 among themselves. Is this a common phenomenon: yes, it is rather common.
 
 
+Oh, and you might have realized that we are seeing another manifestation of the problem of the order of factors we saw with ANOVA.
+
+
+So, to summarize, when predictor variables are correlated:
+\begin{itemize}
+\item Even if each (or subsets of) predictor seem strongly associated to the outcome, their p-values could be large, and the sign of the associated reverted, when we fit all of the correlated predictors.
+\item The overall model (as given by the overall F statistic or the $R^2$) might indicate that the model is doing a decent job (certainly much better than fitting just a single mean), and yet the individual p-values might suggest that no individual predictor is relevant. 
+\end{itemize}
+
+What model should we choose? We will return to some of these questions in section \qref{modelsel}. For now, remember that prediction and interpretation are not necessarily the same objective (and, in fact, are often at odds with each other). The model with the best predictive power is often not the model that gives the best insight into the biological (or whatever) process. (And none of these might be, either, the models that are best for causal prediction; more on this later: \qref{causal_covar}).
+
 \subsection{$R^2$ and Adjusted $R^2$}
 \label{r2}
 
-We will explain this class, in case it is not clear:
+
+For this class, these are the key messages:
+
+\begin{itemize}
+\item $R^2$ is the proportion of variability in the dependent variable accounted for (or explained) by the model. It is also the square of the correlation between observed and predicted (predicted according to the model) values of the dependent variable.
+  
+\item But adding predictor variables that actually explain nothing will never decrease $R^2$. The adjusted $R^2$ accounts for this (adding a predictor will only increase adjusted $R^2$ if the predictor makes some contribution to improving predictive value). Note that the (unadjusted) $R^2$ is the relative change in residual sums of squares, whereas the adjusted $R^2$ is the relative change in residual variance. In general, the adjusted $R^2$ is a better number to look at (and note it can, in models that explain nothing, become negative)\footnote{There are additional issues that might need to be considered. For example, the default $R^2$ that R gives you, both adjusted and unadjusted, should not be used in models without an intercept (i.e., regression through the origin). And the unadjusted $R^2$ has the virtue that it can be computed for many other models, since it is just the square of the correlation of predicted and observed. We will not discuss these issues here.}.
+
+
+  
+\end{itemize}
+
+The following shows the calculations but the previous summary is enough for this class.
+
+
 
 <<>>=
 summary(mcyst)
@@ -4980,10 +5083,10 @@ length(resid(mcyst))
 
 \subsection{Interactions between continuous variables}\label{regr-int}
 Can we add interactions? Yes, of course. Interactions between continuous
-variables, however, are harder to visualize (they represent curved
+variables, however, are harder to visualize: they represent curved
 surfaces, because the slope of one of the variable changes as the other
 variable changes, whereas an additive model is just a plane ---or
-hyperplane)\footnote{If you want to play around with a regression plane or
+hyperplane\footnote{If you want to play around with a regression plane or
   regression surfaces, go to ``Graphs'', ``3D graph'', ``3D
   scatterplot''. In options, you can choose a plane or three different
   surfaces ---you might need to play with the degrees of freedom if you
@@ -4993,22 +5096,18 @@ hyperplane)\footnote{If you want to play around with a regression plane or
   our brains do not seem ready for 4D and higher.}.
 
 
-How do we interpret coefficients? Just a few hints here. Suppose we have\\
-$y = \alpha + \beta_1 x_1 + \beta_2 x_2 + \beta_{1,2}\ x_1\ x_2 + \epsilon$ (where the
-term $\beta_{12}\ x_1\ x_2$ is literally the product of $\beta_{1,2}$ times the product of
-$x_1$ and $x_2$). Now, in a table of coefficients, what is the meaning of
-$\beta_1$? That is a table that ``shows every variable when everything else is
-also in the model'' (and that includes the interaction).  You can think of
-$\beta_1$ as just the best term that solves the above equation ($y =
-\alpha + \beta_1 x_1 + \beta_2 x_2 + \beta_{1,2} x_1 x_2 +
-\epsilon$). But think about the interpretation of ``a coefficient tells me
-how fast the response changes when the predictor changes by one
-unit''. Let's do that: $\frac{\partial y}{\partial x_1} = \beta_1 +
-\beta_{1,2}\ x_2$; see how $x_2$ is there. How fast $y$ changes with $x_1$
-is also a function of $x_2$. 
-
-
-This differs from the model without interaction where we have:
+How do we interpret coefficients? These are a few hints. Suppose we have\\
+$y = \alpha + \beta_1 x_1 + \beta_2 x_2 + \beta_{1,2}\ x_1\ x_2 + \epsilon$
+(where the term $\beta_{12}\ x_1\ x_2$ is literally the product of $\beta_{1,2}$
+times the product of $x_1$ and $x_2$). Now, in a table of coefficients, what is
+the meaning of $\beta_1$? That is a table that ``shows every variable when
+everything else is also in the model'' (and that includes the interaction).  You
+can think of $\beta_1$ as just the best term that solves the above equation
+($y = \alpha + \beta_1 x_1 + \beta_2 x_2 + \beta_{1,2} x_1 x_2 + \epsilon$). But
+think about the interpretation of ``a coefficient tells me how fast the response
+changes when the predictor changes by one unit''. Let's do that:
+$\frac{\partial y}{\partial x_1} = \beta_1 + \beta_{1,2}\ x_2$. Notice how $x_2$ is
+there: how fast $y$ changes with $x_1$ is also a function of $x_2$. And this differs from the model without interaction where we have:
 $\frac{\partial y}{\partial x_1} = \beta_1$. 
 
 And a simple numerical example:
@@ -5097,7 +5196,7 @@ confint(mcyst)
 round(cov2cor(vcov(mcyst)), 3)
 @ 
 
-(Note: we already knew that the mcyst is probably not a great model!!)
+(Note: we already knew that mcyst is probably not a great model!!)
 
 
 \subsubsection{Confidence intervals, confidence bands: the bootstrap}\label{mult-regr-ci-pred-boot}
@@ -5121,10 +5220,10 @@ There is nothing conceptually new, but the accounting gets more complicated.
 \section{Continuous and discrete independent variables 
   and ANCOVA}\label{ancova}
 
-\subsection{A first example of ANCOVA with the cystfibr data}
+
+\subsection{The general scenario for ANCOVA}
 Right now, nothing should stop us from thinking about models where the
-right hand side contains both continuous and discrete variables. Let's do
-it with the cystic fibrosis data set.  ANCOVA refers to this mixture of
+right hand side contains both continuous and discrete variables. ANCOVA refers to this mixture of
 ANOVA and regression and stands for ``Analysis of
 covariance''\footnote{But this does not mean that we are comparing
   covariances, as in comparing correlations, between groups; we are
@@ -5132,6 +5231,36 @@ covariance''\footnote{But this does not mean that we are comparing
   warranted by the absence of interactions between the continuous and
   discrete predictors.}. Regardless, all of ANOVA, regression, and ANCOVA
 are especial types of linear models.
+
+
+
+Suppose you have a response variable, Y. And two predictor variables; variable A, which is discrete, and has, say, two levels (a1, a2). And variable X, which is continuous. Now, get a piece of paper and draw the following cases, in turn. Really, \textbf{do draw this}.
+\begin{itemize}
+\item The relationship between Y and X increases faster in a1 than in a2. Thus, the regression lines for a1 and a2 are not parallel (and will eventually cross each other).
+\item The relationships between Y and X change at the same rate for a1 and a2. Thus, they are parallel lines. But individuals of group a1 with value X = x have a larger value of Y than individual of group a2 for that value of X. So, as we said, lines are parallel, but they are separate. They have different intercepts.
+\item As the previous case, but now the intercept is the same. So you only see one line.
+\item There is not relationship between Y and X in any of the groups. (Or, if you insisted on putting a line, it would be of slope 0).
+\end{itemize}
+
+ANCOVA is a procedure for differentiating the above scenarios, starting from the first and moving down. It also works when the discrete group has more than two levels. And, for that matter, we can deal with more than one discrete variable and more than one continuous one, etc, etc: these are just linear models. As said several times already, we will use the name ANCOVA as this might be familiar. But once you understand the process, these are just linear models that allow to flexibly model scientific problems even if they no longer fit in the simple ANCOVA framework.
+
+
+Oh, and if you want some specific names for variables to draw the above figures, you can do as follows:
+\begin{itemize}
+\item Y is alertness, A is sex (male, female), X is amount of coffee.
+\item Y is metabolic rate, A is tetrapod group (bird, reptile, amphibian, mammal), X is body mass.
+\item Y is number of somatic mutations, A is type of tissue, X is age.
+\item etc, etc.
+\end{itemize}
+
+
+
+
+
+\subsection{A first example of ANCOVA with the cystfibr data}
+Let's fit an ANCOVA it with the cystic fibrosis data set.  The independent variables are sex (discrete,
+obviously) and age. However, sex is coded with 0/1 and we want it to be a
+factor, explictly. Let's recode it:
 
 
 Let's fit a model where the independent variables are sex (discrete,
@@ -5268,10 +5397,11 @@ the smaller one. It clearly shows that, in this case, that the larger
 model model (the one with both a main effect of ``sex'' and an
 interaction) is not significantly better than the one without ``sex''. So
 we can just keep model \Robject{mcyst3}: there is no statistical evidence
-of \Robject{mcyst2} being any better.
+of \Robject{mcyst2} being any better. Again, notice how we have compared two models that, in this case, differed by the presence of several terms: the small model had only age, the large had sex and the interaction of sex and age. Being able to compare (nested ---see below) models that differ in several terms at once is really handy and there is no need to proceed by dropping one term at a time. 
+ 
 
 
-Three comments here:
+Three additional comments here:
 \begin{itemize}
 \item These tests only make sense for nested models (where the terms of
   one of the models is a subset of terms of the other). Beware that R does
@@ -5453,7 +5583,7 @@ variables, using the \Robject{hellung} dataset included in \CRANpkg{ISwR}.
 \subsection{More variables}
 We can extend the models to incorporate more variables, add interactions,
 etc. Interactions can involve more than two variables, can involve
-continuous and discrete variables, etc.
+continuous and discrete variables, etc, etc.
 
 
 
@@ -5461,221 +5591,6 @@ continuous and discrete variables, etc.
 There is nothing conceptually new here. If you want the details, go to section \nameref{anovaaslm}
 and make sure things make sense with these new models: how we interpret
 coefficients and how many parameters we have.
-
-
-
-
-
-\section{Covariate adjustment and a few comments about causal
-  inference}\label{causal_covar}
-
-Should we use all covariates available to us in our models? It depends on what we
-want to do. If all we care is prediction, then maybe yes. If we care about
-interpretation, probably not. In particular, variables that are effects of the
-outcome variable (i.e., variables that are, causally, downstream from our ``y'')
-are often variables we do not want to adjust for. Likewise for
-variables that are downstream from both the ``y'' and other predictor variables.
-
-
-We have been using language a bit to casually (I wrote ``casually'', not
-``causally'' :-). But sometimes we will read our models as saying ``a unit increase
-in variable X1 is associate with these many units change in Y''. At other times,
-we will want (and even be able to say) ``a unit increase in variable X1 causes
-these many units change in Y''. These differences in wording also emphasize the
-possible difficulties in understanding the meaning of phrases like ``holding
-variable X2 constant, a unit change in variable X1 causes whatever''.
-
-
-That said, it is possible sometimes to use data, both experimental and
-observational, to make causal claims. Yes, we wrote observational, too. And it is
-actually good news that we can (sometimes, and under certain assumptions)
-estimate the effects of causes, since many important questions that concern us
-are inherently causal. For example ``will doing X minimize the risks of being
-infected by the coronavirus?''. An many of these questions (or aspects of these
-questions) are ones for which gathering experimental data is just not possible
-(ethically, logistically, etc).
-
-
-
-% If we have time, we will briefly touch upon
-% these issues in class. Some specific issues we will mention are:
-% \begin{itemize}
-% \item Counterfactuals
-% \item DAGs (directed acyclic graphs) for representing our assumptions. (We have
-%   already done so in some examples).
-% \item The do operator and the interventionist account of causality and how it
-%   relates to DAGs.
-% \end{itemize}
-
-The literature on causal inference has grown quite a bit in the last 10
-years. Some recommended readings, in approximate order of increasing difficulty
-(of the reading itself, or of working through all of the material) are:
-
-\begin{itemize}
-\item Pearl and Mackenzie, 2018, ``The book of why''.
-\item Rosenbaum, 2017, ``Observation and experiment. An introduction to causal inference'' (Rosenbaum does not use
-  DAGs)
-\item Pearl, Glymour, Jewell, 2016, ``Causal inference in statistics: a primer''
-  [Beware with errata: avoid early printings of the book and make sure to look at
-  the errata page anyway!]
-\item Hern\'an and Robins. 2020. ``Causal inference: what if''. Available from \Burl{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
-\item Morgan and Winship, ``Counterfactuals and causal inference: methods and
-  principles for social research'' [Yes, basically all examples are from
-  sociology and political science, but that should not be a problem.]
-\end{itemize}
-
-A separate PDF is available for this topic, \texttt{covars-interpr-causal.pdf},
-and we will cover it at the end of this lesson.
-
-
-
-
-\section{Dealing with ratios}\label{ratios}
-
-%% FIXME: 
-\red{FIXME: might want to add too examples like the one on pp.\ 364 and ff in
-Morgan and Winship ``Counterfactuals and causal inference'' (but for a RCD
-experiment on treatment assignment)}
-
-In biology (as well as in other disciplines) it is common for researchers
-to use ratios of variables to try to standardize/normalize a
-variable. This procedure looks deceptively simple, but it is not. Here, we
-will explore some of the problems\footnote{I thank Alba Concepci\'on, a
-  former student of BM-1, for asking me questions that prompted me to
-  write this section. She also provided the link to Curran-Everett's
-  paper}. You can find more details\footnote{With discussion about errors
-  in the X variable, an issue we have not covered here} in this commentary
-from Curran-Everett:
-\Burl{http://ajpadvan.physiology.org/cgi/doi/10.1152/advan.00053.2013}.
-
-Before we start, though, note that this section should not really be
-necessary after previous sections :-).
-
-
-
-
-So that nothing is hidden, I will simulate the data here, but in these
-notes I won't provide details about how/why the data have been simulated
-that way (the code is below; look at it if you want). We will pretend
-there is a response variable, called ``Y'', two groups (``g1'' and ``g2'')
-and another variable, called ``Z''. Z might be some reporter protein, or
-something that can be taken as a proxy for cell volume, etc.
-
-
-<<>>=
-set.seed(1) ## irrelevant, but so that we all 
-            ## get the same numbers
-n <- 20
-sd <- 0.5
-@ 
-
-
-
-\subsection{A misleading case with parallel lines}
-\label{mislead-ratios-1}
-
-
-<<>>=
-z1 <- runif(n, 1, 10)
-t1 <- factor(rep(c("g1", "g2"), rep(n, 2)))
-y1 <-  2 * z1 + 3 * as.numeric(t1) + rnorm(n, 0, sd)
-data1 <- data.frame(Y = y1, Z = z1, Group = t1, Ratio = y1/z1)
-@ 
-
-
-%%, fig.cap="Parallel slopes but ratio differences?">>=
-<<fig.height=6,fig.cap='Parallel slopes but ratio differences?'>>= 
-par(mfrow = c(1, 2))
-with(data1, plot(Ratio ~ Group))
-with(data1, plot(Y ~ Z, col = c("red", "blue")[Group]))
-abline(lm(Y ~ Z, subset(data1, Group == "g1")), col = "red")
-abline(lm(Y ~ Z, subset(data1, Group == "g2")), col = "blue")
-legend(x = 3, y = 20, legend = c("g1", "g2"), col = c("red", "blue"),
-       pch = 1)
-
-@ 
-
-<<>>=
-summary(lm(Y ~ Z * Group, data = data1))
-t.test(Ratio ~ Group, data = data1)
-## This is the equivalent to the t-test, except the
-## t-test used by default by R does not assume equal variances
-## You could also use t.test(...., var.equal = TRUE)
-summary(aov(Ratio ~ Group, data = data1))
-@ 
-
-The lines are perfectly parallel, but the test for ratios says they
-differ. Why? Because it is forcing a regression through the origin. Note
-the the linear model does get the results right: there are no differences
-in the rate of change of Y relative to Z, but the groups differ in
-intercept. As you can see, the analysis with ratios is misleading.
-
-
-\subsection{A misleading case where ratios differ}
-\label{mislead-ratios2}
-
-Generate  the data:
-<<>>=
-set.seed(123)
-sd <- 0.1
-z2 <- seq(from = 1, to = 3, length.out = n)
-ya <- z2 + rnorm(n, 0, sd)
-yb <- 0.5 * z2 + 1 + rnorm(n, 0, sd)
-y <- c(ya, yb)
-tf <- factor(rep(c("g1", "g2"), rep(n, 2)))
-z <- rep(z2, 2)
-data2 <- data.frame(Y = y, Z = z, Group = tf, Ratio = y/z)
-@ 
-
-
-The figure and analysis:
-%% fig.cap="Different slopes and no ratio differences?">>=
-<<fig.height=6,fig.cap='Different slopes and no ratio differences?'>>=
-par(mfrow = c(1, 2))
-with(data2, plot(Ratio ~ Group))
-with(data2, plot(Y ~ Z, col = c("red", "blue")[Group]))
-abline(lm(Y ~ Z, subset(data2, Group == "g1")), col = "red")
-abline(lm(Y ~ Z, subset(data2, Group == "g2")), col = "blue")
-legend(x = 1.5, y = 2.5, legend = c("g1", "g2"), col = c("red", "blue"),
-       pch = 1)
-@ 
-
-<<>>=
-summary(lm(Y ~ Z * Group, data = data2))
-t.test(Ratio ~ Group, data = data2) ## or do an ANOVA, as above
-@ 
-
-
-The ratios do differ, if we do not force them through the origin: the rate
-of change of Y relative to Z differs between the two groups. But just
-comparing the ratios will not detect it. Again, a linear model does detect
-it just fine: you see a strong interaction between slope and
-group. And, again, the analysis of ratios is misleading.
-
-
-Log-transforming the ratio, using non-parametric statistics, etc, won't
-help; the problem is using the ratio.
-<<>>=
-t.test(log(Ratio) ~ Group, data = data2)
-with(data2, plot(log(Ratio) ~ Group))
-wilcox.test(Ratio ~ Group, data = data2)
-@ 
-
-
-
-\subsection{Diagnostics et al.\ and other warning signs}
-
-If you look closely, the data show warning signals, such as possible
-differences in variances of ratios. And if you have no idea about the
-model, you might be able to compare several and use diagnostics, as
-explained in section \nameref{diagnostics} to choose among models. But, in
-general, ratios are not the way to. And using diagnostics might require a
-decently large sample size. Summary: only use ratios if you really know
-what you are doing and have good reasons to do it. Otherwise, use linear
-models.
-
-By the way: we have covered just two very simple examples. Things can of
-course get a lot more complicated with non-linear relationships, etc.
 
 
 
@@ -6254,29 +6169,64 @@ For you to read and play around further:
 
 \clearpage
 
-
-\section{Variable and model selection}
+\section{Variable and model selection}\label{modelsel}
 
 \subsection{Why model selection?}
 
 
 You say you want to select variables? Select them for what? Prediction?
-Interpretation?  Variable selection is a touchy and delicate
+Interpretation?  Manipulation? Variable selection is a touchy and delicate
 subject. First, procedures based purely in statistical criteria might
 select ``statistically important'' variables (under some suitable
 definition of ``important''), but those need not be the most relevant from
-a biological point of view, or causally, etc
+a biological point of view, or causally, etc. This is a very quick summary:
 
-And with regards to the statistical procedures, we will summarize it as
+
+
+\begin{itemize}
+\item Prediction: predict a variable given others. This might be totally unrelated to intervention (which is often what causal inference is after) or understanding/gaining insight into a process.
+
+  Example: banks might want to filter customers unlikely to return a credit. They are not really trying to correct anyone's behavior, they are not trying to understand why people ask for money they cannot return. They just want to predict (so as not to offer them certain financial products).
+
+  Many models are of this kind. For example, many meteorological models are like this: if you see AEMET's predictions you only care about them being right (and they often are). You are not trying to modify anything (i.e., ``let's try to make of today a rainy day'') nor understand; and this is why purely phenomenological models of high complexity, including deep learning, with millions of parameters that our brains can't just wrap their heads around, are just fine for these tasks.
+
+  
+\item Interpretation/understanding/insight: why are things this way? What factors are relevant for a process and why? This is trying to gain scientific understanding. Is sleep deprivation what causes whatever? Or is it differences in light exposure? Or ... This is often what scientific modeling is about.
+
+  
+\item Causal inference, intervention: what would happen in Y if we manipulated X? For example, if we were to get people to eat legumes twice a week, how many colon cancers could we prevent?
+  
+  
+\end{itemize}
+
+
+  Yes, causal inference and intervention on the one hand and understanding on the other are often very closely related. But they are not the same. For example, you might have a relatively good understanding of a particular process, and yet be unable to predict exactly what an intervention will do because of the presence of modifier variables.
+
+  And sometimes we might not understand the mechanisms in detail\footnote{When one has an adequate understanding of mechanisms is actually a difficult question} and, yet, be able to conduct very successful interventions if we are able to estimate the causal effect of a variable\footnote{Briefly: the effect that changing, by manipulation, a variable from one state or value to another has on the outcome}.
+  
+
+  And intervention is not totally unrelated to successful prediction either, of course. Elements of models that play a role in meteorological and climatological prediction are also present in causal models that are used to guide (or try to guide, unfortunately without much success) actions to prevent the disaster of climate change; we are asking here ``what variables should we change, and to what values, to achieve this result or prevent this other result?''
+
+  But models that might be excellent for predictions of current outcome might be very bad at prediction under new circumstances; causal inference and intervention are after the last objective whereas you looking at AEMET in the morning is you concerned about prediction-without-trying-to-modify-or-understand.
+
+
+\subsection{Variable selection: the summary}
+
+With regards to the statistical procedures, we will summarize it as
 follows: please, please, please, distrust automated variable selection
 procedures that rely on p-values or F-statistics of individual variables
-(in all their variants, such as stepwise, etc). Careful model comparison,
+(in all their variants, such as stepwise, etc). These procedures rarely do what you want to do, are often extremely unstable, etc. They are trivial to implement, and that makes them very common, but they are rarely what you scientific question needs.
+
+
+Careful model comparison,
 for instance using something like \verb@ anova(model1, model2) @, as we
 have seen (e.g., section \nameref{model-comp} or \nameref{ancova_rept}), might be
 a good idea. Notice, again, that \verb@ anova(model1, model2) @ is all
 about comparing models.
 
+
 \subsection{Model selection using AIC and \Rfunction{step}}
+
 
 If you really need automated or semiautomated procedures, then reasonable
 strategies use model-comparison criteria such as AIC\footnote{AIC: Akaike
@@ -6292,8 +6242,6 @@ also in the context of variable selection, by P.\ Dalgaard in chapter 11 of
 Of course, using model diagnostics (section \nameref{diagnostics}) with the
 initial and final models is always a necessity.
 
-
-
 Let's give some examples (look at them carefully, and compare with what we
 did by hand, and with whether or not these are the models you would
 use). We are using AIC ($AIC = -2 \log(\hat{L}) + 2\ k$, where $k$ is the
@@ -6307,6 +6255,7 @@ step(mcyst2, direction = "both")
 step(mcyst, direction = "both")
 @ 
 
+
 <<>>=
 ## In metab, we drop the interaction
 step(metab_b_r, direction = "both")
@@ -6314,11 +6263,6 @@ step(metab_b_r, direction = "both")
 ## But nothing can be dropped here
 step(longev_b_r, direction = "both")
 @ 
-
-%% Something is fucked up in the processing, as commenting or uncommenting
-%% some of the above leads to a non-compiling tex. Go figure. It seems
-%% some kind of interaction between knitr and something else. So leave the
-%% comments in the last chunk.
 
 \subsection{Differences between model selection using AIC and model comparison
   using \Rfunction{anova} (and hypothesis testing using \Rfunction{Anova})}\label{aic-f-tests}
@@ -6371,7 +6315,9 @@ the best model from the prediction point of view.
 
 
 
-\subsection{A large pemax model}
+
+
+\subsection{A large pemax model as an example}
 
 A large pemax model:
 
@@ -6577,6 +6523,229 @@ sizes to the different \textbf{levels of variation}?
    in this context because he said ``To consult the statistician after an
    experiment is finished is often merely to ask him to conduct a post
    mortem examination. He can perhaps say what the experiment died of.''}.
+
+
+
+ 
+\section{Covariate adjustment and a few comments about causal
+  inference}\label{causal_covar}
+
+Should we use all covariates available to us in our models? It depends on what we
+want to do. If all we care is prediction, then maybe yes. If we care about
+interpretation, probably not. In particular, variables that are effects of the
+outcome variable (i.e., variables that are, causally, downstream from our ``y'')
+are often variables we do not want to adjust for. Likewise for
+variables that are downstream from both the ``y'' and other predictor variables.
+
+
+We have been using language a bit to casually (I wrote ``casually'', not
+``causally'' :-). But sometimes we will read our models as saying ``a unit increase
+in variable X1 is associate with these many units change in Y''. At other times,
+we will want (and even be able to say) ``a unit increase in variable X1 causes
+these many units change in Y''. These differences in wording also emphasize the
+possible difficulties in understanding the meaning of phrases like ``holding
+variable X2 constant, a unit change in variable X1 causes whatever''.
+
+
+That said, it is possible sometimes to use data, both experimental and
+observational, to make causal claims. Yes, we wrote observational, too. And it is
+actually good news that we can (sometimes, and under certain assumptions)
+estimate the effects of causes, since many important questions that concern us
+are inherently causal. For example ``will doing X minimize the risks of being
+infected by the coronavirus?''. An many of these questions (or aspects of these
+questions) are ones for which gathering experimental data is just not possible
+(ethically, logistically, etc).
+
+
+
+% If we have time, we will briefly touch upon
+% these issues in class. Some specific issues we will mention are:
+% \begin{itemize}
+% \item Counterfactuals
+% \item DAGs (directed acyclic graphs) for representing our assumptions. (We have
+%   already done so in some examples).
+% \item The do operator and the interventionist account of causality and how it
+%   relates to DAGs.
+% \end{itemize}
+
+The literature on causal inference has grown quite a bit in the last 10
+years. Some recommended readings, in approximate order of increasing difficulty
+(of the reading itself, or of working through all of the material) are:
+
+\begin{itemize}
+\item Pearl and Mackenzie, 2018, ``The book of why''.
+\item Rosenbaum, 2017, ``Observation and experiment. An introduction to causal inference'' (Rosenbaum does not use
+  DAGs)
+\item Pearl, Glymour, Jewell, 2016, ``Causal inference in statistics: a primer''
+  [Beware with errata: avoid early printings of the book and make sure to look at
+  the errata page anyway!]
+\item Hern\'an and Robins. 2020. ``Causal inference: what if''. Available from \Burl{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
+\item Morgan and Winship, ``Counterfactuals and causal inference: methods and
+  principles for social research'' [Yes, basically all examples are from
+  sociology and political science, but that should not be a problem.]
+\end{itemize}
+
+
+
+
+\externalf A separate PDF is available for this topic, \myhref{covars-interpr-causal.pdf}. Please, read it \textbf{now}.
+
+% A separate PDF is available for this topic, \texttt{covars-interpr-causal.pdf},
+% and we will cover it at the end of this lesson.
+
+
+
+
+\section{Dealing with ratios}\label{ratios}
+
+%% FIXME: 
+\red{FIXME: might want to add too examples like the one on pp.\ 364 and ff in
+Morgan and Winship ``Counterfactuals and causal inference'' (but for a RCD
+experiment on treatment assignment)}
+
+In biology (as well as in other disciplines) it is common for researchers
+to use ratios of variables to try to standardize/normalize a
+variable. This procedure looks deceptively simple, but it is not. Here, we
+will explore some of the problems\footnote{I thank Alba Concepci\'on, a
+  former student of BM-1, for asking me questions that prompted me to
+  write this section. She also provided the link to Curran-Everett's
+  paper}. You can find more details\footnote{With discussion about errors
+  in the X variable, an issue we have not covered here} in this commentary
+from Curran-Everett:
+\Burl{http://ajpadvan.physiology.org/cgi/doi/10.1152/advan.00053.2013}.
+
+Before we start, though, note that this section should not really be
+necessary after previous sections :-).
+
+
+
+
+So that nothing is hidden, I will simulate the data here, but in these
+notes I won't provide details about how/why the data have been simulated
+that way (the code is below; look at it if you want). We will pretend
+there is a response variable, called ``Y'', two groups (``g1'' and ``g2'')
+and another variable, called ``Z''. Z might be some reporter protein, or
+something that can be taken as a proxy for cell volume, etc.
+
+
+<<>>=
+set.seed(1) ## irrelevant, but so that we all 
+            ## get the same numbers
+n <- 20
+sd <- 0.5
+@ 
+
+
+
+\subsection{A misleading case with parallel lines}
+\label{mislead-ratios-1}
+
+
+<<>>=
+z1 <- runif(n, 1, 10)
+t1 <- factor(rep(c("g1", "g2"), rep(n, 2)))
+y1 <-  2 * z1 + 3 * as.numeric(t1) + rnorm(n, 0, sd)
+data1 <- data.frame(Y = y1, Z = z1, Group = t1, Ratio = y1/z1)
+@ 
+
+
+%%, fig.cap="Parallel slopes but ratio differences?">>=
+<<fig.height=6,fig.cap='Parallel slopes but ratio differences?'>>= 
+par(mfrow = c(1, 2))
+with(data1, plot(Ratio ~ Group))
+with(data1, plot(Y ~ Z, col = c("red", "blue")[Group]))
+abline(lm(Y ~ Z, subset(data1, Group == "g1")), col = "red")
+abline(lm(Y ~ Z, subset(data1, Group == "g2")), col = "blue")
+legend(x = 3, y = 20, legend = c("g1", "g2"), col = c("red", "blue"),
+       pch = 1)
+
+@ 
+
+<<>>=
+summary(lm(Y ~ Z * Group, data = data1))
+t.test(Ratio ~ Group, data = data1)
+## This is the equivalent to the t-test, except the
+## t-test used by default by R does not assume equal variances
+## You could also use t.test(...., var.equal = TRUE)
+summary(aov(Ratio ~ Group, data = data1))
+@ 
+
+The lines are perfectly parallel, but the test for ratios says they
+differ. Why? Because it is forcing a regression through the origin. Note
+the the linear model does get the results right: there are no differences
+in the rate of change of Y relative to Z, but the groups differ in
+intercept. As you can see, the analysis with ratios is misleading.
+
+
+\subsection{A misleading case where ratios differ}
+\label{mislead-ratios2}
+
+Generate  the data:
+<<>>=
+set.seed(123)
+sd <- 0.1
+z2 <- seq(from = 1, to = 3, length.out = n)
+ya <- z2 + rnorm(n, 0, sd)
+yb <- 0.5 * z2 + 1 + rnorm(n, 0, sd)
+y <- c(ya, yb)
+tf <- factor(rep(c("g1", "g2"), rep(n, 2)))
+z <- rep(z2, 2)
+data2 <- data.frame(Y = y, Z = z, Group = tf, Ratio = y/z)
+@ 
+
+
+The figure and analysis:
+%% fig.cap="Different slopes and no ratio differences?">>=
+<<fig.height=6,fig.cap='Different slopes and no ratio differences?'>>=
+par(mfrow = c(1, 2))
+with(data2, plot(Ratio ~ Group))
+with(data2, plot(Y ~ Z, col = c("red", "blue")[Group]))
+abline(lm(Y ~ Z, subset(data2, Group == "g1")), col = "red")
+abline(lm(Y ~ Z, subset(data2, Group == "g2")), col = "blue")
+legend(x = 1.5, y = 2.5, legend = c("g1", "g2"), col = c("red", "blue"),
+       pch = 1)
+@ 
+
+<<>>=
+summary(lm(Y ~ Z * Group, data = data2))
+t.test(Ratio ~ Group, data = data2) ## or do an ANOVA, as above
+@ 
+
+
+The ratios do differ, if we do not force them through the origin: the rate
+of change of Y relative to Z differs between the two groups. But just
+comparing the ratios will not detect it. Again, a linear model does detect
+it just fine: you see a strong interaction between slope and
+group. And, again, the analysis of ratios is misleading.
+
+
+Log-transforming the ratio, using non-parametric statistics, etc, won't
+help; the problem is using the ratio.
+<<>>=
+t.test(log(Ratio) ~ Group, data = data2)
+with(data2, plot(log(Ratio) ~ Group))
+wilcox.test(Ratio ~ Group, data = data2)
+@ 
+
+
+
+\subsection{Diagnostics et al.\ and other warning signs}
+
+If you look closely, the data show warning signals, such as possible
+differences in variances of ratios. And if you have no idea about the
+model, you might be able to compare several and use diagnostics, as
+explained in section \nameref{diagnostics} to choose among models. But, in
+general, ratios are not the way to. And using diagnostics might require a
+decently large sample size. Summary: only use ratios if you really know
+what you are doing and have good reasons to do it. Otherwise, use linear
+models.
+
+By the way: we have covered just two very simple examples. Things can of
+course get a lot more complicated with non-linear relationships, etc.
+
+
+
+
 
 
 \section{Additional reading and what next}\label{biblio}
