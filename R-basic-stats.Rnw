@@ -670,8 +670,8 @@ We will quickly review the following issues (please, make sure to look at your i
 
 \section{Confidence intervals and p-values: a longer discussion}
 
-Make sure  to look at the notes you took for the file
-  \texttt{confidence-intervals-p-values-interpretation.pdf}.
+\externalf Make sure  to look at the notes you took for the file
+  \myhref{confidence-intervals-p-values-interpretation.pdf}.
 
 
 
