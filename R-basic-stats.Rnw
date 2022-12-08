@@ -5037,7 +5037,7 @@ Oh, and you might have realized that we are seeing another manifestation of the 
 
 So, to summarize, when predictor variables are correlated:
 \begin{itemize}
-\item Even if each (or subsets of) predictor seem strongly associated to the outcome, their p-values could be large, and the sign of the associated reverted, when we fit all of the correlated predictors.
+\item Even if each (or subsets of) predictor seem strongly associated to the outcome, their p-values could be large, and the sign of the coefficient reverted, when we fit all of the correlated predictors.
 \item The overall model (as given by the overall F statistic or the $R^2$) might indicate that the model is doing a decent job (certainly much better than fitting just a single mean), and yet the individual p-values might suggest that no individual predictor is relevant. 
 \end{itemize}
 
