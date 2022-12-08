@@ -630,8 +630,33 @@ from them, what to do, etc.
 
 
 
+%% FIXME: this is poorly explained and two issues
+%% a) sometimes we want something in the null or the alternative
+%% b) bioequivalence per se.
+%% the example here with the fish is NOT bioequivalence.
+%% We could set the null to be ''mortality > 1%'' and thus alternative
+%% mortality < 1, and ask for strong evidence against that null.
+
+
 
 \section{(Bio)equivalence testing and turning things around}
+
+\hrulefill
+
+\red{FIXME: this is poorly explained and I must clarify two issues:}
+
+\begin{enumerate}
+\item sometimes we want something in the null or the alternative; the null might not need to be ``nothing happens'' in depending what meaning or context
+  \item bioequivalence per se
+\end{enumerate}
+
+The example here with the fish is NOT bioequivalence. The example with the fish illustrates that we might, from precautionary arguments, say: the null must be  ``mortality > 1\%'' and we ask for strong evidence against that null before allowing for chlorine dumping.
+
+So start with the fish, and then explain bioequivalence.
+
+\hrulefill
+
+
 We have set things up so that we \textbf{need strong enough evidence to reject the null} and we \textbf{use p-values of measures of strength of evidence AGAINST the null}. This is often what we want in science (why? think about how many papers with claims that are trivially generated under the null you want to read). But not always. And in many cases, in particular in issues related to public health, we might want to follow a precautionary principle (\Burl{https://en.wikipedia.org/wiki/Precautionary_principle}).
 
 For example, we might want to say ``We will only allow you to dump chlorine in the river if there is strong enough evidence that such action will not cause harm, for instance, will not increase fish mortality''. This is not something you can settle with p-values as we have used them. \red{Why??}
