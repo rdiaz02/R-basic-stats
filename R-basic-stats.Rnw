@@ -1629,6 +1629,10 @@ one-sample t-test is what you want.
 
 
 
+
+
+
+
 \section{Non-parametric procedures}
 
 
@@ -1645,7 +1649,7 @@ are:
 \begin{itemize}
 \item Do the data look bad enough that a parametric procedure will lead to
   trouble?
-  \item What about the relative efficiency of the non parametric procedure?
+\item What about the relative efficiency of the non parametric procedure?
   (relative efficiency refers to the sample size required for two
   different procedures that have similar type I error rate to achieve the
   same power ---more on power later). When assumptions are met, parametric
@@ -1671,36 +1675,41 @@ wrong); a simple illustration is shown in section \ref{wpi}.
 
 However, \textbf{\red{the independence assumption}} is as important with
 Wilcoxon as with the t-test. Nonparametric tests are not
-``assumption-free'' tests!!! (there is no such thing, in statistics or in life).
+``assumption-free'' tests! (there is no such thing, in statistics or in life).
 
 
 % An excellent non-parametrics book is Conover's ``Practical nonparametric
 % statistics'', in its 3rd edition (it is so awesome, I have two copies, one
 % at home and one at the office ---you can get one from Amazon for about 20
-% euros). (For more general categorical data analysis, Agresti's
+% \texteuro{}). (For more general categorical data analysis, Agresti's
 % ``Categorical data analysis'' is a must. It is now also in its third
 % edition. There is, by the same author, a smaller ``Introduction to
 % categorical data analysis'').
 
 
 
-\subsection{Two-sample Wilcoxon or Mann-Whitney test}
+\subsection{Wilcoxon rank-sum test or Mann-Whitney U test: 2 independent samples}
 
 This test applies to data of ordinal and interval scales. The basic logic
 is: put all the observations together, rank them, and examine if the sum
 of the ranks of one of the groups is larger (or smaller) than the
-sum of the ranks from the other. If this makes sense to you, you should
+sum of the ranks from the other\footnote{The actual test statistic reported by R is not this one, but is one that is linearly related to it. Likewise, the equivalent Mann-Whitney U test uses another different statistic, but the test results are identical.}. If this makes sense to you, you should
 understand why you can use both ordinal and interval scales.
 
 
-%% Just go do it with R Commander. It is under ``Statistics'',
-%% ``Nonparametric tests''. Do it for p53, pten, and brca1. Compare the
-%% results with those from the t test.
+%% The W statistic is: sum(ranks)[group = A] - n*(n+1)/2; where n is the sample size of the group in question.
+
+% Just go do it with R Commander. It is under ``Statistics'',
+% ``Nonparametric tests''. Do it for p53, pten, and brca1. Compare the
+% results with those from the t test.
 
 For example:
 <<>>=
-wilcox.test(p53 ~ cond, alternative = "two.sided", data = dp53)
+wilcox.test(p53 ~ cond, alternative="two.sided", data=dp53)
 @
+
+
+
 
 % Contrary to Conover, not really testing F(x)= G(x)
 %% Wikipedia entry much clearer: is a nonparametric test of the null
@@ -1755,8 +1764,7 @@ wilcox.test(p53 ~ cond, alternative = "two.sided", data = dp53)
 % wilcox.test(x, y)
 % @
 
-
-\subsection{What a two-sample Wilcoxon is not}
+\subsection{What a rank-sum Wilcoxon test is not}
 
 Many people say ``I'll use a Wilcoxon test to compare the means''. Well \ldots the \textbf{Wilcoxon test is not a test of means}. It is often not even a test of medians.  The Wilcoxon test can reject the null even if the medians are the same, and the Wilcoxon test can fail to reject the null even if the medians differ.
 
@@ -1766,7 +1774,7 @@ How is this possible? Please, make sure you read this:
 
 %% in the directory as  graph-pad-link.png
 
-More details are available here: \Burl{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1120984/} and in the Wikipedia entry for the Mann-Whitney U test. Many more details about permutation tests not testing what you might think they are testing are available, for example, from Christensen \& Zabriskie, 2022. When Your Permutation Test is Doomed to Fail. \textit{The American Statistician}, 76. \Burl{https://doi.org/10.1080/00031305.2021.1902856}
+More details are available here: \Burl{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1120984/} and in the Wikipedia entry for the Mann-Whitney U test (\Burl{https://en.wikipedia.org/wiki/Mann\%E2\%80\%93Whitney_U_test}). Many more details about permutation tests not testing what you might think they are testing are available, for example, from Christensen \& Zabriskie, 2022. When Your Permutation Test is Doomed to Fail. \textit{The American Statistician}, 76. \Burl{https://doi.org/10.1080/00031305.2021.1902856}
 
 
 A few examples? Sure. Run the following in R:
@@ -1830,49 +1838,95 @@ What is the Wilcoxon test testing? As the Wikipedia entry says ``the null hypoth
 
 Summary: do not use a Wilcoxon expecting it to test for mean differences. And below we will emphasize another related message: do not use a Wilcoxon because of some ill-motivated fear of using the t-test.
 
+%
 
 
-\subsection{Wilcoxon matched-pairs test}
+\subsection{Wilcoxon signed-rank test: matched-pairs or single sample test}
 
-The idea here is to assess whether the within-pair differences are
-symmetrically distributed around zero. As we are talking about symmetry,
-this means that this test can be used \textbf{only with interval scale}
-data (see also section \ref{wpi}).
-
-In a nutshell, this is what the test does: for each pair, it computes the
-difference of the two measures (thus, taking differences must make sense,
-and it does not for ordinal data but it does for interval data). These
-differences (discarding the sign) are then ranked, and then the sum of the
-ranks of all the positive differences is computed and compared to the null
-distribution.
+When we have paired data, the idea here is to assess whether the within-pair differences are symmetrically distributed (generally around zero). As we are talking about symmetry, this means that this test can be used \textbf{only with interval scale} data (see also section \ref{wpi}).
 
 
-%% Go do it with the dmyc data we used for the paired t-test (section
-%% \ref{pairedt}). Remember we had to reshape the data so I will reuse our
-%% ``m3'' data set:
+The null hypothesis is that the differences are symmetrically distributed around some value (generally zero). We can therefore reject the null if the differences are symmetrical around some other value, or if the differences are not symmetrical around the posited value (as we said, generally 0), or a combination of both. Put differently, if we reject the null, we could be rejecting it for different reasons (asymmetry, symmetry around a value different from the one specified by the null), or combinations of those reasons\footnote{This is discussed, for example, in \Burl{https://stats.stackexchange.com/questions/348057/wilcoxon-signed-rank-symmetry-assumption}. Note, by the way, that this is not unique to this test: many tests can reject the null for a variety of reasons, and this is common in permutation-based tests.}. As usual, try to look at plots to disentangle what might be the case. It is often the case that, if we are dealing with within-individual differences, for example a ``before vs.~ after'' design, those within-individual differences will tend to be symmetric even if the center of the distribution shifts (regardless of the original distribution of the ``before'' measure ---see also the example in \ref{sym-paired-t}), but not always.
 
+
+How does the test work? In a nutshell, this is what the test does: for each pair, it computes the difference of the two measures (thus, taking differences must make sense, and it does not for ordinal data but it does for interval data). These differences (discarding the sign) are then ranked, and then the sum of the ranks of all the positive differences is computed and compared to the null distribution.
+
+
+
+
+% Go do it with the dmyc data we used for the paired t-test (section
+% \ref{pairedt}). Remember we had to reshape the data (section
+% \ref{reshaping}) so I will reuse our \texttt{dmycWide} data set:
+
+
+% <<>>=
+% wilcox.test(dmycWide$myc.NC, dmycWide$myc.Cancer, alternative='two.sided',
+%             paired=TRUE)
+% @
 
 <<>>=
 wilcox.test(myc.nc, myc.cancer, alternative = 'two.sided', paired = TRUE)
 @
 
+
 You can verify that the results are the same as doing a single sample
 Wilcoxon, or a Wilcoxon signed-rank test, on the within-subject
 differences. %% The single sample Wilcoxon test is not directly available
 %% from R Commander of versions before 2.1-0 and you can run it from
-%% the console as:
+%% the console as: %% it is in 2.1-7
 
 <<>>=
 wilcox.test(diff.nc.c)
 @
 
-%% For versions of R Commander 2.1-0 or later you can run it directly from
-%% the menu (you will have to create a data frame of the within-subject
-%% differences).
+
+% Remember we computed intra-subject differences before
+% (section \ref{paired-single}), so we will reuse them:
+
+% <<>>=
+% wilcox.test(dmycWide$diff.nc.c)
+% @
+
+% For versions of R Commander 2.1-0 or later you can run the Wilcoxon signed
+% rank test directly from the menu.
+
+
+Before we move on: what is the role of symmetry in the paired t-test? To try to make progress thinking about this, remember that the paired t-test is the same as testing the mean of the within-individual differences against a pre-specified mean. Go to Appendix, section \ref{sym-paired-t} for an example.
 
 
 
 
+\subsection{A bad (very bad, terrible!) way to choose between nonparametric and parametric
+  procedures}
+
+Don't do the following:
+\begin{enumerate}
+\item Carry out a test for normality (I guess for each group separately if and independent-samples t-test ---testing for normality collapsing the two groups would be absolutely nonsensical).
+\item If failed, use a nonparametric test. Otherwise a t-test.
+\end{enumerate}
+
+
+
+There are several problems with the above procedure, among them:
+
+\begin{itemize}
+\item Tests for normality do not have a power of 1, and in fact can have
+  very low power with small sample sizes.
+\item They can have power to detect a minor and irrelevant deviation from
+  normality (e.g., slightly heavy tails) that have no effects on, say, a
+  t-test. So we should really prefer a t-test, but we might be mislead
+  into doing a Wilcoxon.
+\item They might fail to detect a large deviation from normality in a very
+  non-normal small sample where we really, given our ignorance, might want
+  to conduct a Wilcoxon test.
+\item They lead to ``sequential testing'' problems, where the second
+  p-value (the one from the t or Wilcoxon) cannot be simply interpreted at
+  face value (as it is conditional on the normality test).
+\end{itemize}
+
+Even if this procedure is (or was) common in some circles, you now know why it is a bad idea. Please, do not do this.
+
+Again, this is the type of ``cargo-cult statistics''\footnote{``going through the motions with scant understanding''; Stark and Saltelli, 2018. Cargo-cult statistics and scientific crisis. \textit{Significance}, 15.} that does no body any good. Think about your data, what you want to test (is it means? or is it something else?), what are reasonable assumptions (heavy tails, asymmetries, etc) and whether the deviations are likely to cause trouble. The above simple-minded (brain-dead, actually) procedure is no substitute for thinking.
 
 
 
@@ -1932,39 +1986,11 @@ does require interval data. This is left as a simple exercise.
 
 
 
-\subsection{A bad (very bad, terrible!) way to choose between nonparametric and parametric
-  procedures}
-
-Don't do the following:
-\begin{enumerate}
-\item Carry out a test for normality
-\item If failed, use a nonparametric test. Otherwise a t-test.
-\end{enumerate}
-
-
-
-There are several problems with the above procedure, among them:
-
-\begin{itemize}
-\item Tests for normality do not have a power of 1, and in fact can have
-  very low power with small sample sizes.
-\item They can have power to detect a minor and irrelevant deviation from
-  normality (e.g., slightly heavy tails) that have no effects on, say, a
-  t-test. So we should really prefer a t-test, but we might be mislead
-  into doing a Wilcoxon.
-\item They might fail to detect a large deviation from normality in a very
-  non-normal small sample where we really, given our ignorance, might want
-  to conduct a Wilcoxon test.
-\item They lead to ``sequential testing'' problems, where the second
-  p-value (the one from the t or Wilcoxon) cannot be simply interpreted at
-  face value (as it is conditional on the normality test).
-\end{itemize}
-
-Even if this procedure is (or was) common in some circles, you now know why it is
-a bad idea.  Please, do not do this.
-
 
 \clearpage
+
+
+
 \section{Non-independent data}\label{pseudorep}
 
 \subsection{Multiple measures per  subject}
