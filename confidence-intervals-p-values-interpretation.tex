@@ -20,7 +20,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{url}
-\usepackage[UKenglish]{isodate}
+
 
 \usepackage[begintext=\textquotedblleft,endtext=\textquotedblright]{quoting}
 
@@ -38,8 +38,7 @@
 
 \author{Ramon Diaz-Uriarte}
 % \date{}
-% \date{2021-09-21}
-\cleanlookdateon
+\date{2024-09-03}
 \title{Confidence intervals, p-values, and interpretation}
 \hypersetup{
   pdfkeywords={},
@@ -56,11 +55,13 @@
 \begin{frame}
   \frametitle{I will draw some 95\% confidence intervals}
 
-%%%  A figure in CIexamples.pdf
+%%% There is a figure of this: CIexamples.pdf
+
+%%%
 
 
   %    this is the 0 line
-  %    |	   
+  %    |
   % [------------*--------------] : results compatible with very relevant effects
   %                                most definitely this provides NO support for the null
 
@@ -69,20 +70,20 @@
   %   information"
 
 
-				 
+
   %           [--*--]: the ideal thing
 
-     
 
-  % [-*-]
+
+  % [-*-]  : like example below
   %   |
   %  [-*-] : all values are of little practical importance
   %          our results most compatible with no important effect
   %          (this ain't "the null is true"; it is "most likely little relevant")
 
 
-    
-  %                 |  
+
+  %                 |
   %   [-------------*-------------]
   %   Anything could be happening: from very relevant positive to very relevant
   %   negative. Probably little can be said here.
@@ -90,8 +91,8 @@
 
   %   | [-*-] : significant but not relevant
 
-  
-  
+
+
   \ldots
 \end{frame}
 
@@ -103,7 +104,7 @@
   \item Which are compatible with strong positive effects?
   \item Which ones make it sensible to try to focus on this gene as a possible
     target?
-    
+
     \begin{itemize}
     \item what if chasing this lead is extremely expensive or risky (side effects?)?
     \item what if it is cheap?
@@ -130,7 +131,7 @@
 \frametitle{Hypothesis vs.\ significance testing}
 
 \includegraphics[width=11.5cm,keepaspectratio]{goodman.pdf}
-  
+
 {\scriptsize From Goodman, 2016, \textit{Aligning statistical and scientific
   reasoning}, Science, 352.}
 \end{frame}
@@ -170,10 +171,10 @@
     But focusing on effect sizes can often be better than determining
     whether an effect exists.
   \end{quoting}
-  
+
   Ioannidis, letter to Nature, 28 March, 2019, vol.\ 567. ``Retiring significance: a
   free pass to bias''
-  
+
 \end{frame}
 
 
@@ -181,19 +182,15 @@
 \begin{frame}
   \frametitle{Taking someone to trial and presumption of innocence analogy}
   \begin{description}
-  \item[Significance and hypothesis testing] Is there enough evidence to sent this
-    person to jail? How likely is, if she were innocent, that she committed
-    the crime?
-    \vspace*{15pt}
-    
-  \item[Estimate] But I really think she is guilty. Or ``but the evidence is most
-    compatible with her being guilty (though we cannot show it beyond reasonable
-    doubt)''.
+  \item[Significance and hypothesis testing] Is there enough evidence to sent this person to jail? How likely is it, if she were innocent, that we find the corpse of the victim in her living room? What about her owning a pair of scissors? But \ldots: do you want \(P(O|H)\) or \(P(H|O)\)? (O: observations, H hypothesis)?
+%    \vspace*{15pt}
 
-    \vspace*{15pt}    
-  \item[Bioquivalence] You have to show your innocence.
+  \item[Estimate] But I really think she is guilty. Or ``but the evidence is most compatible with her being guilty (though we cannot show it beyond reasonable doubt)''.
 
-    \vspace*{15pt}    
+ %   \vspace*{15pt}
+  \item[Bioquivalence] Sometimes like ``You have to show your innocence'' (if you want to dump chlorine in the river).
+
+  %  \vspace*{15pt}
   \end{description}
 \end{frame}
 
@@ -206,6 +203,7 @@
 \begin{frame}
   \frametitle{Let's go back to the initial cases}
   \ldots
+  %% They should be in the blackboard. Same as in CIexamples.pdf
 \end{frame}
 
 %\section{Some references}
@@ -236,8 +234,8 @@
   \begin{itemize}
   \item A lot!!
   \item And what about wide CIs?
-  \item Many studies are seriously misinterpreted. For example, this
-    has happened, with possibly serious consequences, during the covid pandemic.
+  \item Many studies seriously misinterpreted. It has happened a lot, with
+    serious consequences with the covid pandemic.
   \end{itemize}
 \end{frame}
 
@@ -246,7 +244,7 @@
 \frametitle{}
 
 \includegraphics[width=11.5cm,keepaspectratio]{Hernan-6.png}
-  
+
 {\scriptsize From Miguel Hernán's talk, Causal inference, ``Epidemiological
   Research Methods in the COVID-19 Pandemic'', IAP, 2021-06,14. Also García-Albéniz et
 al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.full}}
@@ -272,7 +270,7 @@ al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.f
   \begin{itemize}
 {\scriptsize
 \item Wasserstein, R. L., Schirm, A. L., \& Lazar, N. A. (2019). Moving to a World Beyond p < 0.05. \textit{The American Statistician}, 73(sup1), 1-19. \Burl{https://doi.org/10.1080/00031305.2019.1583913}
-    
+
   % \item \textit{The American Statistician}, 2019, Vol. 73. ``Statistical
   %   Inference in the 21st Century: A World Beyond p < 0.05''.
   %   \Burl{https://www.tandfonline.com/toc/utas20/73/sup1}
@@ -284,8 +282,8 @@ al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.f
   1180-1181. \Burl{https://doi.org/10.1126/science.aaf5406}
 
   \item Amrhein, V., Greenland, S., \& McShane, B. (2019). Scientists rise up
-    against statistical significance (``Retire statistical significance''). \textit{Nature}, 567(7748). \Burl{https://doi.org/10.1038/d41586-019-00857-9} 
-    
+    against statistical significance (``Retire statistical significance''). \textit{Nature}, 567(7748). \Burl{https://doi.org/10.1038/d41586-019-00857-9}
+
   \item Greenland, S., et al. (2016). Statistical tests, P values,
     confidence intervals, and power: a guide to
     misinterpretations. \textit{European Journal of Epidemiology, 31(4),
@@ -294,10 +292,10 @@ al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.f
   \item García-Albéniz et al. (2021). Systematic review and meta-analysis of
     randomized trials of hydroxychloroquine for the prevention of
     COVID-19. \textit{medRxiv}. \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.full}
-    
+
 }
   \end{itemize}
-  
+
 \end{frame}
 
 
@@ -305,3 +303,8 @@ al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.f
 
 \end{document}
 
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
