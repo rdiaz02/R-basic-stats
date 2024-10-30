@@ -10,6 +10,7 @@
 \usepackage{url}
 \usepackage{nameref}
 \usepackage[english]{babel}
+%% FIXME: I should be using UTF-8. Fix this annoying thing!
 \usepackage[latin1]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
@@ -86,7 +87,7 @@ opts_knit$set(stop_on_error = 2L)
 % %% BiocStyle needs to be 1.2.0 or above
 % <<packages,echo=FALSE,results='hide',message=FALSE>>=
 % require(BiocStyle, quietly = TRUE)
-% @ 
+% @
 % <<style-knitr, eval=TRUE, echo=FALSE, results="asis">>=
 % BiocStyle::latex()
 % ## or latex(use.unsrturl = FALSE)
@@ -101,7 +102,7 @@ opts_knit$set(stop_on_error = 2L)
 \title{Choosing covariates, interpreting coefficients, and causal inference}
 
 \author{Ramon Diaz-Uriarte\\
-  Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\ 
+  Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\
   Instituto de Investigaciones Biom\'edicas ``Alberto Sols'' (UAM-CSIC)\\
   Madrid, Spain{\footnote{r.diaz@uam.es, rdiaz02@gmail.com}} \\
   %% {\footnote{rdiaz02@gmail.com}} \\
@@ -128,7 +129,7 @@ opts_knit$set(stop_on_error = 2L)
 
 
 \section*{License and copyright}\label{license}
-This work is Copyright, \copyright, 2022, Ramon Diaz-Uriarte, and is
+This work is Copyright, \copyright, 2024, Ramon Diaz-Uriarte, and is
 licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -138,7 +139,7 @@ International License:
 
 
 All the original files for the document are available (again, under a Creative
-Commons license) from \Burl{https://github.com/rdiaz02/R-basic-stats}. (Note that in the
+Commons license) from \Burl{https://github.com/rdiaz02/BM-1}. (Note that in the
 github repo you will not see the PDF, or R files, nor many of the data files,
 since those are derived from the Rnw file). This file is called \texttt{covars-interpr-causal.Rnw}.
 
@@ -175,7 +176,7 @@ understand if consuming red wine affects (i.e., has an effect on) cardiovascular
 health. We might want to do this so that we can make public health
 recommendations or take personal action (should I start drinking a little bit of
 wine?).  Intuitively, if a variable, X, has a causal effect on a variable, Y,
-manipulating X will change the value of Y.
+manipulating X will change the value of Y\footnote{The philosopher James Woodward, in \citet{woodward2003}, defends a manipulationist or interventionist account of causality; the informal ideas introduced in these notes fall under that umbrella.}.
 
 And what do we mean by \textbf{causal effects}? ``(...) causal effects in
 populations, that is, \textbf{numerical quantities} that measure changes in the
@@ -183,8 +184,7 @@ distribution of an outcome under different \textbf{interventions}.'' \citep[p.\
 v]{hernan2020} (emphasis is mine)
 
 
-\subsection{There is no such thing as  ``spurious associations''. But when people
-  use this term, it suggests they are trying to obtain causal estimates}
+\subsection{There is no such thing as  ``spurious association''. But when people  use this term, it suggests they are trying to obtain causal estimates}
 
 In the above study, there is a possible obvious problem. Suppose you observe an
 association between moderate red wine consumption and better cardiovascular
@@ -206,14 +206,14 @@ correlation''\footnote{Instead of ``spurious'' you might read ``illusory'' or
 and health (or ice creams and homicides). Well, not really: the association is
 not spurious. It is quite real. And there is nothing wrong with computing it, nor
 is there anything false, invalid, or fake with it showing up as
-positive. But the association is not causal.
+positive\footnote{This point is emphasized, for example, by  \citet[][section 7.1]{hernan2020} or \citet{sober2024}}. But the association is not causal.
 
 And the reason we can tell ``there is something wrong going on here if we infer
 an effect of red wine on health'' is, precisely, because we are trying to use a
 model that has causal interpretations. We are trying to answer questions such as
 ``Is red wine really good for your health?''  or ``Is switching from not
-consuming red wine to consuming moderates amount of it a good idea?''. See
-\citet[][p.\ 84, for similar comments]{hernan2020}.
+consuming red wine to consuming moderate amounts of it a good idea?''. See
+\citet[][p.\ 84, for similar comments]{hernan2020}
 
 
 So someone using expressions like ``spurious associations'' is actually revealing
@@ -237,7 +237,7 @@ Sections \ref{dag-structs}, \ref{backdoor-basics} are there just to explain why.
 More complex examples are provided in \ref{direct-indirect}, but you can skip
 this if you want.
 
-The Appendix is optional (though not harmful).
+The Appendix (section \ref{appendix}) is optional (though not harmful).
 
 <<load_libs, echo=FALSE, results='hide',message=FALSE>>=
 ## Plots, with dagitty
@@ -248,22 +248,45 @@ library(dagitty)
 ## So have a fallback if rethinking not available
 if(!suppressWarnings(require("rethinking", quietly = TRUE))) {
     drawdag <- plot
-} 
+}
 
 library(car)
-@ 
+@
 
 \section{Graphs, DAGs, notation}
 
 Graphs, such as the one in Figure \ref{fig:plot_dag_1}, are very useful to represent
 causal concepts. In that figure, Age is a \textbf{common cause} of Exercise and
 Cholesterol, and Exercise has a direct effect on Cholesterol too.  These are
-\textbf{DAG}s, for Directed (i.e., there is direction, and thus we see arrows,
-not just edges) Acyclic (there are no cycles: you do not go twice through a
-variable if you follow arrows) Graphs.
+\textbf{DAG}s, for Directed Acyclic Graphs; Directed because there is direction, and thus we see arrows,
+not just edges; Acyclic because there are no cycles: you do not go through a variable twice if you follow arrows.
+
+% (Yes, we do know that we should recommend people exercise if they want to lower
+% their cholesterol)
+
+<<dag_1, results='hide', echo=FALSE>>=
+common_cause <- dagitty("dag {
+Age -> Exercise
+Age -> Cholesterol
+Exercise -> Cholesterol
+}")
+
+@
+
+
+
+%% <<plot_dags_1_2, out.width = '14cm', out.height='7cm'>>=
+<<plot_dag_1, fig.width = 4, fig.height=2, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cholesterol, Exercise, Age example',out.width='10cm', fig.pos="!h">>=
+coordinates(common_cause) <- list(x = c(Exercise = 1, Age = 2, Cholesterol = 3),
+                                  y = c(Exercise = 0, Age = -1, Cholesterol = 0))
+
+drawdag(common_cause, xlim = c(0.5, 3.5), ylim = c(0, 1.3))
+## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
+
+@
 
 Sometimes we will use variables denoted as  $U$ (or $U$ with subindices): these
-are unobserved variables. 
+are unobserved variables.
 
 % Total, direct and indirect effect
 
@@ -284,34 +307,12 @@ variables are shown in Figure \ref{fig:plot_dag_1}.
 
 
 
-% (Yes, we do know that we should recommend people exercise if they want to lower
-% their cholesterol)
-
-<<dag_1, results='hide', echo=FALSE>>=
-common_cause <- dagitty("dag {
-Age -> Exercise
-Age -> Cholesterol
-Exercise -> Cholesterol
-}")
-
-@ 
 
 
-
-%% <<plot_dags_1_2, out.width = '14cm', out.height='7cm'>>=
-<<plot_dag_1, fig.width = 4, fig.height=2, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cholesterol, Exercise, Age example',out.width='10cm', fig.pos="!h">>=
-coordinates(common_cause) <- list(x = c(Exercise = 1, Age = 2, Cholesterol = 3),
-                                  y = c(Exercise = 0, Age = -1, Cholesterol = 0))
-
-drawdag(common_cause, xlim = c(0.5, 3.5), ylim = c(0, 1.3))
-## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
-
-@ 
-
-Here I simulate some data that follow the above relationships.  
+Here I simulate some data that follow the above relationships.
 
 <<simul_1, results='hide', echo = TRUE>>=
-N <- 1e4 
+N <- 1e4
 ################## Common_cause
 common_cause <- data.frame(Age = rnorm(N, 30, 5))
 common_cause$Exercise <- 2 * common_cause$Age + rnorm(N)
@@ -319,12 +320,11 @@ common_cause$Cholesterol <- 3 * common_cause$Age -
   common_cause$Exercise +
   rnorm(N)
 
-@ 
+@
 
 
 Before turning the page, think what kind of relationship you expect between
-Cholesterol and Exercise in the whole population and between Cholesterol and
-Exercise for people of age 10, and for people of age 20, \ldots.
+Cholesterol and Exercise in the whole population and between Cholesterol and Exercise for people of age 10, and for people of age 20, \ldots.
 
 \clearpage
 The process above generate data that look like this:
@@ -350,16 +350,17 @@ The process above generate data that look like this:
      Figure 6.6 in \citealp{pearl2018}; a preview of chapter 1 of
      \citealp{pearl_causal_2016} is available from Pearl's page: \Burl{http://bayes.cs.ucla.edu/PRIMER/}). }
 \end{figure}
-  
+
 
 \clearpage
-Let's analyze the data with and without adjusting for Age
-consumption. 
+Let's analyze the data with and without adjusting for Age.
 
 
 <<code_1, results='show', echo = TRUE>>=
-m_common_cause_adjust <- lm(Cholesterol ~ Exercise + Age, data = common_cause)
-m_common_cause_no_adjust <- lm(Cholesterol ~ Exercise, data = common_cause)
+m_common_cause_adjust <- lm(Cholesterol ~ Exercise + Age,
+                            data = common_cause)
+m_common_cause_no_adjust <- lm(Cholesterol ~ Exercise,
+                               data = common_cause)
 
 ## Function "S" is from the car library
 S(m_common_cause_adjust)
@@ -397,7 +398,7 @@ antifungal treatment (Treatment) on plant final size (Size). The amount of fungu
 (a post-treatment variable, Fungus) is also measured. Since plots varied in
 quality, in ways that could affect final plant Size, a variable (or variables)
 Plot measure the plot quality (pretreament, though this is irrelevant since this
-variable, or variables, are not affected by treatment). The DAG is shown in \ref{fig:plot_fungus_1}
+variable, or variables, are not affected by treatment). The DAG is shown in Fig.~\ref{fig:plot_fungus_1}.
 
 <<dag_fungus_1, results='hide', echo=FALSE>>=
 fungus1 <- dagitty("dag {
@@ -406,7 +407,7 @@ Fungus -> Size
 Plot -> Size
 }")
 
-@ 
+@
 
 <<plot_fungus_1, fig.width = 4, fig.height=1.4, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Fungus, first example',out.width='9cm', fig.pos="!h">>=
 coordinates(fungus1) <- list(x = c(Treatment = 1, Fungus = 2,
@@ -419,18 +420,22 @@ coordinates(fungus1) <- list(x = c(Treatment = 1, Fungus = 2,
 drawdag(fungus1, xlim = c(0.5, 3.5), ylim = c(-.1, 1.3))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
 
-@ 
+@
 
 
 %% Write R code for this!
 
 We definitely want to adjust for Plot to reduce the variability in our
-estimates. What about Fungus: no, we do not want to adjust for it, as adjusting
+estimates.
+
+What about Fungus: no, we do not want to adjust for it, as adjusting
 for Fungus would actually prevent us from estimating the effect of Treatment:
 Treatment affects plant size through Fungus. Once we know about Fungus, Treatment
 says nothing about Size \footnote{Size is conditionally independent of Treatment
   given Fungus, $Size \upmodels Treatment | Fungus$. The  $\upmodels$ symbol
-  means independence. You can ignore this notation if it does not help you.}.
+  means independence. You can ignore this notation if it does not help you.
+
+  You might also read the expression ``Fungus screens-off Size from Treatment'': \(P(S|F \& T) = P(S|F) \ne P(S|T)\), where \(S, F, T\) denote Size, Fungus, Treatment, respectively; the ``screening-off'' expression is common in the philosophical literature.}.
 
 
 
@@ -438,7 +443,7 @@ Even if the true relationship was as shown in Figure \ref{fig:plot_fungus_2} we 
 want to use Fungus as a covariate. Here Treatment is not independent of Size
 given Fungus, but Fungus mediates in the relationship. If we added Fungus in the
 statistical model, we would not be estimating the total effect of Treatment on
-Size (see more details in \qref{direct-indirect}).
+Size (if you want more details, go to Appendix, \qref{direct-indirect}).
 
 
 
@@ -450,7 +455,7 @@ Fungus -> Size
 Plot -> Size
 }")
 
-@ 
+@
 
 <<plot_fungus_2, fig.width = 4, fig.height=1.4, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Fungus, second example',out.width='9cm',fig.pos="!h">>=
 coordinates(fungus2) <- list(x = c(Treatment = 1, Fungus = 2,
@@ -463,7 +468,7 @@ coordinates(fungus2) <- list(x = c(Treatment = 1, Fungus = 2,
 drawdag(fungus2, xlim = c(0.5, 3.5), ylim = c(-.1, 1.3))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
 
-@ 
+@
 
 
 \section{More fungus: a collider}\label{fungus-collider}
@@ -472,7 +477,7 @@ This example is modified from \citet[][p.\ 175]{rethinking_2020}. Suppose
 now that Fungus does not affect final Size. But both Fungus  and Size are
 affected by moisture (moisture and Plot quality are different
 variables). Moreover, and this is crucial, moisture has not been measured, so
-there is no way for you to adjust for it, and is shown as U in the DAG below,
+there is no way for you to adjust for it, and it is shown as U in the DAG below,
 Figure \ref{fig:fungus_collider}.
 
 
@@ -484,7 +489,7 @@ U -> Size
 Plot -> Size
 }")
 
-@ 
+@
 
 <<fungus_collider, fig.width = 4, fig.height=1.4, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Fungus, collider example',out.width='9cm',fig.pos="!h">>=
 coordinates(fungus3) <- list(x = c(Treatment = 1,
@@ -501,7 +506,7 @@ coordinates(fungus3) <- list(x = c(Treatment = 1,
 drawdag(fungus3, xlim = c(0.5, 3.5), ylim = c(-.1, 1.6))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
 
-@ 
+@
 
 In Figure \ref{fig:fungus_collider}, Fungus is a descendant of both U and
 Treatment. This is called a \textbf{collider}. Conditioning on Fungus will lead
@@ -517,7 +522,7 @@ and a few derived ones.
 
 (But before we leave this example: what should we have done? Include in the model
 Treatment, which is the variable we are interested in, and also Plot, to decrease
-variability of the estimates.  If we could have adjusted for U, we would have adjusted for it, but we can't adjust for U; anyway, not including U in the model will increase
+variability of the estimates. If we could have adjusted for U, we would have adjusted for it, but we can't adjust for U; anyway, not including U in the model will increase
 the variability, but will not lead to bias. The bad idea was adjusting for
 Fungus.)
 
@@ -525,11 +530,11 @@ Fungus.)
 \section{Basic DAG structures}\label{dag-structs}
 
 \subsection{The three basic DAG structures}\label{three-basic-structs}
-The basic DAG structures with their names are presented in Figure
-\ref{fig:plot_dag_struct}\footnote{This is fairly standard material; you can find it in,
+The basic DAG structures with their names\footnote{This is fairly standard material; you can find it in,
 for example, Figure 3.3 in \citet{morgan_counterfactuals_2015}, section 6.3 in
 \citet{hernan2020}, sections 2.2. and 2.3 in \citet{pearl_causal_2016}, Figure
-8.1 in \citet{kline2015}.}.
+8.1 in \citet{kline2015}.} are presented in Figure
+\ref{fig:plot_dag_struct}.
 
 
 
@@ -550,7 +555,7 @@ X -> Z
 Y -> Z
 }")
 
-@ 
+@
 
 <<plot_dag_struct, fig.width = 5, fig.height=2.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Basic DAG structures',out.width='14cm',fig.pos="!h">>=
 op <- par(mfrow = c(1, 3))
@@ -589,7 +594,7 @@ text(x = 2, y = -.4, labels ="b) Fork.\n Z common cause", cex = 1.1)
 drawdag(collider, xlim = c(0.5, 3.5), ylim = c(-1, 1.3))
 text(x = 2.1, y = -.4, labels ="c) Inverted fork with collider.\n Z common effect: collider", cex = 1.1)
 
-@ 
+@
 
 
 Each of those structures determines the pattern of association between variables.
@@ -601,9 +606,9 @@ course ``Causal Diagrams: Draw Your Assumptions Before Your Conclusions''\\
 \Burl{https://www.edx.org/course/causal-diagrams-draw-your-assumptions-before-your},
 you can see animations of this process).  Both a mediator and a common cause, if
 conditioned upon, block the flow of information because they close the pipe; in
-contrast, a collider, if conditioned upon, opens the pipe.
+contrast, a collider, if conditioned upon, opens the pipe. Make sure to play with the analogy of the pipe, and apply it to the figures, thinking about the effect of closing an imaginary tap in Z.
 
-Put it differently, in the chain example in Figure \ref{fig:plot_dag_struct} a),
+Let us reword the above. In the chain example in Figure \ref{fig:plot_dag_struct} a),
 if we do not condition in Z, the pipe is open, so X and Y are
 associated\footnote{Strictly: ``are very likely associated'' as it could happen
   that they are not, but this would be rare.}. But if we condition on Z, we close
@@ -613,7 +618,7 @@ opposite thing happens in Figure \ref{fig:plot_dag_struct} c).
 
 
 
-More systematically: 
+More systematically:
 \begin{enumerate}[label=\alph*)]
 
 \item Chain: X and Y are associated. But conditioning on Z will render X and Y
@@ -621,7 +626,7 @@ More systematically:
   dependencies are (you can ignore this if it does not help you):
   $X \upmodels Y | Z$, \quad $X \cancel{\upmodels} Y$.
 
-  
+
 
 \item Fork: X and Y are associated. But conditioning on Z will render X and Y
   independent (there will be no association). $X \upmodels Y | Z$, \quad
@@ -635,12 +640,12 @@ More systematically:
     assume a linear model, they would be correlated. Association and
     non-independence are more general concepts than correlation.}
   $X \cancel{\upmodels} Y | Z$, \quad $X \upmodels Y$.
-   
-  
+
+
 \end{enumerate}
 
 
-More about \textbf{confounding}: we must adjust for Z, or condition on Z, to
+More about \textbf{confounding}. In Figure \ref{fig:plot_dag_struct} b) we must adjust for Z, or condition on Z, to
 avoid confounding the estimate of the relationship between X and Y. It is the
 presence of confounding that leads to the ``correlation is not necessarily
 causation'' \citep[][p.\ 58]{westreich2019}.  (For more details about confounding
@@ -649,7 +654,7 @@ see chapter 7 in \citealp{hernan2020}; a brief discussion in section 3.5.1, pp.\
 
 
 %% ZZ FIXME : give the example of Y must compensate whatever X has
-And more about \textbf{colliders}. The consequences of the last structure, where
+And more about \textbf{colliders}. The consequences of the last structure, Figure \ref{fig:plot_dag_struct} c), where
 we have a collider, sometimes seem counterintuitive. This structure is behind
 ``Berkson's paradox''\footnote{
   \url{https://en.wikipedia.org/wiki/Berkson\%27s_paradox}, and it might explain
@@ -666,13 +671,13 @@ severe pneumonia or a broken bone are enough to take you there).
 Another way to understand it: suppose you only look at a value, or small set of
 values, of Z (that is what conditioning is); now, if X has any value, the value
 of Y has to compensate the value of X, so that the value of Z is the one you
-conditioned on. 
+conditioned on.
 
 
 If these examples are not clear, look at the Wikipedia entry linked in the
 footnotes (or the ``Why are handsome men such jerks'', linked in the footnote
 too). Conditioning (and restricting) on colliders leads to \textbf{selection
-  bias} (see chapters 7 and 8 in \citealp{hernan2020} and a brief account in
+  bias} (see chapters 7 and 8 in \citealp{hernan2020}, and a brief account in
 section 3.5.3, pp.\ 64--66 in \citealp{westreich2019})
 
 \activities: Think of at least one example for each of the structures
@@ -692,7 +697,7 @@ The following three expressions are equivalent, and you will find them in the li
     ``condition on'', ``given'', ``adjusting'', and we would need to be more
     precise about the meaning of \textit{holding constant}: are we really,
     physically holding Z constant via intervention, or adjusting statistically
-    for it, as in conditioning?.}
+    for it, as in conditioning?}
 \end{itemize}
 
 
@@ -702,7 +707,7 @@ To make sure we understand how the flow of association is blocked or unblocked,
 let us add some descendants and ancestors to the previous structures and see what
 happens. If you want, you can read this section very quickly and skip over all
 the ``in addition''. The \textbf{most important structure to pay attention to is
-  f)}. The rest is here for completeness, but following it actually only requires
+  f)}. The rest are here for completeness, but following it actually only requires
 to use the rules we have explained above.
 
 
@@ -752,7 +757,7 @@ Y -> Z
 W -> Z
 }")
 
-@ 
+@
 
 <<plot_dag_struct2, fig.width = 5, fig.height=4.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Descendants and ancestors in the basic DAG structures',out.width='12cm'>>=
 op <- par(mfrow = c(2, 3))
@@ -837,7 +842,7 @@ text(x = 2, y = -.4, labels ="h)", cex = 1.4)
 drawdag(co2, xlim = c(0.5, 3.5), ylim = c(-1, 1.3))
 text(x = 2, y = -.4, labels ="i)", cex = 1.4)
 
-@ 
+@
 
 
 
@@ -860,7 +865,7 @@ These are the consequences:
   \item Y and W are independent if we condition on Z.
   \end{enumerate}
   % $X \cancel{\upmodels} Y | W$.
-  
+
 \item As above: conditioning on W does not make X and Y independent.
 
   In addition (but this is not new):
@@ -872,13 +877,13 @@ These are the consequences:
   \end{enumerate}
   % $X
   % \cancel{\upmodels} Y | W$.
-  
+
 \item \textbf{Pay attention here}: conditioning on W will make X and Y
   associated. This is the general rule: \textbf{conditioning on a collider} (as
   in c)) or \textbf{a descendant of a collider will make the ancestors
     associated}. Why? Think about the hospital, broken bones and pneoumonia;
   instead of looking at people at the door of the hospital you look at people
-  downstream (e.g., people who have been admitted to the hospital).
+  downstream (e.g., people who have been admitted to the hospital). Or think again about the pipes: put a tap on W, and close it.
 
   In addition (but this is not new):
   \begin{enumerate}[label=\arabic*.]
@@ -891,7 +896,7 @@ These are the consequences:
   % \cancel{\upmodels} Y | W$ (and $X
   % \cancel{\upmodels} Y | Z$,  \quad $X \upmodels
   % Y$).
-  
+
 \item Conditioning on W will not render X and Y independent. Notice also that \textbf{now Z is
   a collider with respect to X and W}. So conditioning on Z will induce an
 association between X and W.
@@ -905,7 +910,7 @@ In addition:
   \end{enumerate}
 
 \item Conditioning on W will not render X and Y independent.
-  
+
   In addition:
   \begin{enumerate}[label=\arabic*.]
   \item X and W are associated.
@@ -915,9 +920,9 @@ In addition:
   \end{enumerate}
 
 
-\item Now Z is a collider with respect to all three pairs of variables X, Y, W. 
+\item Now Z is a collider with respect to all three pairs of variables X, Y, W.
   \begin{enumerate}[label=\arabic*.]
-     \item X and Y are independent (we saw this before).
+    \item X and Y are independent (we saw this before).
   \item X and W are independent.
   \item Y and W are independent.
   \item X and W are associated if we condition on Z (Z is a collider).
@@ -925,7 +930,7 @@ In addition:
   \item X and Y are associated if we condition on Z (Z is a collider), as it was before.
   \end{enumerate}
 
-  
+
 \end{enumerate}
 
 
@@ -952,7 +957,7 @@ there is. The key ideas are:
 \end{itemize}
 
 And this can be done using a systematic procedure. In the appendix, \qref{backdoor-crit}, I give the
- procedure in full detail. 
+ procedure in full detail.
 
 
 
@@ -982,23 +987,63 @@ U_2 -> L
 U_1 -> Y
 U_2 -> X
 }")
-@ 
+@
 
-<<plot_dag_ptr, fig.width = 4, fig.height=2.73, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='A pretreatment collider',out.width='9cm', fig.pos= "!h">>=
+<<plot_dag_ptr, fig.width = 4, fig.height=2.73, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='A pretreatment collider.',out.width='9cm', fig.pos= "!h">>=
 coordinates(ptr) <- list(x = c(L = 1, X = 2, Y = 3, U_1 = 0.8, U_2 = 0.8),
                          y = c(L = 0, X = 0, Y = 0, U_1 = -.5, U_2 = .5))
 
 drawdag(ptr, xlim = c(0.5, 3.5), ylim = c(-.51, .6))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
-@ 
+@
 
-You know the answer. No, do not adjust for L: it is a collider ($U_1$ and $U_2$
+
+(To turn the above into a specific example:
+
+<<dag_ptr22, results='hide', echo=FALSE>>=
+ptr22 <- dagitty("dag {
+Diet -> Outcome
+U_g -> Exercise
+U_c  -> Exercise
+U_g -> Outcome
+U_c  -> Diet
+}")
+@
+
+<<plot_dag_ptr22, fig.width = 4, fig.height=2.73, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='A pretreatment collider; Uc: country, Ug: genetics.',out.width='9cm', fig.pos= "!h">>=
+coordinates(ptr22) <- list(x = c(Exercise = 1, Diet = 2,
+                                 Outcome = 3,
+                                 U_g = 0.8,
+                                 U_c = 0.8),
+                           y = c(Exercise = 0,
+                                 Diet = 0,
+                                 Outcome = 0,
+                                 U_c = .5,
+                                 U_g = -.5))
+
+drawdag(ptr22, xlim = c(0.5, 3.5), ylim = c(-.51, .6))
+## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
+@
+
+)
+
+
+You know the answer. No, do not adjust for L (Exercise): it is a collider ($U_1$ and $U_2$
 are its parents) on the backdoor path between X and Y. If we adjust for L, it
 will induce a non-causal association between X and Y\footnote{The bias induced is
   sometimes called \textit{M-bias}.}.
 
+
 Main moral of this story: \textbf{adjusting for all possible pre-treatment
   variables is not always a good idea}. More on that below.
+
+
+Another moral of the story: \(U_c\) might not be an unmeasured variable. Maybe it is there, in the dataset, but you have not used it. If you were to include it in your model, then we would have blocked the backdoor path.
+
+Still, the main moral of this story remains: \textbf{adjusting for all possible pre-treatment
+  variables is not always a good idea}.
+
+
 
 
 \subsection{Should we adjust for the cause of the cause?}\label{cause-of-cause}
@@ -1012,15 +1057,15 @@ ccc <- dagitty("dag {
 Z -> X
 X -> Y
 }")
-@ 
+@
 
-<<plot_dag_zxy, fig.width = 4, fig.height=.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cause of a cause',out.width='8cm', fig.pos= "!h">>=
+<<plot_dag_zxy, fig.width = 4, fig.height=.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cause of a cause.',out.width='8cm', fig.pos= "!h">>=
 coordinates(ccc) <- list(x = c(Z = 1, X = 2, Y = 3),
                          y = c(Z = 0, X = 0, Y = 0))
 
 drawdag(ccc, xlim = c(0.5, 3.5), ylim = c(-.051, .051))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
-@ 
+@
 
 
 Short answer: no. If you do, it will increase the noise of the estimate of the
@@ -1039,11 +1084,11 @@ there will be no bias''. That is a possibly sensible argument.
 
 Is there a way to decide? Yes, it might be possible to examine if you really need
 to adjust for Z and, then, avoid adjusting for Z. See \citet{vanderweele2011},
-section 4 (p.\ 1409, and p.\ 1411 with the results of their simulations). 
+section 4 (p.\ 1409, and p.\ 1411 with the results of their simulations).
 
 \subsection{The cause of the cause and bias amplification}\label{amplification}
 
-Now consider the DAG (U is an unmeasured variable) in Figure \ref{fig:plot_dag_bias_amp}
+Now consider the DAG (U is an unmeasured variable) in Figure \ref{fig:plot_dag_bias_amp}:
 
 <<dag_bias_amp, results='hide', echo=FALSE>>=
 bamp <- dagitty("dag {
@@ -1052,9 +1097,9 @@ X -> Y
 U -> X
 U -> Y
 }")
-@ 
+@
 
-<<plot_dag_bias_amp, fig.width = 4, fig.height=1.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cause of a cause and bias amplification',out.width='8cm', fig.pos= "!h">>=
+<<plot_dag_bias_amp, fig.width = 4, fig.height=1.5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Cause of a cause and bias amplification.',out.width='8cm', fig.pos= "!h">>=
 coordinates(bamp) <- list(x = c(Z = 1, X = 2, Y = 3, U = 1),
                          y = c(Z = 0, X = 0, Y = 0, U = -.5))
 
@@ -1064,11 +1109,11 @@ drawdag(bamp, xlim = c(0.5, 3.5), ylim = c(0, .9))
 
 Adjusting for Z is generally a very bad idea here, because it can lead to
 \textbf{bias amplification}: amplification of the bias induced by U. Of course,
-things would be OK if you could adjust for U (but U has not been measured). 
+things would be OK if you could adjust for U (but U has not been measured).
 More details in section 18.2, pp.\ 224 and ff.\ of \citet{hernan2020}; this
 phenomenon is also mentioned in \citet{vanderweele2011}\footnote{Actually, Z
 could be used as an instrument, or instrumental variable, but when adjusting for
-it, Z is not being used as an instrument.}.
+it, Z is not being used as an instrument. Instrumental variables are frequently used in causal inference in economics and sociology; see \citet{morgan_counterfactuals_2015} for many examples and details.}.
 
 \subsection{A more complex, but very real, example: the birth-weight paradox}\label{bwparadox}
 
@@ -1095,6 +1140,9 @@ I copy from p.\ 1115 of \citet{hernandez-diaz2006}:
   such a way that smoking is beneficial for LBW babies.
 \end{quoting}
 
+(Does the above sound confusing? It was for me. Write, with your own words and your own pencil, a simple scheme of what is being described.)
+
+
 This is another case of collider bias, in this case stratifying on a common
 effect. In Figure \ref{fig:bw-paradox} there are two possible causal DAGs that
 would lead to this paradox.
@@ -1106,7 +1154,7 @@ would lead to this paradox.
   \includegraphics[width=0.9\textwidth]{bw-paradox-2-crop}
   \caption{\label{fig:bw-paradox}. Two DAGs that would result in the
     birth-weight paradox. From Figure 3 in \citet{hernandez-diaz2006}. The
-    presence or not of an arrow from LBW to Mortality is not the relevant feature.} 
+    presence or not of an arrow from LBW to Mortality is not the relevant feature.}
 \end{figure}
 
 
@@ -1130,7 +1178,7 @@ have been measured \citep{hernandez-diaz2006a}.
 
 % \subsection{More examples}\label{more-examples}
 % Chapter 18 in \citet{hernan2020} contains several examples where the usual
-% heuristic procedures for what to include, or not, in a model, fail. 
+% heuristic procedures for what to include, or not, in a model, fail.
 
 
 \section{How is all of this relevant if I only do experimental/observational
@@ -1160,16 +1208,16 @@ making stronger assumptions.
 (By the way, we have not touched at all here on topics such as trying to measure
 the causes of an effect and finding \textbf{sufficient causes}, nor on trying to
 find the causal DAGs from a set of data. We have focused ``just'' on measuring
-the effects of causes. For more on those topics, go to \citealp{hernan2020},
-\citealp{morgan_counterfactuals_2015}, \citealp{neal_causality_2020}).
+the effects of causes. For more on those topics, go to \citealp{hernan2020};
+\citealp{morgan_counterfactuals_2015}; \citealp{neal_causality_2020}, \citealp{peters_causal_2017}).
 
 %% ZZ FIXME  what variables to add to a DAG
 
 \noindent\rule{\textwidth}{1pt}
 \clearpage
 \setcounter{part}{1}
-\part{Appendix and additional material}
-As it says: what follows gives additional details on some issues above. 
+\part{Appendix and additional material}\label{appendix}
+As it says: what follows gives additional details on some issues above. This is \textbf{not} required reading.
 
 
 
@@ -1178,7 +1226,7 @@ As it says: what follows gives additional details on some issues above.
 \subsection{Estimating direct effects}\label{direct-eff}
 Look at the following DAG (this is from section 3.7, pp.\ 75 and ff.\
 \citealp{pearl_causal_2016}; a similar example is shown in section 6.3.2, p.\
-180--182
+180--182 of
 \citealp{rethinking_2020}\footnote{Though in \citealp{rethinking_2020}, the
   explanation of the problem I find possibly misleading, since the difference
   between the direct and indirect effects is not emphasized enough.}) in Figure \ref{fig:dag_direct}:
@@ -1206,7 +1254,7 @@ drawdag(dire, xlim = c(0.5, 3.5), ylim = c(-.1, 1.3))
 ## drawdag(ptr, xlim = c(0.5, 3.5), ylim = c(-.9, 1.3))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
 ## par(op)
-@ 
+@
 
 You might want to estimate the \textbf{direct effect} of Gender on Hiring (if
 there is any, it could be evidence for discrimination). The direct effect is the
@@ -1240,7 +1288,7 @@ coordinates(dire3) <- list(x = c(Gender = 1, Qualification = 2, Hiring = 3,
                                 SocioecStatus = -1.45))
 
 drawdag(dire3, xlim = c(0.5, 5), ylim = c(-.1, 1.6))
-@ 
+@
 
 If you only adjust by Qualification, your estimates of direct effect will be
 biased because Qualification is a collider (a descendant of both Income and
@@ -1302,7 +1350,7 @@ model without confounders).
 % Food -> Cholesterol
 % Exercise -> Cholesterol
 % }")
-% @ 
+% @
 % %% <<plot_dags_1_2, out.width = '14cm', out.height='7cm'>>=
 % <<plot_direct_chol_food, fig.width = 10, fig.height=5, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='Introductory figures'>>=
 % coordinates(common_cause) <- list(x = c(Exercise = 1, Age = 2, Cholesterol = 3),
@@ -1310,18 +1358,18 @@ model without confounders).
 
 % drawdag(mediator, xlim = c(0.5, 3.5), ylim = c(0, 1.3))
 % text(x = 2, y = 1.2, labels ="b)", cex = 1.2)
-% @ 
+% @
 
 
 % <<simul_2, results='hide', echo = TRUE>>=
-% N <- 1e4 
+% N <- 1e4
 
 % ################## Mediator
 % mediator <- data.frame(Exercise = runif(N, 1, 100))
 % mediator$Food <- mediator$Exercise * 3 + rnorm(N)
 % ## Cholesterol decreases with Exercise (-1) but increases with Food
 % mediator$Cholesterol <- mediator$Food * 2 - mediator$Exercise + rnorm(N)
-% @ 
+% @
 
 % And here for case b).
 % <<code_2, results='show', echo = TRUE>>=
@@ -1331,7 +1379,7 @@ model without confounders).
 % S(m_mediator_adjust)
 % S(m_mediator_no_adjust)
 
-% @ 
+% @
 
 % In case b), if we want to measure the total
 % effect of Exercise in this experiment, we should not adjust for Food
@@ -1365,7 +1413,7 @@ is:
   (...) a back-door path is defined as any path between the causal variable
   [treatment] and the outcome variable [our Y] that begins with an arrow that
   points to the causal variable
-\end{quoting} \citet{morgan_counterfactuals_2015}, Section 1.5, p.\ 30. 
+\end{quoting} \citet{morgan_counterfactuals_2015}, Section 1.5, p.\ 30.
 
 
 \begin{quoting}
@@ -1374,7 +1422,7 @@ In a causal DAG, a
   definition above] and outcome [our Y] that remains even if all arrows pointing
   from treatment to other variables (the descendants of treatment) are
   removed. That is, the path has an arrow pointing into treatment
-\end{quoting}  
+\end{quoting}
 \citet{hernan2020},  Section 7.1, p.\ 83.
 
 
@@ -1424,7 +1472,7 @@ backdoor criterion):
 
     \item (b) contains a fork of mutual dependence $A \leftarrow C \rightarrow B$,
       where the middle variable $C$ is in $Z$, or
-      
+
     \item (c) contains an inverted fork of mutual causation
       $A \rightarrow C \leftarrow B$, where the middle variable $C$ and all of $C$'s
       descendants are not in $Z$;
@@ -1459,7 +1507,7 @@ Yes, there is software to do this. For example, DAGitty
 (\Burl{http://www.dagitty.net/}) of which there is an R package, dagitty
 (\Burl{https://cran.r-project.org/web/packages/dagitty/index.html}\footnote{This
   is the R package I am using to draw the figures in this document, in combination with the
-  \texttt{drawdag} function of the 
+  \texttt{drawdag} function of the
   ``rethinking'' package
   ---\Burl{https://github.com/rmcelreath/rethinking}}). But before using
 software, I'd make sure to really understand the patterns, as shown in the
@@ -1473,13 +1521,13 @@ figures above.
 Some explanations of the backdoor criterion and the use of DAGs to find
 dependencies and independencies make use of \textit{d-separation}.  But you can
 explain and use the backdoor criterion without introducing more jargon, as we
-have seen above (for example, \citealp{morgan_counterfactuals_2015}, only use the
-term d-separation in one footnote, though their
-procedure, which we have copied above, actually implicitly uses the definition of
-d-separation). Anyway, d-separation is well explained in Definition 2.4.1, p.\ 46
-of \citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
-\citet{hernan2020} and is very useful if you want to find all the independencies
-and conditional independencies implied by a DAG.
+have seen above (for example, \citealp{morgan_counterfactuals_2015} only use the
+term d-separation in one footnote, though their procedure, which we have copied
+above, actually implicitly uses the definition of d-separation). Anyway,
+d-separation is well explained in Definition 2.4.1, p.\ 46 of
+\citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
+\citet{hernan2020} and is very useful if you want to find all the
+independencies and conditional independencies implied by a DAG.
 
 
 % With what we have
@@ -1490,7 +1538,7 @@ and conditional independencies implied by a DAG.
 %   A path p is blocked by a set of nodes Z if and only if
 %   \begin{itemize}
 %   \item p contains a chain of nodes
-% or a fork 
+% or a fork
 %   \end{itemize}
 % 1. p contains a chain of nodes
 % or a fork
@@ -1510,13 +1558,13 @@ and conditional independencies implied by a DAG.
 
 
 
-\section{Designed experiments and lack of confounding}\label{randomiz}
-\subsection{Randomization and exchangeability}
+% \section{Designed experiments and lack of confounding}\label{randomiz}
+\section{Randomization and exchangeability in designed experiments}
 In designed experiments with random assignment of experimental units (patients,
 petri dishes, whatever) to treatments, there is no
 confounding. There is no arrow to treatment assignment from anything else
 precisely because treatment assignment is random. So go and redraw the very first
-DAG, but remove the arrow into the treatment variable (Exercise). 
+DAG, but remove the arrow into the treatment variable (Exercise).
 
 Put differently, randomization leads to exchangeability: there is no association
 between the potential outcomes and the actual treatment received.  The
@@ -1537,7 +1585,7 @@ see chapter 8 in \citet{hernan2020}. On both issues, see also chapter 5 in
 \citet{westreich2019} for a shorter discussion.
 
 
-\subsection{Terminology: exchangeability, ignorability}\label{ignorab}
+\section{Terminology: exchangeability, ignorability}\label{ignorab}
 
 More on ``exchangeability''. What follows is just for completeness, and because I
 tend to trip over terminological issues.
@@ -1559,7 +1607,7 @@ covariates. % But then,
   % itself nor to the treatment actually received.
 
 
-\subsection{Randomization, exchangeability, counterfactuals, and potential
+\section{Randomization, exchangeability, counterfactuals, and potential
   outcomes}\label{counterf}
 
 I have not used the words counterfactuals or potential outcomes. But
@@ -1568,11 +1616,13 @@ inferences from randomized experiments, and to understand what we are trying to
 do when we try to eliminate confounding to try to do causal inference from
 observational data. See further details in \citet{rosenbaum2017},
 \citet{hernan2020}, \citet{morgan_counterfactuals_2015},
-\citet{pearl2016}. (\citealp{rosenbaum2017}, does not use DAGs at all; the others
+\citet{pearl2016} (and \citealp{woodward2003} and \citealp[][ch.~5]{otsuka2023} for philosophical discussion). (\citealp{rosenbaum2017}, does not use DAGs at all; the others
 do, and draw ---pun intended--- connections between counterfactuals and
-DAGs). Key message: even if you don't care about DAGs or making causal inferences
+DAGs).
+
+Key message: even if you don't care about DAGs or making causal inferences
 from observational data, counterfactuals are key for your inferences from
-experimental data.
+experimental data. In fact, you most likely thing counterfactually (pun intended) a lot of the time: would you have had so much fun for the last hour or so had you not been reading these notes? \smiley{}
 
 
 \section{Lord's paradox}
@@ -1582,7 +1632,7 @@ paradox\footnote{This same paradox has been presented in many different places b
   other authors, and also by Pearl in other work; but the presentation in
   \citealp{pearl2016} I find much, much, clearer and insightful than the one in
   p.\ 85 of \citealp{pearl_causal_2016} or pp.\ 212-215 ---chapter 6--- of
-  \citealp{pearl2018}}. As Pearl explains, his paper ``address(es) the general
+  \citealp{pearl2018}.}. As Pearl explains, his paper ``address(es) the general
 methodological issue of whether adjustments for preexisting conditions is
 justified in group comparison applications''. A nice feature of this paper is
 that Pearl presents both the original paradox as written by Lord as well as some
@@ -1597,13 +1647,198 @@ adjust for the covariate.
 
 
 
+% {\small
+%   \bibliography{covars-causal}
+%   \bibliographystyle{jss2}
+%   %% \bibliography{refs}
+%   %% \bibliographystyle{myplainnat}
+%   %% \bibliographystyle{mybibwithurl} %% not compatible with author-year
+% }
 
+\section{References}
+
+(Note: some of the books below are ---legally and freely--- available from UAM's library and/or from the author's pages).
+
+%% FIXME: in the future, use \bibliographystyle{jss2}
 {\small
-  \bibliography{covars-causal}
-  \bibliographystyle{jss2} 
-  %% \bibliography{refs}
-  %% \bibliographystyle{myplainnat}
-  %% \bibliographystyle{mybibwithurl} %% not compatible with author-year
+  % \bibliography{refs}
+  % \bibliographystyle{myplainnat}
+
+  \begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Cole and Hern{\'a}n(2002)]{cole2002}
+Cole, S.~R. and Hern{\'a}n, M.~A.
+\newblock Fallibility in estimating direct effects.
+\newblock \emph{International Journal of Epidemiology}, 31\penalty0
+  (1):\penalty0 163--165, February 2002.
+\newblock ISSN 0300-5771.
+\newblock \doi{10.1093/ije/31.1.163}.
+\newblock URL \url{https://doi.org/10.1093/ije/31.1.163}.
+
+\bibitem[Hernan and Robins(2020)]{hernan2020}
+Hernan, M.~A. and Robins, J.~M.
+\newblock \emph{What If. {{Causal Inference}}}.
+\newblock {CRC Press}, 2020.
+\newblock ISBN 978-1-4200-7616-5.
+\newblock URL
+  \url{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
+
+\bibitem[{Hernandez-Diaz} et~al.(2006){Hernandez-Diaz}, Schisterman, and
+  Hernan]{hernandez-diaz2006}
+{Hernandez-Diaz}, S., Schisterman, E.~F., and Hernan, M.~A.
+\newblock The {{Birth Weight}} "{{Paradox}}" {{Uncovered}}?
+\newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
+  1115--1120, September 2006.
+\newblock ISSN 0002-9262, 1476-6256.
+\newblock \doi{10.1093/aje/kwj275}.
+\newblock URL
+  \url{https://academic.oup.com/aje/article-lookup/doi/10.1093/aje/kwj275}.
+
+\bibitem[{Hern{\'a}ndez-D{\'i}az} et~al.(2006){Hern{\'a}ndez-D{\'i}az},
+  Schisterman, and Hern{\'a}n]{hernandez-diaz2006a}
+{Hern{\'a}ndez-D{\'i}az}, S., Schisterman, E.~F., and Hern{\'a}n, M.~A.
+\newblock Hern\'andez-{{D\'iaz}} et al. {{Respond}} to ``{{The Perils}} of
+  {{Birth Weight}}''.
+\newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
+  1124--1125, December 2006.
+\newblock ISSN 0002-9262.
+\newblock \doi{10.1093/aje/kwj277}.
+\newblock URL \url{https://doi.org/10.1093/aje/kwj277}.
+
+\bibitem[Kline(2015)]{kline2015}
+Kline, R.~B.
+\newblock \emph{Principles and {{Practice}} of {{Structural Equation
+  Modeling}}, {{Fourth Edition}}}.
+\newblock {The Guilford Press}, {New York}, 2015.
+\newblock ISBN 978-1-4625-2334-4.
+
+\bibitem[McElreath(2020)]{rethinking_2020}
+McElreath, R.
+\newblock \emph{Statistical Rethinking: A {{Bayesian}} Course with Examples in
+  {{R}} and {{Stan}}, 2nd Ed.}
+\newblock {CRC Press}, 2020.
+\newblock ISBN 978-0-367-13991-9.
+
+\bibitem[Morgan and Winship(2015)]{morgan_counterfactuals_2015}
+Morgan, S.~L. and Winship, C.
+\newblock \emph{Counterfactuals and Causal Inference: Methods and Principles
+  for Social Research, 2nd Ed}.
+\newblock {Cambridge University Press}, {New York, NY}, 2015.
+\newblock ISBN 978-1-107-58799-1 978-1-107-06507-9 978-1-107-69416-3.
+\newblock URL \url{http://dx.doi.org/10.1017/CBO9781107587991}.
+
+\bibitem[Neal(2020)]{neal_causality_2020}
+Neal, B.
+\newblock \emph{Introduction to {{Causal Inference}}}.
+\newblock 2020.
+\newblock URL
+  \url{https://www.bradyneal.com/Introduction_to_Causal_Inference-Dec17_2020-Neal.pdf}.
+
+
+\bibitem[Otsuka(2023)]{otsuka2023}
+Otsuka, J.
+\newblock \emph{Thinking about Statistics: The Philosophical Foundations}.
+\newblock {Routledge}, {New York, NY}, 2023.
+\newblock ISBN 978-1-03-232610-8
+
+
+
+
+
+\bibitem[Pearl(2009)]{pearl_causality_2009}
+Pearl, J.
+\newblock \emph{Causality: Models, Reasoning, and Inference, 2nd Ed}.
+\newblock {Cambridge Univ. Press}, {New York, NY}, 2009.
+\newblock ISBN 978-0-521-89560-6.
+
+\bibitem[Pearl(2016)]{pearl2016}
+Pearl, J.
+\newblock Lord's {{Paradox Revisited}} \textendash{} ({{Oh Lord}}!
+  {{Kumbaya}}!).
+\newblock \emph{Journal of Causal Inference}, 4\penalty0 (2), 2016.
+\newblock ISSN 2193-3677.
+\newblock \doi{10.1515/jci-2016-0021}.
+\newblock URL
+  \url{https://www.degruyter.com/view/j/jci.2016.4.issue-2/jci-2016-0021/jci-2016-0021.xml}.
+
+\bibitem[Pearl and Mackenzie(2018)]{pearl2018}
+Pearl, J. and Mackenzie, D.
+\newblock \emph{The Book of Why: The New Science of Cause and Effect.}
+\newblock {Basic Books}, {New York, N.Y.}, 2018.
+
+\bibitem[Pearl et~al.(2016)Pearl, Glymour, and Jewell]{pearl_causal_2016}
+Pearl, J., Glymour, M., and Jewell, N.~P.
+\newblock \emph{Causal Inference in Statistics: A Primer}.
+\newblock {John Wiley \& Sons}, {Chichester, UK}, 2016.
+\newblock ISBN 978-1-119-18684-7.
+
+
+\bibitem[Peters et~al.(2017)Peters, Janzing, Scholkopf]{peters_causal_2017}
+Peters, J., Janzing, D., and Sch{\"o}lkopf, B.
+\newblock \emph{Elements of Causal Inference}.
+\newblock {MIT Press}
+\newblock ISBN 978-0-262-03731-0.
+\newblock URL
+  \url{https://library.oapen.org/bitstream/id/056a11be-ce3a-44b9-8987-a6c68fce8d9b/11283.pdf}
+
+
+
+\bibitem[Rosenbaum(2017)]{rosenbaum2017}
+Rosenbaum, P.
+\newblock \emph{Observation and {{Experiment}}: An {{Introduction}} to {{Causal
+  Inference}}}.
+\newblock {Harvard University Press}, {Cambridge, Massachusetts}, August 2017.
+\newblock ISBN 978-0-674-97557-6.
+
+\bibitem[Sober(2024)]{sober2024}
+Sober, E.
+\newblock Thoughts on {{Jun Otsuka}}'s {{Thinking}} about {{Statistics}} -- the {{Philosphical Foundations}}.
+\newblock \emph{Asian Journal of Philosophy}, 3\penalty0 (1), 2024.
+\newblock ISSN 2731-4642
+\newblock \doi{10.1007/s44204-024-00173-8}.
+\newblock URL
+
+ \url{https://link.springer.com/10.1007/s44204-024-00173-8}
+
+
+\bibitem[VanderWeele(2015)]{vanderweele2015}
+VanderWeele, T.
+\newblock \emph{Explanation in {{Causal Inference}}: Methods for {{Mediation}}
+  and {{Interaction}}}.
+\newblock {Oxford University Press}, {New York}, 2015.
+\newblock ISBN 978-0-19-932587-0.
+
+\bibitem[VanderWeele and Shpitser(2011)]{vanderweele2011}
+VanderWeele, T.~J. and Shpitser, I.
+\newblock A {{New Criterion}} for {{Confounder Selection}}.
+\newblock \emph{Biometrics}, 67\penalty0 (4):\penalty0 1406--1413, 2011.
+\newblock ISSN 1541-0420.
+\newblock \doi{10.1111/j.1541-0420.2011.01619.x}.
+\newblock URL
+  \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1541-0420.2011.01619.x}.
+
+\bibitem[Westreich(2019)]{westreich2019}
+Westreich, D.
+\newblock \emph{Epidemiology by {{Design}}: A {{Causal Approach}} to the
+  {{Health Sciences}}}.
+\newblock {Oxford University Press}, {New York, NY}, 2019.
+\newblock ISBN 978-0-19-066576-0.
+
+
+\bibitem[Woodward(2003)]{woodward2003}
+Woodward, J.
+\newblock \emph{Making Things Happen: A Theory of Causal Explanation}.
+\newblock {Oxford University Press}, {New York, NY}, 2003.
+\newblock ISBN 978-0-19-803533-6.
+
+\end{thebibliography}
+
+
 }
 
 
@@ -1644,7 +1879,7 @@ adjust for the covariate.
 %   \citet{hernan2020}. On both issues, see also chapter 5 in
 %   \citet{westreich2019}.
 
-  
+
 %   More on ``exchangeability''. What follows is just for completeness, and because
 %   I tend to trip over terminological issues.  As explained in pp.\ 459 and 460 of
 %   \cite{vanderweele2015}, the same condition is often referred to by the
@@ -1671,4 +1906,3 @@ adjust for the covariate.
 % chapters 2 and 3 in \citet{hernan2020} and note 33, p.\ 300, in
 % \citet{rosenbaum2017}.
 %% Gelman et al also discuss this, but I think their use of exchangeability is different.
-
