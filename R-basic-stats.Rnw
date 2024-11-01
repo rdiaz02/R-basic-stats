@@ -349,9 +349,10 @@ by other means), but they are extremely convenient.
 %% @
 
 
-And a violin + boxplot showing the points themselves, using package  (and we rotate it ... just because we can):
+And a violin + boxplot showing the points themselves, using package \texttt{ggplot2} (and we rotate it ... just because we can):
 
 <<fig.show = 'hold'>>=
+library(ggplot2)
 tmpdf <- data.frame(x = dp53$cond, y = dp53$p53, z = dp53$cond)
 theplot <- ggplot(data = tmpdf,
                   aes(x = factor(x), y = y, fill = z)) +
@@ -1587,7 +1588,14 @@ Lets go and fit that model! %% Do it under ``Fit models'', ``Linear models'',
 <<>>=
 LinearModel.1 <- lm(myc ~ id + cond, data = dmyc)
 summary(LinearModel.1)
-t.test(myc ~ cond, data = dmyc, paired = TRUE)
+t.test(myc.nc, myc.cancer, paired = TRUE)
+
+## Note: the following syntax is no longer allowed.
+## t.test(myc ~ cond, data = dmyc, paired = TRUE)
+## This change in September 2023
+## https://bugs.r-project.org/show_bug.cgi?id=14359
+## But this is OK
+t.test(Pair(myc.nc, myc.cancer) ~ 1)
 @
 
 Run it and look at the line that has ``cond'' (so, using your common
@@ -2346,6 +2354,40 @@ or a two-samples Wilcoxon test.
 %% @
 
 
+
+\subsection{Symmetry and the paired t-test}\label{sym-paired-t}
+
+In the paired t-test symmetry of the within-subject differences is important. This we know, because the paired t-test is just a one-sample t-test applied to within subject differences (and the usual assumptions of the one-sample t-test apply, one of them being that the data have an approximately symmetrical distribution).
+
+In the paired t-test, though, the within-individual differences (more generally, the within-experimental unit differences) are coming from, well, differences of, say, ``before'' and ``after'' distributions. How relevant is the distribution of those ``before'' and ``after''? In other words, if we define within-individual-difference as \(W\), with \(w_i = u_i - v_i\) (where \(U\) could be the ``after'' and \(V\) the ``before''), what is the relevance of the distributions of \(U\) and \(V\)? What can we expect about \(W\)?
+
+
+If you have access to it, Rupert Miller's ``Beyond Anova'' (Chapman and Hall, 1997), bottom of p.~8 and p.~9 discusses this issue. In class, we will quickly discuss the code below:
+
+<<>>=
+## "num" random deviates from an exponential.
+## Play with num if you want. We use a very large num
+## to make it easier to see the patterns.
+num <- 1000
+V <- rexp(n = num, rate = 1)
+## The exponential is clearly asymmetric
+hist(V)
+
+## Shift those numbers by adding 3, and a little bit of noise
+U <- V + 3 + rnorm(num, sd = 0.2)
+hist(U)
+
+## What about the differences?
+W <- U - V
+hist(W)
+@
+
+So in many cases skewness (asymmetry) tends to cancel out (e.g., for example when we add a constant value plus some random, symmetric noise).
+
+
+And this emphasizes something else: when examining if assumptions are reasonable, think about what you are examining. Here, the distribution that matters is the distribution of the within-individual differences (\(W\)), not each of the separate distributions \(U\) or \(V\): your test is about individual differences, \(W\), not about \(U\) or \(V\).
+
+
 \part{Linear models: ANOVA, regression, ANCOVA}
 
 \section{Introduction to ANOVAs, regression, and linear models}
@@ -2457,6 +2499,24 @@ point that has been flagged as a potential outlier and we will silent that
 output from now on in these notes).
 
 
+
+We can try a boxplot overimposing the observations (and, if you want, you can also try a violin plot) using \texttt{ggplot2}, as we have seen before:
+
+<<>>=
+require("ggplot2")
+tmpdf <- data.frame(x = dmit$ftraining, y = dmit$activ)
+theplot <- ggplot(data = tmpdf, aes(x = factor(x), y = y)) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot(outlier.colour = "transparent") +
+  geom_jitter(colour = "black", width = 0.1, height = 0) +
+  xlab("ftraining") +
+  ylab("activ") +
+  theme_bw(base_size = 14, base_family = "sans")
+print(theplot)
+rm(theplot, tmpdf)
+
+@
+
 \subsection{An ANOVA; some basic theory and output}\label{oneway}
 
 We want to see if time of exercise makes any difference. Conducting three
@@ -2475,18 +2535,23 @@ summary(AnovaMIT)
 Can you interpret the output?
 
 
-% We will cover this in more detail in class, in case you do not remember
-% ANOVA. Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
-% Moodle (\texttt{anova-basic-theory.pdf}), then read
-% \texttt{anova-theory-even-simpler}, and then re-read Dalgaard's. If there are
-% questions, we will cover them in class.
+Note: we are using \Rfunction{aov}. We could also use \Rfunction{lm} and then
+show the summary with function \Rfunction{anova}. Sometimes, these are just syntactic
+features ---annoyances?--- of R. I'll explain them in class. But the key concepts
+do not change. For example, go to ``Statistics -> Fit models models -> Linear model'' (Linear model, NOT regression: do you know why?). Then, go to ``Models -> Hypothesis test -> ANOVA model''
 
 
-We will cover this in more detail in class, in case you do not remember
-ANOVA.
+<<>>=
+LinearModel.1 <- lm(activ ~ ftraining, data = dmit)
+Anova(LinearModel.1, type="II")
+@
+
+In most of this course we will generally prefer this second route (i.e., functions \texttt{lm} with \texttt{Anova}).
 
 
-\externalf Read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
+\vspace*{25pt}
+
+\externalf We will cover this in more detail in class, in case you do not remember ANOVA. So  read \textbf{now} the 2 and a half pages from Peter Dalgaard's book available in
 Moodle (\myhref{anova-basic-theory.pdf}), then read
 \myhref{anova-theory-even-simpler.pdf}, and then re-read Dalgaard's. If there are questions, we will cover them in class.
 
@@ -2496,7 +2561,7 @@ Now, things to notice about the output:
 \begin{itemize}
 \item The two rows; one of them is the effect you are interested in (ftraining)
 \item The ``Df'' column: those are the degrees of freedom (three groups -
-  1 for ``ftraining'').
+  1 for ``ftraining''). Do you know what degrees of freedom are? If not, ask in class.
 \item The two columns Sum Sq (Sum of Squares) and Mean Sq (Mean
   Squares). Sum of Squares is a quantity related to the variance. Mean
   Squares is obtained from the ratio of Sum Sq over Df. Then, we use Mean
@@ -2509,7 +2574,7 @@ Now, things to notice about the output:
 \end{itemize}
 
 
-By the way, notice how we created a ``Model'' which is called
+By the way, notice how we created a ``Model'' which we called
 \Robject{AnovaMIT}. But we could have named it differently.
 
 
@@ -2611,7 +2676,7 @@ look at each one of the three p-values and keep any with a p-value $\leq
 Understanding what we just said is crucial. So we will use another two examples, a depressing and an uplifting one. If you understand them, you understand why we need multiple comparisons:
 
 \begin{itemize}
-\item Russian roulette. (Important note: we of course strongly discourage playing Russian roulette!). Suppose you have two friends, ``A'' and ``B''. ``A'' intends to play Russian roulette once a year, ``B'' intends to play it ten times a year\footnote{We say ``intends to'': obviously, the first time that the gun fires is the last time the player plays the game}. Whose funeral are you likely to attend first?
+\item Russian roulette. (Important note: we of course strongly discourage playing Russian roulette!). Suppose you have two friends, ``A'' and ``B''. ``A'' intends to play Russian roulette once a year, ``B'' intends to play it ten times a year\footnote{We say ``intends to'': obviously, the first time that the gun fires is the last time the player plays the game.}. Whose funeral are you likely to attend first?
 \item Lottery: we can give you either one lottery ticket or 20 lottery tickets (each with a different number). Assuming you have no problem with becoming rich, what option do you prefer?
 \end{itemize}
 
@@ -2865,7 +2930,7 @@ instance, that the mean of groups 2 and 3 is different from the mean of group 4,
 or comparing specific treatments against a control. Etc, etc. We will not get
 into this. A very good introduction, in addition to other references already
 mentioned, is chapter 3 of the on-line book `` ANOVA and Mixed Models: A Short
-Intro Using R '': \Burl{https://stat.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html}
+Intro Using R '': \Burl{https://stat.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html}.
 
 
 
@@ -2992,7 +3057,7 @@ each case.
 In the example in section \nameref{multcomp1} $U + V + T + S = 3$ (beware, 3
 is the number of \textbf{hipothesis tests}, it is not the number of means;
 in our case, both are three, but Table \ref{table-multcomp} reflects
-number of hypothesis, not tests). Procedures such as the one we used
+number of hypothesis, not number of means). Procedures such as the one we used
 (Tukey) or Bonferroni or similar ones, try to control the probability that
 $V \geq 1$. They control what is called the ``family-wise error rate''
 (FWER).
@@ -3008,7 +3073,7 @@ rate provide are mechanisms for ensuring that $Pr(V \geq 1)$ is below a
 number you specify (e.g., 0.05).
 
 
-Note that, in our usage of Tukey, we did not pre-specify that
+Note that, in our usage of Tukey, we did not pre-specify the actual
 $Pr(V \geq 1)$. The procedure is run, and it gives us ``adjusted
 p-values''. And what is an adjusted p-value?  The classical paper from
 Wright, 1992, ``Adjusted p-values for simultaneous inference'',
@@ -3016,14 +3081,15 @@ Wright, 1992, ``Adjusted p-values for simultaneous inference'',
 adjusted p-value: ``The adjusted $P$-value for a particular hypothesis
 within a collection of hypotheses, then, is the smallest overall (i.e.,
 'experimentwise') significance level at which the particular hypothesis
-would be rejected.''  This might sound like a mess, but it really
-ain't. Think about it. To get going, start reading the sentence covering
+would be rejected.''
+Read it very carefully. To get going, start reading the sentence covering
 ``adjusted'' and ``collection of'' (i.e., think about a single p-value for
 an experiment where a single null is tested); then move on to the multiple
-p-values case. It is so nice that it makes comparisons very simple, as
-Wright explains: ``An adjusted $P$-value can be compared directly with any
-chosen significance level $\alpha$: If the adjusted $P$-value is less than
-or equal to $\alpha$, the hypothesis is rejected.'' (If you find this too advanced for now, don't worry. But remember this once you feel more comfortable with these issues. And no, this paragraph will not be in the exam.)
+p-values case.
+It makes comparisons very simple; as Wright explains: ``An
+adjusted $P$-value can be compared directly with any chosen significance
+level $\alpha$: If the adjusted $P$-value is less than or equal to
+$\alpha$, the hypothesis is rejected.'' (If you find this too advanced for now, don't worry. But remember this once you feel more comfortable with these issues. And no, this paragraph will not be in the exam.)
 
 
 
@@ -3036,7 +3102,7 @@ There is a different approach to the multiple testing problem. In this
 approach we focus on controlling the fraction of false positives. The
 total number of null hypothesis we reject is $V+S$. The intuitive idea
 behind the control of the false discovery rate (\textbf{FDR}) is to bound
-(to set an upper limit to) to the ratio $\frac{V}{V+S}$\footnote{There are
+(to set an upper limit to) the ratio $\frac{V}{V+S}$\footnote{There are
   several different approaches. The most common one is to control $FDR =
   E(Q)$ where $Q=V/(V+S)$ if $V + S > 0$ (and $Q = 0$ otherwise). But
   there are others, such as the $pFDR$, etc.}.
@@ -3057,7 +3123,7 @@ that now these p-values are adjusted for FDR (not adjusted for control of
 the family wise error rate).  So, when we deal with FDR, the adjusted
 p-value of an individual hypothesis is the lowest level of FDR for which
 the hypothesis is first included in the set of rejected hypotheses (e.g.,
-Reiner et al., 2003, \textit{Bioinformatics}).
+Reiner et al., 2003, \textit{Bioinformatics})\footnote{Reiner et al. (2003). Identifying differentially expressed genes using false discovery rate controlling procedures. Bioinformatics, 19(3), 368--375. https://doi.org/10.1093/bioinformatics/btf877}).
 
 
 The FDR is usually employed in screening procedures, where we are willing
@@ -3190,8 +3256,8 @@ m1 <- lm(y ~ A + B, data = df1)
 anova(m1)
 @
 
-The above is the anova table; we will say many more things later about
-that.
+The above is the anova table; later, we will say many more things about
+it.
 
 
 But for now notice also this output, that gives the estimated coefficients:
@@ -3248,6 +3314,20 @@ Before we continue, however, let's do the following thought experiment. Suppose 
 \item How many coefficients will you be estimating in a model without interactions?
 \item How many coefficients will you be estimating in a model with interactions?
 \end{itemize}
+
+% %% Can easily check that
+
+% <<>>=
+% two_way_p29_data <- expand.grid(A = LETTERS[1:4],
+%                                 B = letters[1:7],
+%                                 rep = 1:3)
+
+% two_way_p29_data$y <- rnorm(nrow(two_way_p29_data))
+
+% a_two_way_p29 <- lm(y ~ A + B, data = two_way_p29_data)
+% i_two_way_p29 <- lm(y ~ A * B, data = two_way_p29_data)
+
+% @
 
 
 And could you think about how you would estimate the coefficients for the interactions? How many of those coefficient would there be? How are the number of coefficients related to the degrees of freedom for the interaction?
@@ -3388,6 +3468,10 @@ usual, read the data and look at them. Since the author used names for the
 levels within each of the two factors, Diet and Drug, we do not need to
 transform them into factors, in contrast to what we did in section
 \nameref{recode}. Call the data \Robject{dcholest}.
+
+(Note: since a few versions ago, R no longer converts characters to factors when
+reading with \Rfunction{read.table}. In some places that is inconsequential, in
+other places we will have to use factors. We will deal with it.)
 
 <<create_tooth, echo=FALSE, results='hide'>>=
 
@@ -3680,21 +3764,28 @@ happening?
 \item Type I (or sequential) sums of squares do not. They are sequential,
   in the order shown in the output. R, by default, gives you this via
   \Rfunction{anova}.
+
+\item {\footnotesize (More details about Type I and Type II Sums of Squares are
+    provided in the Appendix in \qref{ssI-to-III}, but you can skip it. This
+    issue is also discussed, by focusing on the key issues from an applied
+    perspective, in chapter 5 of Fox and Weisberg's ``An R companion to applied
+    regression, 3rd edition''.)}
+
 \end{itemize}
 
 
 And this, of course, affects models with two, three, \ldots
 factors. Always pay attention to what it is you are being reported (and
 beware that the defaults used by R need not the same as those used by
-SPSS, SAS, etc.)\footnote{The type of sums of squares used (and,
-  actually, the type of hypothesis tested) is a debated topic. The book by
-  John Fox ``Applied regression analysis and generalized linear models''
-  contains a great discussion (his book with S.\ Weisberg ``An R companion
-  to applied regression'', one of the recommended books, does too). An
+SPSS, SAS, etc.)\footnote{More details about Type I and Type II Sums of Squares are
+    provided in the Appendix in \qref{ssI-to-III}, but you can skip it. This
+    issue is also discussed, by focusing on the key issues from an applied
+    perspective, in chapter 5 of Fox and Weisberg's ``An R companion to applied
+    regression, 3rd edition'' and Fox's ``Applied regression analysis and
+    generalized linear models''. An
   email-length discussion of these topics can be found here
   \Burl{https://stat.ethz.ch/pipermail/r-help/2006-August/111854.html} and
-  \Burl{https://stat.ethz.ch/pipermail/r-help/2006-August/111927.html}.
-\label{fn:2}}.
+  \Burl{https://stat.ethz.ch/pipermail/r-help/2006-August/111927.html}.\label{fn:2}}.
 
 
 
@@ -4167,9 +4258,8 @@ residual standard errors, and thus the p-values.
 
 \subsection{One observation per cell}\label{one-obs-cell}
 
+Briefly: try not to fit models with a single observation per cell. You will not be able to test interactions. And, of course \ldots that would be a tiny sample size anyway.
 
-Briefly: try not to do this. You will not be able to test interactions. And, of course \ldots that would be a tiny sample size anyway.
-+
 So far, we have had more than one observation for each combination of
 levels (i.e., more than one observation per cell, where cell means each of
 the ``places'' or ``boxes'' in a table that shows the combinations of
@@ -4212,6 +4302,47 @@ summary(m2)
 
 Do you understand what is going on?
 
+
+\subsection{Another quick two-way example}
+\label{sec:another-quick-two}
+
+We will use the \texttt{coking} data from the \texttt{ISwR} package (the one associated with Dalgaard's book \textit{Introductory statistics with R}). You can access that data using the menu ``Data -> Data in packages''. Please, look at the description of the data. Now, we will fit a model and summarize it.
+
+You should make sure what kinds of variables these are (i.e., do we have factors or numeric variables for \texttt{width} and \texttt{temp}?)
+
+<<>>=
+library(ISwR)
+ck1 <- lm(time ~ width * temp, data = coking)
+Anova(ck1)
+anova(ck1)
+@
+
+First, make sure you understand the degrees of freedom and the rest of the output. What can you say from the above results? Would you have wanted to analyze temperature as a numerical variable? Would it have made any difference here?
+
+Is this a balanced design? If we were to fit a model without interactions, would the order of factors change the output? Would fitting a model without interactions be justified here?
+
+<<echo=FALSE,results='hide'>>=
+with(coking, tapply(time, list(temp, width), length))
+aggregate(time ~ width + temp, FUN = length, data = coking)
+mcok1 <- lm(time ~ width + temp, data = coking)
+mcok2 <- lm(time ~ temp + width, data = coking)
+anova(mcok1)
+anova(mcok2)
+Anova(mcok2)
+@
+
+%% Explain, or not, what is the denominator, how the interaction is using up dfs and consuming/giving up RSS?
+
+% A few additional details and answers:
+% \begin{itemize}
+% \item Why are the main effects entries the same with \texttt{anova} and \texttt{Anova}? Because the design is fully balanced.
+% <<cokingN>>=
+% aggregate(time ~ width + temp, FUN = length, data = coking)
+% @
+
+% \item
+
+% \end{itemize}
 
 
 \subsection{ANOVA/linear models with more than two factors}\label{more-than-two}
@@ -4282,21 +4413,46 @@ Finally, repeat once more on your own. An experiment with four factors, the firs
 % %% chol_tukey <- TukeyHSD()
 % %% @
 
+% Using the example from the help of mmc.
+
+
+
+
+% % <<>>=
+% % data(display)
+% % display_int <- aov(time ~ emergenc * panel, data=display)
+% % display_add <- aov(time ~ emergenc + panel, data=display)
+
+% % display_int.mmc <- mmc(display_int, focus = "panel")
+% % display_add.mmc <- mmc(display_add, focus = "panel")
+
+% % display_int.mmc2 <- mmc(display_int,
+% %                         linfct=mcp(panel="Tukey",
+% %                                    `interaction_average`=TRUE,
+% %                                    `covariate_average`=TRUE))
+
+% % display_add.mmc2 <- mmc(display_add,
+% %                         linfct=mcp(panel="Tukey",
+% %                                    `interaction_average`=TRUE,
+% %                                    `covariate_average`=TRUE))
+
+
+
+
+% % @
 
 This section is way too long for this course. We will cover it quickly, focusing
 on the key conceptual issues. But we leave the code, examples, and more advanced
 comments for your future reference. Why is this that long, then? Because we want
-to emphasize that \textbf{``p values are just not enough''}: in many/most cases,
+to emphasize that \textbf{``p values are  not enough''}: in many/most cases,
 you will want to look at confidence intervals and other measures of uncertainty
 around the parameters you have estimated and the contrasts (differences in means)
 of interest. And, of course, you will need to correct for multiple testing when
 you, well, conduct multiple tests.
 
 
-In two-way and, more generally, multi-way ANOVA, this is more complicated. Among
-other questions you should ask yourself, at what levels of one variable will you
-be comparing the other? How does lack of balance affect the contrasts? Do you
-really want all possible contrasts? A good place to start reading on these issues
+In two-way and, more generally, multi-way ANOVA, computing and displaying multiple comparisons is more complicated than in one-way ANOVA. Among
+other questions you should ask yourself, probably some of the first ones are: At what levels of one variable will I be comparing the other? How does lack of balance affect the contrasts? Do I really want all possible contrasts? A good place to start reading on these issues
 is chapter 14 (and section 5.3.2) of Everitt and Hothorn's ``A handbook of
 statistical analysis using R, 2nd ed'', and then the documentation of \CRANpkg{multcomp}.
 
@@ -4315,7 +4471,7 @@ Again, it is the main messages that you need to understand. You can skip section
   \end{itemize}
 \item When there are interactions, this is more complicated. For example, at what
   level of each variable do you want to estimate the differences in the other? A
-  very simple numerical example illustrating the problem is shown in \qref{ci-two-way-int-example}.
+  very simple numerical example illustrating the problem is shown below in \qref{ci-two-way-int-example}.
 \item Finally, in both cases, you might want to think if carrying out comparisons
   between \textbf{all} pairs of means is what you really want to do. (Of course,
   you \textbf{must} report what you really did: carrying out comparisons between
@@ -4323,7 +4479,7 @@ Again, it is the main messages that you need to understand. You can skip section
 \end{itemize}
 
 
-\subsubsection{Comparisons between means when there are interactions: a simple
+\paragraph{Comparisons between means when there are interactions: a simple
   example of why we need to specify at what level of the other variable/of the
   interaction}\label{ci-two-way-int-example}
 
@@ -4987,7 +5143,7 @@ An alternative to \Rfunction{ellipse} is \CRANpkg{car}'s
 
 
 (And no, there is nothing wrong with this correlation. It actually makes a lot of
-sense.  Think about changing the slope of the regression line, keeping the center
+sense.  Think about tilting the regression line, keeping the center
 of mass fixed, so play with increasing or decreasing the slope: what happens with
 the intercept?)
 
@@ -4995,6 +5151,12 @@ the intercept?)
 
 
 \clearpage
+
+
+
+
+
+
 \section{Multiple regression}\label{multreg}
 
 \subsection{Introduction to multiple regression and the cystfibr data}\label{introcystfib}
@@ -5120,7 +5282,7 @@ What model should we choose? We will return to some of these questions in sectio
 For this class, these are the key messages:
 
 \begin{itemize}
-\item $R^2$ is the proportion of variability in the dependent variable accounted for (or explained) by the model. It is also the square of the correlation between observed and predicted (predicted according to the model) values of the dependent variable.
+\item $R^2$ (R-squared) is the proportion of variability in the dependent variable accounted for (or explained) by the model. It is also the square of the correlation between observed and predicted (predicted according to the model) values of the dependent variable.
 
 \item But adding predictor variables that actually explain nothing will never decrease $R^2$. The adjusted $R^2$ accounts for this (adding a predictor will only increase adjusted $R^2$ if the predictor makes some contribution to improving predictive value). Note that the (unadjusted) $R^2$ is the relative change in residual sums of squares, whereas the adjusted $R^2$ is the relative change in residual variance. In general, the adjusted $R^2$ is a better number to look at (and note it can, in models that explain nothing, become negative)\footnote{There are additional issues that might need to be considered. For example, the default $R^2$ that R gives you, both adjusted and unadjusted, should not be used in models without an intercept (i.e., regression through the origin). And the unadjusted $R^2$ has the virtue that it can be computed for many other models, since it is just the square of the correlation of predicted and observed. We will not discuss these issues here.}.
 
@@ -5128,7 +5290,7 @@ For this class, these are the key messages:
 
 \end{itemize}
 
-The following shows the calculations but the previous summary is enough for this class.
+The following shows the calculations but the previous summary is enough for this class (i.e., you can skip what follows).
 
 
 
@@ -5191,7 +5353,8 @@ hyperplane\footnote{If you want to play around with a regression plane or
   our brains do not seem ready for 4D and higher.}.
 
 
-How do we interpret coefficients? These are a few hints. Suppose we have\\
+How do we interpret coefficients? These are a few hints  (you can skip this if you
+want). Suppose we have\\
 $y = \alpha + \beta_1 x_1 + \beta_2 x_2 + \beta_{1,2}\ x_1\ x_2 + \epsilon$
 (where the term $\beta_{12}\ x_1\ x_2$ is literally the product of $\beta_{1,2}$
 times the product of $x_1$ and $x_2$). Now, in a table of coefficients, what is
@@ -5205,7 +5368,7 @@ $\frac{\partial y}{\partial x_1} = \beta_1 + \beta_{1,2}\ x_2$. Notice how $x_2$
 there: how fast $y$ changes with $x_1$ is also a function of $x_2$. And this differs from the model without interaction where we have:
 $\frac{\partial y}{\partial x_1} = \beta_1$.
 
-And a simple numerical example:
+And a simple numerical example (again, skip if you want):
 <<>>=
 mah <- lm(pemax ~ age + height, data = cystfibr2)
 mahi <- lm(pemax ~ age * height, data = cystfibr2)
@@ -5358,13 +5521,11 @@ obviously) and age. However, sex is coded with 0/1 and we want it to be a
 factor, explictly. Let's recode it:
 
 
-Let's fit a model where the independent variables are sex (discrete,
-obviously) and age. However, sex is coded with 0/1 and we want it to be a
-factor, explictly. Let's recode it:
-
 <<>>=
 cystfibr2$sex <- factor(cystfibr2$sex, labels = c('Male','Female'))
 @
+
+Now, fit a model.
 
 <<>>=
 mcyst2 <- lm(pemax ~ age * sex, data = cystfibr2)
@@ -5488,8 +5649,8 @@ anova(mcyst3, mcyst2)
 
 This is a comparison of two models using an F test: it tests whether the
 larger (more complex, with more terms) model is significantly better than
-the smaller one. It clearly shows that, in this case, that the larger
-model model (the one with both a main effect of ``sex'' and an
+the smaller one. It clearly shows that, in this case,  the larger
+model (the one with both a main effect of ``sex'' and an
 interaction) is not significantly better than the one without ``sex''. So
 we can just keep model \Robject{mcyst3}: there is no statistical evidence
 of \Robject{mcyst2} being any better. Again, notice how we have compared two models that, in this case, differed by the presence of several terms: the small model had only age, the large had sex and the interaction of sex and age. Being able to compare (nested ---see below) models that differ in several terms at once is really handy and there is no need to proceed by dropping one term at a time.
@@ -5561,7 +5722,7 @@ We will see interactions, parallel and non-parallel slopes, and more
 comparison of models. Again, these analyses are not fully correct as we
 ignore phylogenetic relatedness. But they are nice to illustrate a couple
 of points. We will directly use log transformations (again, theory and
-previous empirical evidence indicate this is the way to go ---and I looked
+previous empirical evidence indicate this is the way to go ---and we looked
 at a couple of different models already).
 
 
@@ -5660,6 +5821,11 @@ anova(longev_b_r_2, longev_b_r)
 Section 12.7 of Dalgaard's ``Introductory statistics with R'' contains a
 beautiful and detailed example of ANCOVA, including transformation of
 variables, using the \Robject{hellung} dataset included in \CRANpkg{ISwR}.
+
+
+
+\textbf{To discuss in class}: suppose you had four groups (call if Factor4) and one continuous variable (call it X). How many lines would you see in the figures? What would the ANOVA table(s) look like? (Think about rows and degress of freedom).
+
 
 
 
@@ -5883,7 +6049,7 @@ distribution has several very large residuals, is heavy tailed, and also
 somewhat skewed.
 
 The bottom right can be hard to interpret: it shows two quantities
-(residuals and leverage) that, together, are part of Cook's distance, that
+(residuals and leverage) that, together, are part of Cook's distance. Cook's distance
 measures the effect of individual points on the fitted coefficients
 (values of Cook's distance larger than 1 usually indicate a possibly very
 influential point, but any point with a widely outstanding Cook's distance
@@ -6013,7 +6179,7 @@ rm(x1, y1, x1y1, x1y1lm)
 The next is a contrived example, but one that shows things are clearly wrong (look at the bottom left).
 
 
-<<f2d77z,echo=FALSE, fig.pos = '!h',fig.width=5.8, fig.height=5.8, fig.cap='', fig.lp="fig:", fig.cap='Yet another example of non-constant variance (plus other issues)'>>=
+<<f2d77z,echo=FALSE, fig.pos = '!h',fig.width=5.8, fig.height=5.8, fig.cap='', fig.lp="fig:", fig.cap='Yet another example of non-constant variance (plus other issues ---these is a contrived example))'>>=
 suppressWarnings(try(rm(X, U, Z, x1, y1, x1y1lm, x1y1)))
 
 set.seed(19)
@@ -6266,27 +6432,37 @@ For you to read and play around further:
 
 \section{Variable and model selection}\label{modelsel}
 
+
 \subsection{Why model selection?}
 
 
 You say you want to select variables? Select them for what? Prediction?
-Interpretation?  Manipulation? Variable selection is a touchy and delicate
-subject. First, procedures based purely in statistical criteria might
+Interpretation?  Manipulation? The first thing to realize is that procedures based purely in statistical significance criteria might
 select ``statistically important'' variables (under some suitable
 definition of ``important''), but those need not be the most relevant from
-a biological point of view, or causally, etc. This is a very quick summary:
+a biological point of view, or causally, etc.
+
+
+This is a very quick summary of some of the reasons why we fit statistical models and, then, maybe conduct variable and/or model selection:
 
 
 
 \begin{itemize}
+
+
+\item Interpretation/understanding/insight: why are things this way? What factors are relevant for a process and why? This is trying to gain scientific understanding in the sense of ``uncovering the truth''. Is sleep deprivation what causes whatever? Or is it differences in light exposure? Or ... This is often what much (not all!!!) scientific modeling is about.
+
+
+
 \item Prediction: predict a variable given others. This might be totally unrelated to intervention (which is often what causal inference is after) or understanding/gaining insight into a process.
 
   Example: banks might want to filter customers unlikely to return a credit. They are not really trying to correct anyone's behavior, they are not trying to understand why people ask for money they cannot return. They just want to predict (so as not to offer them certain financial products).
 
-  Many models are of this kind. For example, many meteorological models are like this: if you see AEMET's predictions you only care about them being right (and they often are). You are not trying to modify anything (i.e., ``let's try to make of today a rainy day'') nor understand; and this is why purely phenomenological models of high complexity, including deep learning, with millions of parameters that our brains can't just wrap their heads around, are just fine for these tasks.
+  Or you might want estimate response to a treatment based on the gene expression profile of patients. You are not trying to understand why that gene's overexpression or repression leads to that response, just predict, so as to give each patient the best treatment. (In other words, you are not trying to ``understand the true relationship between gene expression and response to treatment'').
 
+  Many other models are of this kind. For example, many meteorological models are like this: if you see AEMET's predictions you only care about them being right (and they often are). You are not trying to modify anything (i.e., ``let's try to make of today a rainy day'') nor understand.
 
-\item Interpretation/understanding/insight: why are things this way? What factors are relevant for a process and why? This is trying to gain scientific understanding. Is sleep deprivation what causes whatever? Or is it differences in light exposure? Or ... This is often what scientific modeling is about.
+  Incidentally, that we care just about prediction is what makes models of high complexity, including deep learning, with millions of parameters that our brains can't just wrap their heads around, fine for many these tasks\footnote{Yes, we can argue that interpretable AI and machine learning models are important, for practical reasons ---better predictions---, for ethical reasons, for legal reasons, and for conceptual reasons.}.
 
 
 \item Causal inference, intervention: what would happen in Y if we manipulated X? For example, if we were to get people to eat legumes twice a week, how many colon cancers could we prevent?
@@ -6297,12 +6473,16 @@ a biological point of view, or causally, etc. This is a very quick summary:
 
   Yes, causal inference and intervention on the one hand and understanding on the other are often very closely related. But they are not the same. For example, you might have a relatively good understanding of a particular process, and yet be unable to predict exactly what an intervention will do because of the presence of modifier variables.
 
-  And sometimes we might not understand the mechanisms in detail\footnote{When one has an adequate understanding of mechanisms is actually a difficult question} and, yet, be able to conduct very successful interventions if we are able to estimate the causal effect of a variable\footnote{Briefly: the effect that changing, by manipulation, a variable from one state or value to another has on the outcome}.
+  And sometimes we might not understand the mechanisms in detail\footnote{When one has an adequate understanding of mechanisms is actually a difficult question.} and, yet, be able to conduct very successful interventions if we are able to estimate the causal effect of a variable\footnote{Briefly: the effect that changing, by manipulation, a variable from one state or value to another has on the outcome.}.
 
 
   And intervention is not totally unrelated to successful prediction either, of course. Elements of models that play a role in meteorological and climatological prediction are also present in causal models that are used to guide (or try to guide, unfortunately without much success) actions to prevent the disaster of climate change; we are asking here ``what variables should we change, and to what values, to achieve this result or prevent this other result?''
 
-  But models that might be excellent for predictions of current outcome might be very bad at prediction under new circumstances; causal inference and intervention are after the last objective whereas you looking at AEMET in the morning is you concerned about prediction-without-trying-to-modify-or-understand.
+  But models that might be excellent for predictions of current outcome might be very bad at prediction under new circumstances; causal inference and intervention are after the last objective whereas you looking at AEMET in the morning is you concerned about prediction-without-trying-to-modify-or-understand..
+
+
+  And, maybe counterintuitively, some models that are ``closer to the truth'' in the sense of ``they incorporate all the variables that matter'' can actually be much worse than simpler (i.e., ``less true'' models) for making predictions. Please, think about this \textbf{now!} Come up with examples of your own; why could this be? If this is not clear, \textbf{ask about this in class}.
+
 
 
 \subsection{Variable selection: the summary}
@@ -6310,7 +6490,8 @@ a biological point of view, or causally, etc. This is a very quick summary:
 With regards to the statistical procedures, we will summarize it as
 follows: please, please, please, distrust automated variable selection
 procedures that rely on p-values or F-statistics of individual variables
-(in all their variants, such as stepwise, etc). These procedures rarely do what you want to do, are often extremely unstable, etc. They are trivial to implement, and that makes them very common, but they are rarely what you scientific question needs.
+(in all their variants, such as stepwise, etc). These procedures rarely do what you want to do, are often extremely unstable, etc. They are trivial to implement, and that makes them very common, but they are rarely what your scientific question needs. Make sure you use subject-matter guidance to, well, guide you on what are sensible hypotheses to test, and in what order. Subject-matter knowledge might dictacte what are and are not candidates for deletion and in what
+order.
 
 
 Careful model comparison,
@@ -6320,17 +6501,79 @@ a good idea. Notice, again, that \verb@ anova(model1, model2) @ is all
 about comparing models.
 
 
+
+The book by Frank Harrell, ``Regression modeling strategies'' contains great discussions of these topics, including using the bootstrap to assess stability, etc.
+
+
 \subsection{Model selection using AIC and \Rfunction{step}}
 
-
 If you really need automated or semiautomated procedures, then reasonable
-strategies use model-comparison criteria such as AIC\footnote{AIC: Akaike
-  Information Criterion} (e.g., with the \Rfunction{step} function) and even
-better is then bootstrapping the whole process to get estimates of error,
-predictive ability, etc. Even better, of course, is subject-matter guidance on
-how to proceed and what are and are not candidates for deletion and in what
-order. The book by Frank Harrell, ``Regression modeling strategies'' contains
-great discussions of these topics. The actual data set used here is discussed,
+strategies use model-comparison criteria such as AIC (e.g., with the \Rfunction{step} function) are much more sensible.  But the focus, now, is different: we are doing \textbf{model selection}, not variable selection. And we are trying to achieve a different objective: we are trying to \textbf{find the best model to make predictions}. In other words, we are trying to find the model that, when applied to new data, will give the best predictions (we will explain what we mean by ``best predictions'').% \footnote{The meaning of ``best predictions'' can be made precise; for instance the Kullback-Leibler divergence from the true distribution or the cross-validated Mean Squared Error of prediction, etc.}
+
+
+\subsubsection{A very brief introduction to AIC}
+\label{sec:very-brief-intr}
+
+AIC stands for Akaike Information Criterion. This is the AIC of a model:
+
+\(2\ \ln(\hat{L}) - 2\ k\)
+
+where \(k\) is the number of parameters, \(\hat{L}\) is the likelihood of the model at the maximum likelihood parameters (and \(\ln\) is the  base \(e\) logarithm). (Many definitions of AIC multiply the above by \(-1\), as we will see below, but that is irrelevant; so if with our definition better models are those with larger AIC, if you multiply by -1, better models are those with smaller AIC).
+
+And what is the likelihood? You should now this already. If not, ask in class, but essentially, \(L(\theta)\), is the probability of the data under parameter \(\theta\) (it is better to think of the joint density, as that includes, then, continuous distributions). For a data set, we can find the value of \(\theta\), the parameters, that makes that likelihood as large as it can be; this would be the maximum likelihood estimate of the parameter(s) \(\theta\).  So in the expression above, \(\hat{L}\) is the value of the likelihood when evaluated with the paramenters that make that likelihood as large as possible, i.e., at the value(s) that make the data as likely as possible. In a regression example, this would be the value of the likelihood when the regression coefficientes (and the intercept) take the values estimated by your regression software.
+
+What is AIC computing then? The log of the likelihood penalized by the number of parameters. In other words, AIC is showing the trade-off between good fit (to the current data) and number of parameters: models with many parameters might be able to adjust the data better (i.e., have larger likelihood), but slight increases in likelihood might not justify some of those parameters. So AIC says something like ``larger likelihood is good, but do not get carried away adding too many parameters''. With too many parameters, the model might be just too complex. Too complex for what? Not for the present data (the likelihood increased), but too complex for making good predictions in other data sets. Too many parameters increase the risk of \textbf{overfitting}.
+
+
+These are three key features of AIC:
+
+\begin{enumerate}
+\item AIC (under certain assumptions) is an unbiased estimate of the predictive accuracy of the model: the expected likelihood of the model when applied to new data (see Figure \ref{aic-otsuka}, from Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations}.).
+\item AIC measures (again, under certain assumptions) how close to the true values are the predictions of the model\footnote{Here, ``how close'' is evaluated using the Kullback-Leibler divergence, a measure of distance between probability distributions.}.
+\item AIC is equivalent to leave-one-out cross-validation for (many) linear models (including linear regression and mixed-effects).
+\end{enumerate}
+
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.40\paperwidth,keepaspectratio]{aic-otsuka.png}
+    \caption{\label{aic-otsuka} AIC as estimate of expected likelihood.  From J.\ Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations.}, Routledge, Figure 4.2, p.~116.}
+  \end{center}
+\end{figure}
+
+
+The importance of the above three results is huge.
+
+
+Now, suppose we have a bunch of models, and we measure the AIC of each. Model selection via AIC will tells us to prefer the model with the largest AIC. (Note: largest if we define AIC as above; we should prefer the model with the smallest AIC if we define AIC as
+$AIC = -2 \ln(\hat{L}) + 2\ k$).
+
+The key idea is that AIC allows us to select models so as to keep the model that has (among the ones we consider) the best predictive performance in future samples.
+
+
+Before we continue, it is crucial that we understand that:
+
+\begin{enumerate}
+\item  The model thus selected (i.e., the model with the best AIC) need not be the model that has ``all and every parameter that really affects the outcome'': ``smaller models'', models that do not include some parameters, might actually work better. Make sure you understand this.
+
+  To repeat: for a given sample size, the best model according to AIC might tell you NOT to include a variable that really has an effect (that is ``significant''). Not all variables that ``really have an effect''  necessarily improve predictive performance; similarly, if the relationship is really slightly quadratic, adding the parameter for the quadratic term not necessarily improves the predictive performance. Yes, this means that ``true models'' (in terms of variables, parameters, etc) are not necessarily the best models for predictive performance, and simpler models are often better. Can you think of a reason why this could be the case? (Hint: you need to estimate the model from data.)
+
+
+\item The size (the number of parameters) of the selected model depends on the sample size: with larger samples sizes, we can often afford to fit larger models, and thus with larger sample sizes AIC will often select larger models. (Larger can mean ``more variables'' or ``more parameters'' if we include, say, non-linear relationships, etc).
+
+\end{enumerate}
+
+
+A great, book-length, treatment of AIC is Burnham and Anderson, 2002, \textit{Model Selection and Multimodel Inference: A practical information-theoretic approach,  2nd ed.}, Springer-Verlag.
+
+A conceptual discussion of AIC and its philosophical implications is given in pp.~109--124 of Otsuka, 2023, \textit{Thinking about statistics. The philosophical foundations}, Routledge.
+
+There are other criteria related to AIC. For example, for small sample sizes we might want to use \texttt{AIC\_c}; other criteria such as BIC seem very similar, though they have different objectives; etc. We will not get into further details here.
+
+
+
+\subsubsection{Model selection using AIC: an example}
+
+The actual data set used here is discussed,
 also in the context of variable selection, by P.\ Dalgaard in chapter 11 of
 ``Introductory statistics with R''.
 
@@ -6339,8 +6582,11 @@ initial and final models is always a necessity.
 
 Let's give some examples (look at them carefully, and compare with what we
 did by hand, and with whether or not these are the models you would
-use). We are using AIC ($AIC = -2 \log(\hat{L}) + 2\ k$, where $k$ is the
-number of parameters, so we want to minimize AIC):
+use).
+
+
+We will use the \texttt{step} function. As is customary, we are defining $AIC = -2 \log(\hat{L}) + 2\ k$, so we want to minimize AIC. % And before we get going, yes, you can do this from the R Commander menus.
+
 
 <<>>=
 step(mcyst2, direction = "both")
@@ -6363,12 +6609,12 @@ step(longev_b_r, direction = "both")
   using \Rfunction{anova} (and hypothesis testing using \Rfunction{Anova})}\label{aic-f-tests}
 
 
-The major difference is that when we compare models using \Rfunction{anova}, or
-examine each of the terms in a fitted model with, say, \Rfunction{Anova}, we are
-conducting statistical hypothesis testing. In contrast, the AIC criterion is not
+The \textbf{major difference} is that when we compare models using \Rfunction{anova}, or
+examine each of the terms in a fitted model with, say, \textbf{\Rfunction{Anova}, we are
+conducting statistical hypothesis testing}\footnote{The hypotheses tests we conduct with Anova are, in fact, comparisons of models, where we test the null hypothesis that the smaller model is good enough.}. In contrast, the AIC criterion is not
 used to conduct hypothesis testing, but is a criterion related to predictive
-performance; so when we carry out model selection using AIC we are trying to find
-the best model where ``best'' is ``best from the point of view of prediction''.
+performance; so when we carry out \textbf{model selection using AIC we are trying to find
+the best model where ``best'' is ``best from the point of view of prediction''}.
 
 A second difference is that when we use \Rfunction{anova} and \Rfunction{Anova}
 to compare models or assess the significance of different variables, we generally
@@ -6407,6 +6653,13 @@ need for \Rfunction{step}. And, similarly, with thousands of possible variables,
 running thousands of manually run model tests would not make sense if you are
 trying to build a good predictive model; use a procedure that will try to find
 the best model from the prediction point of view.
+
+\subsection{Model selection or model averaging?}
+\label{sec:model-selection-or}
+
+To finish this section: why select one single model? If we are interested in prediction, it could make a lot more sense to obtain predictions from several models, and weight those predictions using AIC weights. This is discussed at length in the Burnham and Anderson book mentioned above (and in many other places).
+
+
 
 
 
@@ -6693,10 +6946,12 @@ years. Some recommended readings, in approximate order of increasing difficulty
 
 \section{Dealing with ratios}\label{ratios}
 
+We will only cover this in class if we have time. But many of you deal with this issue, so you might want to read it anyway \smiley{} .
+
 %% FIXME:
-\red{FIXME: might want to add too examples like the one on pp.\ 364 and ff in
-Morgan and Winship ``Counterfactuals and causal inference'' (but for a RCD
-experiment on treatment assignment)}
+% \red{FIXME: might want to add too examples like the one on pp.\ 364 and ff in
+% Morgan and Winship ``Counterfactuals and causal inference'' (but for a RCD
+% experiment on treatment assignment)}
 
 In biology (as well as in other disciplines) it is common for researchers
 to use ratios of variables to try to standardize/normalize a
@@ -6830,7 +7085,7 @@ If you look closely, the data show warning signals, such as possible
 differences in variances of ratios. And if you have no idea about the
 model, you might be able to compare several and use diagnostics, as
 explained in section \nameref{diagnostics} to choose among models. But, in
-general, ratios are not the way to. And using diagnostics might require a
+general, ratios are not the way to analyze the data. And using diagnostics might require a
 decently large sample size. Summary: only use ratios if you really know
 what you are doing and have good reasons to do it. Otherwise, use linear
 models.
@@ -7220,10 +7475,6 @@ understanding of what the numbers mean, but then for real you'll do this
 with a computer.
 
 
-\subsection{Three way anovas, factors with more than two classes, etc}
-There is nothing conceptually new, but the accounting gets more complicated.
-
-
 \section{A two-way ANOVA with interaction: SS, coefficients}\label{two-way-by-hand}
 
 Here are some details about the sums of squares of the interaction term or a two-way Anova with interactions. This section is not required material.
@@ -7346,7 +7597,7 @@ In our case we have
 Why did we have an estimate of the coefficient of interaction of 3 (or -3, depending on the reference) and yet the SS is $3 * 4 * (0.75)^2$?
 
 
-When we compute the sums of squares for interaction we first fit a model with an overall (or common) mean, and rows and columns effects and then estimate the deviations of all cells from it to fund the sums of squares. In other words, the deviations that are squared and then summed are the deviations of all the observed cell means from a model with a common mean (the overall mean) and rows and columns effects (the marginal means) that combine additively. We are computing the variation due to interaction, the variation in cell means that deviates from the additive model.  In our case, when we computed the SS each of those cell deviations terms were $0.75$ or $-0.75$.
+When we compute the sums of squares for interaction we first fit a model with an overall (or common) mean, and rows and columns effects and then estimate the deviations of all cells from it to find the sums of squares. In other words, the deviations that are squared and then summed are the deviations of all the observed cell means from a model with a common mean (the overall mean) and rows and columns effects (the marginal means) that combine additively. We are computing the variation due to interaction, the variation in cell means that deviates from the additive model.  In our case, when we computed the SS each of those cell deviations terms were $0.75$ or $-0.75$.
 
 
 When we computed the coefficient of the interaction, say \texttt{Aa1:Bb2} we subtracted the mean of one cell (e.g., bottom right) from the sum of another cell (top left) as reference and the other two (bottom left and top right) as the ones that dictate the effect. So the reference and the other two cells were modelled perfectly, and all the deviation was placed in the remaining cell.
@@ -7360,6 +7611,7 @@ Note that the estimate of the coefficient $3$ or $-3$ can change if we use the f
 
 
 Finally, note that the estimate of the interaction, e.g., \texttt{Aa2:Bb2} is -3, but it has an standard error estimate. The \textit{t-statistic} is -2.598. And its square is \ldots 6.75, exactly the same as the F statistic for the interaction, as we have 1 degree of freedom.
+
 
 
 
