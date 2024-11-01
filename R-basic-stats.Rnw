@@ -1899,7 +1899,7 @@ wilcox.test(diff.nc.c)
 % rank test directly from the menu.
 
 
-Before we move on: what is the role of symmetry in the paired t-test? To try to make progress thinking about this, remember that the paired t-test is the same as testing the mean of the within-individual differences against a pre-specified mean. Go to Appendix, section \ref{sym-paired-t} for an example.
+Before we move on: what is the role of symmetry in the paired t-test? To try to make progress thinking about this, remember that the paired t-test is the same as testing the mean of the within-individual differences against a pre-specified mean. Go to  section \nameref{sym-paired-t}, \ref{sym-paired-t} for an example.
 
 
 
