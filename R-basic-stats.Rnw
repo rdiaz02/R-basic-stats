@@ -1995,7 +1995,7 @@ does require interval data. This is left as a simple exercise.
 
 \subsection{Multiple measures per  subject}
 Paired data are non-independent: they are associated via the subject, or
-id. There are other forms of non-dependency. Many. We will now look at the
+id. There are other forms of dependency. Many. We will now look at the
 most common one: multiple measures per subject.
 
 <<create_brca, echo=FALSE, results='hide'>>=
@@ -2032,7 +2032,7 @@ rm(dbrca)
 
 
 <<echo=FALSE, results = 'hide'>>=
-dbrca <- read.table("BRCA2.txt", header = TRUE)
+dbrca <- read.table("BRCA2.txt", header = TRUE, stringsAsFactors = TRUE)
 @
 
 
@@ -2075,6 +2075,7 @@ is a double check that each subject is in one, and only one, of the
 groups. Call this data ``aggbrca''.
 
 <<>>=
+
 aggbrca <- aggregate(dbrca[,c("brca2"), drop = FALSE],
                      by = list(cond = dbrca$cond,
                          id = dbrca$id), FUN = mean)
