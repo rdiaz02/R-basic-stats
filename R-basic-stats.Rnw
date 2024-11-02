@@ -2360,7 +2360,7 @@ or a two-samples Wilcoxon test.
 
 
 
-\subsection{Symmetry and the paired t-test}\label{sym-paired-t}
+\section{Symmetry and the paired t-test}\label{sym-paired-t}
 
 In the paired t-test symmetry of the within-subject differences is important. This we know, because the paired t-test is just a one-sample t-test applied to within subject differences (and the usual assumptions of the one-sample t-test apply, one of them being that the data have an approximately symmetrical distribution).
 
