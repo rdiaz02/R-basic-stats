@@ -64,7 +64,7 @@
 \usepackage[authoryear, round, sort]{natbib}
 %% \usepackage[square,numbers,sort&compress]{natbib}
 
-\usepackage{gitinfo}
+\usepackage{gitinfo2}
 
 
 \setlength{\parskip}{0.35em}
@@ -83,10 +83,31 @@ opts_knit$set(stop_on_error = 2L)
 ##listings-knitr-html%%render_listings()
 @
 
+% % %% Tryng to get lines to respect width in output
+% % https://tex.stackexchange.com/questions/488075/class-tufte-book-and-r-listings-code-box-width-problem
+% \usepackage{listings}
+% \lstset{language = R,
+%   frame = single,
+%   breaklines=true
+% }
+% \def\Rcolor{\color{black}}
+% \def\Routcolor{\color{black}}
+% \def\Rcommentcolor{\color{red}}
+% \def\Rbackground{\color[rgb]{0.992, 0.965, 0.894}}
+% \def\Routbackground{\color[rgb]{0.894, 0.965, 0.992}}
+% % \definecolor{lightYellow}{rgb}{0.992, 0.965, 0.894}
+% % \sethlcolor{lightYellow}
+% \lstdefinestyle{Routstyle}{%
+%   language=R,%
+%   basicstyle={\Routcolor\Sweavesize\ttfamily},
+%   backgroundcolor=\Routbackground,%
+% }
 <<rcmdrsetup,echo=FALSE,results='hide',message=FALSE>>=
 suppressMessages(library(Rcmdr, quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library(RcmdrPlugin.HH, quietly = TRUE, warn.conflicts = FALSE))
 suppressMessages(library(RcmdrPlugin.KMggplot2, quietly = TRUE, warn.conflicts = FALSE))
+options(width = 60)
+
 
 @
 
@@ -101,8 +122,17 @@ suppressMessages(library(RcmdrPlugin.KMggplot2, quietly = TRUE, warn.conflicts =
 % @
 
 
+% Trying to get output to not go beyond widht. Does not work.
+% \usepackage{fvextra}
+% \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
 
 \begin{document}
+
+% %% Listings: trying to get R output within the page
+% \lstset{
+%   breaklines=true,
+%   basicstyle=\ttfamily
+% }
 
 % \bioctytle
 \title{Confidence intervals and p-values in the two-sample t-test: some examples}
@@ -140,9 +170,9 @@ International License:
 
 
 All the original files for the document are available (again, under a Creative
-Commons license) from \Burl{https://github.com/rdiaz02/BM-1}. (Note that in the
+Commons license) from \Burl{https://github.com/rdiaz02/R-basic-stats}. (Note that in the
 github repo you will not see the PDF, or R files, nor many of the data files,
-since those are derived from the Rnw file). This file is called \texttt{covars-interpr-causal.Rnw}.
+since those are derived from the Rnw file). This file is called \texttt{CI-p-value-examples.Rnw}.
 
 \vspace*{10pt}
 
@@ -164,20 +194,21 @@ Please, \textbf{respect the copyright and license}. This material is
 Clarify the relationship between confidence intervals and p-values, using examples from the two-sample t-test.
 
 
-First, we read the data as in Lesson 2:
+First, we read the data as we did in the main notes:
 
 <<>>=
-dp53 <- read.table("P53.txt", header = TRUE, stringsAsFactors = TRUE)
+dp53 <- read.table("P53.txt", header = TRUE,
+                   stringsAsFactors = TRUE)
 @
 
 
 Now, we do the same two-sample t-test we did there. Because I will reuse some output, I will store the object.
 
-<<>>=
+<<firstt>>=
 (tt1 <- t.test(p53 ~ cond, data = dp53))
 @
 
-Before doing some numerical explorations, let us plot the t-distribution. You can do this easily from R Commander, using ``Distributions -> Continuous distributions -> t distribution'' or the KMggplot2 menu: ``KMggplot2 -> plot distribution -> t distribution''. I will use something like the first route, but modify it because I want to add some lines for what comes next. I will draw a t distribution with 17.402 degrees of freedom, the same degrees of freedom as in our test above\footnote{It might have been simpler to use the ``non-Welch'' test, the one that assumes variances are the same, so as to not to have to use non-integer degrees of freedom. But our original example uses Welch, so we will stick to that.}.
+Before doing some numerical explorations, let us plot the t-distribution. You can do this in several different ways from R. I will use function \texttt{plotDistr} from package \texttt{RcmdrMisc}. I will draw a t distribution with 17.402 degrees of freedom, the same degrees of freedom as in our test above\footnote{It might have been simpler to use the ``non-Welch'' test, the one that assumes variances are the same, so as to not to have to use non-integer degrees of freedom. But our original example uses Welch, so we will stick to that.}.
 
 
 
@@ -189,10 +220,13 @@ q001 <- qt(p = 0.0005, df = 17.402)
 
 
 <<tdist>>=
+library(RcmdrMisc)
 .x <- seq(-4.1, 4.1, length.out=1000)
 
-plotDistr(.x, dt(.x, df=17.402), cdf=FALSE, xlab="x", ylab="Density",
-          main=paste("t Distribution:  Degrees of freedom=17.402"))
+plotDistr(.x, dt(.x, df=17.402), cdf=FALSE, xlab="x",
+          ylab = "Density",
+          main = paste(c("t Distribution.",
+                         "Degrees of freedom = 17.402")))
 abline(v = -2.34019, lty = 2)
 abline(v = 2.34019, lty = 2)
 
@@ -216,31 +250,33 @@ legend(x = -1, y = 0.15,
        lty = c(2, 5, 3, 4),
        col = c("black", "orange", "blue", "red"))
 
+rm(.x)
 @
 
 The figure shows lines that delimit four regions:
 
 \begin{itemize}
 
-\item \textbf{0.10}: the blue lines denote rejection regions for tests at the \(\alpha = 0.10\): the area to right of the right blue line + the area to the left of the left blue line adds to 0.10. So any value of the t-statistic larger than 1.74, or smaller than -1.74 will lead to rejection at \(\alpha = 0.10\).  A test with a test statistic of exactly 1.74 will have a p-value of exactly 0.10.
+\item \textbf{0.10}: the blue lines denote rejection regions for tests at the \(\alpha = 0.10\): the area to right of the right blue line + the area to the left of the left blue line adds to 0.10. So any value of the t-statistic larger than 1.74 or smaller than -1.74 will lead to rejection at \(\alpha = 0.10\).  A test with a test statistic of exactly 1.74 will have a p-value of exactly 0.10.
 
 
-\item \textbf{0.05}: the blue lines denote rejection regions for tests at the \(\alpha = 0.05\): the area to right of the right blue line + the area to the left of the left blue line adds to 0.05. So any value of the t-statistic larger than 2.11, or smaller than -2.11 will lead to rejection at \(\alpha = 0.05\).  A test with a test statistic of exactly 2.11 will have a p-value of exactly 0.05.
+\item \textbf{0.05}: the blue lines denote rejection regions for tests at the \(\alpha = 0.05\): the area to right of the right blue line + the area to the left of the left blue line adds to 0.05. So any value of the t-statistic larger than 2.11 or smaller than -2.11 will lead to rejection at \(\alpha = 0.05\).  A test with a test statistic of exactly 2.11 will have a p-value of exactly 0.05.
 
 
-\item \textbf{0.0342}. This is ``our test''.  The black lines denote rejection regions for tests at the \(\alpha = 0.0342\): the area to right of the right black line + the area to the left of the left black line add to 0.0342. So any value of the t-statistic larger than 2.34, or smaller than -2.34 (hey! our test statistic) will lead to rejection at \(\alpha = 0.0342\).  A test with a test statistic of exactly -2.34 will have a p-value of exactly 0.0342; just like our test.
+\item \textbf{0.0342}. This is ``our test''.  The black lines denote rejection regions for tests at the \(\alpha = 0.0342\): the area to right of the right black line + the area to the left of the left black line add to 0.0342. So any value of the t-statistic larger than 2.34 or smaller than -2.34 (hey! our test statistic) will lead to rejection at \(\alpha = 0.0342\).  A test with a test statistic of exactly -2.34 will have a p-value of exactly 0.0342; just like our test.
 
 
 \item \textbf{0.001}. The red line. At test with a test statistic of exactly 3.95 will have a p-value of 0.001.
 
 \end{itemize}
 
-Now, I am going to get confidence intervals. I am going to use a  brute-force approach: I am going to run t-tests with our data, and modify the argument that asks for the size of the confidence interval (yes, you can modify this via R Commander). There are other ways to get confidence intervals, but I want to use output/methods that are familiar to us.
+Now, I am going to get confidence intervals. I am going to use a  brute-force approach: I am going to run t-tests with our data, and modify the argument that asks for the size of the confidence interval. % (yes, you can modify this via R Commander)
+There are other ways to get confidence intervals, but I want to use output/methods that are familiar to us.
 
 
 First, I will use a confidence region of exactly 1 - p.value, the p-value we actually get from the t-test. (I specify the confidence level by passing the value of the p.value, instead of typing it).
 
-<<>>=
+<<out.width = '\\textwidth'>>=
 t.test(p53 ~ cond, data = dp53, conf.level = 1 - tt1$p.value)
 @
 Notice that right limit of the confidence interval is basically 0.
@@ -273,7 +309,7 @@ Now, please take a piece of paper and draw a figure like this:
  \end{center}
  \end{figure}
 
-As it says: fill up the question marks.
+As it says: fill up the question marks. \textbf{Really, do it NOW.}
 
 
 \end{document}

@@ -588,6 +588,10 @@ understand this!!!
 
 In class we will very briefly cover how the confidence interval is constructed. In this case, it involves kind of turning around the logic of the p-value.
 
+Please, read \textbf{now} and do the exercise in \externalf
+  \myhref{CI-p-value-examples.pdf}.
+
+
 
 
 \subsection{Assumptions of the t-test}
@@ -822,10 +826,11 @@ We will quickly review the following issues (please, make sure to look at your i
 
 \section{Confidence intervals and p-values: a longer discussion}
 
-\externalf Make sure  to look at the notes you took for the file
+In class we will go over \externalf the file
   \myhref{confidence-intervals-p-values-interpretation.pdf}.
 
-
+You probably want to review the notes you took for \externalf
+  \myhref{CI-p-value-examples.pdf}.
 
 
 
