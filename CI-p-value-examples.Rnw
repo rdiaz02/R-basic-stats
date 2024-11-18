@@ -103,12 +103,10 @@ opts_knit$set(stop_on_error = 2L)
 %   backgroundcolor=\Routbackground,%
 % }
 <<rcmdrsetup,echo=FALSE,results='hide',message=FALSE>>=
-suppressMessages(library(Rcmdr, quietly = TRUE, warn.conflicts = FALSE))
-suppressMessages(library(RcmdrPlugin.HH, quietly = TRUE, warn.conflicts = FALSE))
-suppressMessages(library(RcmdrPlugin.KMggplot2, quietly = TRUE, warn.conflicts = FALSE))
+## suppressMessages(library(Rcmdr, quietly = TRUE, warn.conflicts = FALSE))
+## suppressMessages(library(RcmdrPlugin.HH, quietly = TRUE, warn.conflicts = FALSE))
+## suppressMessages(library(RcmdrPlugin.KMggplot2, quietly = TRUE, warn.conflicts = FALSE))
 options(width = 60)
-
-
 @
 
 % %% BiocStyle needs to be 1.2.0 or above
