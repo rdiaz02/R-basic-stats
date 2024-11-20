@@ -11,7 +11,9 @@ clt1 <- function(n_pop, n_mean,  FUN, ...) {
     means <- unlist(mclapply(seq.int(n_mean),
                              function(u) mean(FUN(n_pop, ...)),
                              mc.cores = cores))
+    ## FIXME: eh? and I do not reset op?
     op <- par(mfrow = c(2, 1))
+    ## FIXME: do not hard-code breaks
     hist(means, breaks = 50)
     abline(v = mean(means))
     qqnorm(means, pch = ".")
