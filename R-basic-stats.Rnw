@@ -1846,6 +1846,24 @@ stripchart(c(x, y) ~ c(rep("x", 10000), rep("y", 10000)), vertical = TRUE,
 @
 
 
+This is a very similar case
+<<>>=
+x <- rep(c(-2, -1, 1, 2), 1000)
+y <- rep(c(-4, -2, 2, 4), 1000)
+wilcox.test(x, y)
+
+## Oh, you say you dislike the many identical values?
+x <- x + rnorm(1000, 0, sd = 0.001)
+y <- y + rnorm(1000, 0, sd = 0.002)
+## No identical values
+length(unique(c(x, y)))
+wilcox.test(x, y)
+summary(x)
+summary(y)
+@
+
+
+
 What is the Wilcoxon test testing? As the Wikipedia entry says ``the null hypothesis that, for randomly selected values X and Y from two populations, the probability of X being greater than Y is equal to the probability of Y being greater than X.''
 
 
