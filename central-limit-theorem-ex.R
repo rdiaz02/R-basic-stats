@@ -144,7 +144,7 @@ tdt1(10, 10000, 10, rpois, 10)
 ## get range from the min and max of the random numbers
 
 
-
+### Initial attempts
 ## this will not work
 clt2 <- function(n_mean, n_pop, FUN, ...) {
   means <- replicate(n_mean, mean(FUN(n_pop, ...)))
