@@ -391,6 +391,7 @@ Now, think about what these plots tell you:
   expression between the cancer and non-cancer patients?
 
 \item Are density plots reasonable in these cases?
+\item Look closely at the violin plots; what are the units of the width of the plot? Are you to add the widths if you were to think of a histogram/desntiy plot?
 
 \end{enumerate}
 
@@ -499,7 +500,7 @@ t.test(p53 ~ cond, data = dp53)
 
 \begin{itemize}
 \item What is this test for?
-\item Do you remember what the formula for the t-statistic look like? And
+\item Do you remember what the formula for the t-statistic looks like? And
   why should this matter?
 \item What are the options given?
   \begin{itemize}
@@ -528,11 +529,10 @@ A few ideas that should be clear after this section:
   \item That (most of the time) we use samples to make inferences about populations
 \item What a statistic is; estimators (for example, the sample mean is an
   estimator) are a type of statistic \footnote{Briefly: a statistic is
-    number that can be computed from a sample. An estimator is a function
+    number that can be computed from a sample (without having to use unknown parameters). An estimator is a function
     used to calculate, or estimate, a quantity of a probability
-    distribution. The sample mean, with the function $\sum x/N$, is a
-    function of the data and is used to estimate the true mean of a
-    distribution using the data from a given sample.}
+    distribution. The sample mean, with the function $\sum x/N$, is a  function of the data and is used to estimate the true mean of a
+    distribution using the data from a given sample. Thus, all estimators are statistics (or: estimator = statistic + specified target parameter), whereas not all statistics are necessarily estimators, in the sense that we don't use them to estimate a particular parameter; for example, we often use the t-statistic, as we will do in this class, as a statistic for testing, without mapping it to the parameter of anything ---though it could be, as the non-centrality parameter of a t-distribution}.
 \item What a t-statistic is (a t-statistic is a test statistic used in
   hypothesis testing; a test statistic is a statistic used in hypothesis
   testing).
@@ -562,7 +562,7 @@ though, is material you have surely been taught before  \smiley{} .  So if any o
 These ideas should be clear:
 \begin{itemize}
 \item We do not ``confirm the null hypothesis'': we fail to reject (and failing
-  to reject can be something trivial to achieve)
+  to reject can be something trivial to achieve ---carry out your  experiment with as tiny a sample size as possible)
 \item The p-value is not the probability of the null hypothesis
 \item The p-value is not the probability of the alternative hypothesis
 \item The p-value can be used as a measure of strength of evidence
@@ -667,12 +667,12 @@ When comparing means between two groups, A and B, we can think of three scenario
 \end{enumerate}
 
 
-The first scenario, the most common one, is called a two-tailed test. We look (and sum) both tails of the distribution. Deviations from \(H_0\) in both directions (A being larger than B, and A being smaller than B) count against the null.
+The first scenario, the most common one, is called a two-tailed test. We sum both tails of the distribution. Deviations from \(H_0\) in both directions (A being larger than B, and A being smaller than B) count against the null.
 
 Now, suppose you find \(\bar{X}_A > \bar{X}_B\) (i.e., the sample mean of group A is larger than the sample mean of group B). You do a two-tailed t-test and find a t-statistic \(t_1\) with a p-value of 0.06. This means that the area under the curve that is larger than \(t_1\) is 0.03, and the area under the curve that is smaller than \(-t_1\) is 0.03. \red{Make sure you understand this!!! Draw a picture of the t-distribution right now and place, in that figure, \(t_1\)! }
 
 
-(In a culture of p-value worshiping) it could be tempting to reason as follows: ``I got a barely significant p-value. Hummmm... But ... hey, let us do this. I will write that my \(H_0\) is \(\mu_A \le \mu_B\). The p-value will then be 0.03''. Well, this is both \textbf{a technical mistake and a case of scientific misconduct}: you have changed your original question just to achieve a smaller p-value. That renders the p-value meaningless.
+(In a culture of p-value worshiping) it could be tempting to reason as follows: ``I got a barely significant p-value. Hummmm... But ... hey, let us do this. I will write that my \(H_0\) is \(\mu_A \le \mu_B\). The p-value will then be 0.03''. Well, this is both \textbf{a technical mistake and a case of scientific misconduct}: you have changed your original question just to achieve a smaller p-value. And this also  renders the p-value meaningless.
 
 Now, what about this case? My true, original \(H_0: \mu_A \ge \mu_B\). The p-value will be \(1 - 0.03 = 0.97\). And you can think: ``Had I done a two-tailed test, I'd have a p-value of 0.06. Now I have one of 0.97!''.
 
@@ -836,6 +836,7 @@ Here is a interesting and recent example where the winner's curse can be
 
     Oh, and the winner's curse is something that \textbf{can affect you too}; in other words, the winner's curse is not something that only happens to other researchers \smiley{}.
 
+    Final note when we conduct many hypotheses tests (as in screening): using control of multiple testing (that we will see later) \textbf{does not} minimize or prevent the winner's curse. Actually, the opposite.
 
 \section{(Bio)equivalence testing and turning things around}\label{bioequiv}
 We have set things up so that we \textbf{need strong enough evidence to reject the null} and we \textbf{use p-values of measures of strength of evidence AGAINST the null}. This is often what we want in science (why? think about how many papers with claims that are trivially generated under the null you want to read). But not always. And in many cases, in particular in issues related to public health, we might want to follow a precautionary principle (\Burl{https://en.wikipedia.org/wiki/Precautionary_principle}).
