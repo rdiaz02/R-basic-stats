@@ -836,7 +836,7 @@ Here is a interesting and recent example where the winner's curse can be
 
     Oh, and the winner's curse is something that \textbf{can affect you too}; in other words, the winner's curse is not something that only happens to other researchers \smiley{}.
 
-    Final note when we conduct many hypotheses tests (as in screening): using control of multiple testing (that we will see later) \textbf{does not} minimize or prevent the winner's curse. Actually, the opposite.
+    Final note when we conduct many hypotheses tests (as in screening): using control of multiple testing (that we will see later) \textbf{does not} minimize or prevent the winner's curse (the winner's curse problem gets worse when we conduct many hypotheses tests).
 
 \section{(Bio)equivalence testing and turning things around}\label{bioequiv}
 We have set things up so that we \textbf{need strong enough evidence to reject the null} and we \textbf{use p-values of measures of strength of evidence AGAINST the null}. This is often what we want in science (why? think about how many papers with claims that are trivially generated under the null you want to read). But not always. And in many cases, in particular in issues related to public health, we might want to follow a precautionary principle (\Burl{https://en.wikipedia.org/wiki/Precautionary_principle}).
