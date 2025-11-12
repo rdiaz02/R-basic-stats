@@ -528,11 +528,11 @@ A few ideas that should be clear after this section:
 \item The difference between a sample and a population
   \item That (most of the time) we use samples to make inferences about populations
 \item What a statistic is; estimators (for example, the sample mean is an
-  estimator) are a type of statistic \footnote{Briefly: a statistic is
+  estimator) are a type of statistic \footnote{A statistic is
     number that can be computed from a sample (without having to use unknown parameters). An estimator is a function
     used to calculate, or estimate, a quantity of a probability
     distribution. The sample mean, with the function $\sum x/N$, is a  function of the data and is used to estimate the true mean of a
-    distribution using the data from a given sample. Thus, all estimators are statistics (or: estimator = statistic + specified target parameter), whereas not all statistics are necessarily estimators, in the sense that we don't use them to estimate a particular parameter; for example, we often use the t-statistic, as we will do in this class, as a statistic for testing, without mapping it to the parameter of anything ---though it could be used to estimate the non-centrality parameter of a t-distribution, and then it would play the role of a estimator}.
+    distribution using the data from a given sample. Thus, all estimators are statistics (or: estimator = statistic + specified target parameter), whereas not all statistics are necessarily estimators, in the sense that we don't use them to estimate a particular parameter; for example, we often use the t-statistic, as we will do in this class, as a statistic for testing, without mapping it to the parameter of anything ---though it could be used to estimate the non-centrality parameter of a t-distribution, and then it would play the role of a estimator.}.
 \item What a t-statistic is (a t-statistic is a test statistic used in
   hypothesis testing; a test statistic is a statistic used in hypothesis
   testing).
