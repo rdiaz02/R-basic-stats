@@ -103,7 +103,7 @@ opts_knit$set(stop_on_error = 2L)
 
 \author{Ramon Diaz-Uriarte\\
   Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\
-  Instituto de Investigaciones Biom\'edicas ``Alberto Sols'' (UAM-CSIC)\\
+  Instituto de Investigaciones Biom\'edicas Sols-Morreale, IIBM (UAM-CSIC)\\
   Madrid, Spain{\footnote{r.diaz@uam.es, rdiaz02@gmail.com}} \\
   %% {\footnote{rdiaz02@gmail.com}} \\
   {\small \Burl{https://ligarto.org/rdiaz}} \\
@@ -129,7 +129,7 @@ opts_knit$set(stop_on_error = 2L)
 
 
 \section*{License and copyright}\label{license}
-This work is Copyright, \copyright, 2024, Ramon Diaz-Uriarte, and is
+This work is Copyright, \copyright, 2025, Ramon Diaz-Uriarte, and is
 licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
