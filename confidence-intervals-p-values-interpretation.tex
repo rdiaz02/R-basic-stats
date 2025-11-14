@@ -37,6 +37,19 @@
 
 \usepackage{gitinfo2}
 
+%% Increase spacing between items in itemize and enumerate
+\AddToHook{cmd/itemize/after}{\addtolength{\itemsep}{1.2\baselineskip}}
+\AddToHook{cmd/enumerate/after}{\addtolength{\itemsep}{1.2\baselineskip}}
+
+%% Increase nested item spacing
+\setbeamertemplate{itemize/enumerate subbody begin}{\vspace{.75\baselineskip}}
+
+%% First item
+\setbeamertemplate{itemize/enumerate body begin}{\vspace{1.0\baselineskip}}
+%% Last
+\setbeamertemplate{itemize/enumerate body end}{\vspace{1.5\baselineskip}}
+
+
 \author{Ramon Diaz-Uriarte}
 % \date{}
 %\date{2025-09-03}
@@ -46,6 +59,10 @@
   pdfkeywords={},
   pdfsubject={},
   pdfcreator={Emacs 24.4.1 (Org mode 8.2.10)}}
+
+
+
+
 \begin{document}
 
 % \maketitle
@@ -101,13 +118,13 @@
 
 \begin{frame}
   \frametitle{Look at each of the figures}
-  \begin{itemize}
+  \begin{itemize}\addtolength{\itemsep}{-1.8ex}
   \item Which one(s) will be significant (at 0.05)?
   \item Which are compatible with strong positive effects?
   \item Which ones make it sensible to try to focus on this gene as a possible
     target?
 
-    \begin{itemize}
+    \begin{itemize}\addtolength{\itemsep}{-1.8ex}
     \item what if chasing this lead is extremely expensive or risky (side effects?)?
     \item what if it is cheap?
     \end{itemize}
@@ -184,7 +201,7 @@
 \begin{frame}
   \frametitle{Taking someone to trial and presumption of innocence analogy}
   \begin{description}
-  \item[Significance and hypothesis testing] Is there enough evidence to sent this person to jail? How likely is it, if she were innocent, that we find the corpse of the victim in her living room? What about her owning a pair of scissors? But \ldots: do you want \(P(O|H)\) or \(P(H|O)\)? (O: observations, H hypothesis)?
+  \item[Significance and hypothesis testing] Is there enough evidence to send this person to jail? How likely is it, if she were innocent, that we find the corpse of the victim in her living room? What about her owning a pair of scissors? But \ldots: do you want \(P(O|H)\) or \(P(H|O)\)? (O: observations, H hypothesis)?
 %    \vspace*{15pt}
 
   \item[Estimate] But I really think she is guilty. Or ``but the evidence is most compatible with her being guilty (though we cannot show it beyond reasonable doubt)''.
@@ -201,16 +218,17 @@
 
 \begin{frame}
   \frametitle{Three different questions}
+  \vspace*{10pt}
   (Modified from Richard Royall ---though not everyone agrees this is sensible, e.g., Deborah Mayo)
 
-  \vspace*{20pt}
-  \begin{enumerate}\addtolength{\itemsep}{3.1ex}
+  \vspace*{2pt}
+  \begin{enumerate}
   \item What does the evidence say (how much evidence does this observation provide for/against the hypothesis)?
   \item What should I believe?
   \item How should I act?
   \end{enumerate}
 
-   \vspace*{20pt}
+   \vspace*{2pt}
   (In this class we focus on the first ---but we deal only with p-values and confidence intervals)
 \end{frame}
 
@@ -227,12 +245,12 @@
 
 \begin{frame}
   \frametitle{Look at each of the figures}
-  \begin{itemize}
+  \begin{itemize}\addtolength{\itemsep}{-1.8ex}
   \item Which one(s) will be significant?
   \item Which are compatible with strong positive effects?
   \item Which ones make it sensible to try to focus on this gene as a possible
     target?
-    \begin{itemize}
+    \begin{itemize}\addtolength{\itemsep}{-1.8ex}
     \item what if chasing this lead is extremely expensive or risky (side effects?)?
     \item what if it is cheap?
     \end{itemize}
@@ -283,7 +301,7 @@ al., 2021, \Burl{https://www.medrxiv.org/content/10.1101/2020.09.29.20203869v4.f
 \begin{frame}
   \frametitle{References}
 
-  \begin{itemize}
+  \begin{itemize}\addtolength{\itemsep}{-1.8ex}
 {\scriptsize
 \item Wasserstein, R. L., Schirm, A. L., \& Lazar, N. A. (2019). Moving to a World Beyond p < 0.05. \textit{The American Statistician}, 73(sup1), 1-19. \Burl{https://doi.org/10.1080/00031305.2019.1583913}
 
