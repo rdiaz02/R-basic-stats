@@ -2710,7 +2710,9 @@ faith). So, often, we will want to explicitly ask ``Which means are different'',
 and that is what we do next.
 
 
-
+%% FIXME: reorganize this material. Follow more the structure in
+%% https://people.math.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html
+%% So maybe FDR vs FWER first, and then the rest. Or not. But as of now this is slightly disorganized.
 
 \subsection{So which means are different? Multiple comparisons}
 \label{multcomp1}
@@ -2877,6 +2879,7 @@ interval around it. The plot title says ``95\% family-wise confidence
 interval'', and that indicates that multiple testing correction has been
 used. (You might want to make that even more explicit by using a title
 such as ``95\% family-wise confidence interval using Tukey contrasts'').
+Again, notice the output says ``simultaneous'': as emphasized in Lukas Meier's ``ANOVA and Mixed Models'' (2025, CRC Press; HTML from \Burl{https://people.math.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html\#sec-tukey-hsd}), ``these confidence intervals are simultaneous, meaning that the probability that they all cover the corresponding true difference at the same time is 95%.''.
 
 Given how far two of the contrasts are from 0.0, it seems those are highly
 significant differences. %% Let's go to the numerical output.
@@ -3042,8 +3045,8 @@ groups. As well, we could be interested in other types of contrasts, for
 instance, that the mean of groups 2 and 3 is different from the mean of group 4,
 or comparing specific treatments against a control. Etc, etc. We will not get
 into this. A very good introduction, in addition to other references already
-mentioned, is chapter 3 of the on-line book `` ANOVA and Mixed Models: A Short
-Intro Using R '': \Burl{https://stat.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html}.
+mentioned, is chapter 3 of Meier's book `` ANOVA and Mixed Models: A Short
+Intro Using R '', 2025, CRC Press; on-line at  \Burl{https://stat.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html}.
 
 
 
@@ -3566,7 +3569,26 @@ anova(lm(y ~ f1 * f2, data = dfdf))
 ## 3 * 5
 anova(lm(y ~ f2 * f3, data = dfdf))
 
+## First, the following example
+## for two-way
+## A: 4 levels
+## B: 7 levels
+## Additive: 1 + 3 + 6 = 10 params
+## Multipl:  1 + 3 + 6 + (3 * 6) = 1 + 27 = 28: number of cells
 
+## The very first is this
+## A: 2 levels
+## B: 3 levels
+## 1 + 1 + 2 for additive
+## 1 + 1 + 2 + (1*2)
+## and do a figure and get why we need two deviations
+## use, for each cell, things like
+## mu
+## mu + alpha_2
+## mu + beta_2
+## mu + beta_3
+## mu + alpha_2 + beta_2 + deviation
+## mu + alpha_2 + beta_3 + deviation
 
 @
 
@@ -3622,7 +3644,7 @@ dcholest <- read.table("Cholesterol.txt", header = TRUE)
 Look at the output, which I comment below
 <<>>=
 ## This fits the model. Pay attention to the "*"
-cholestanova <- (lm(y ~ Diet*Drug, data=dcholest))
+cholestanova <- lm(y ~ Diet*Drug, data=dcholest)
 ## This shows the ANOVA table. Notice the "Type II"
 ## And notice we are using function Anova with capital A
 ## which is a function from the car package.
