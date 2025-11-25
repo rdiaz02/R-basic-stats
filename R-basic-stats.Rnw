@@ -3913,7 +3913,7 @@ And this, of course, affects models with two, three, \ldots
 factors. Always pay attention to what it is you are being reported (and
 beware that the defaults used by R need not the same as those used by
 SPSS, SAS, etc.)\footnote{More details about Type I and Type II Sums of Squares are
-    provided in the Appendix in \qref{ssI-to-III}, but you can skip it. This
+    provided in \qref{ssI-to-III}, but you can skip it. This
     issue is also discussed, by focusing on the key issues from an applied
     perspective, in chapter 5 of Fox and Weisberg's ``An R companion to applied
     regression, 3rd edition'' and Fox's ``Applied regression analysis and
@@ -4013,7 +4013,9 @@ B:  SS(B|A) = R(A) - R(A, B)
 AB: SS(AB|A, B) = R(A, B) - R(A, B, AB)
 \end{verbatim}
 
-We assume no significant interaction
+Again, recall we assume no significant interaction when looking at the main effects.
+
+What is \verb@ SS(A|B) @: the Sums of Squares explained by A (after accounting for B): the model with only B has its residual SS increased by SS(A|B) compared to the model with both A and B.
 
 
 \vspace*{15pt}
@@ -4047,29 +4049,52 @@ the right contrasts).
 
 And some numbers here:
 <<>>=
+## Recall this:
+## dcholest <- read.table("Cholesterol.txt", header = TRUE)
+
 m_diet <- lm(y ~ Diet, data = dcholest)
 m_drug <- lm(y ~ Drug, data = dcholest)
 m_diet_drug <- lm(y ~ Diet + Drug, data = dcholest)
+m_drug_diet <- lm(y ~ Drug + Diet, data = dcholest)
 m_int <- lm(y ~ Diet * Drug, data = dcholest)
 
+
+### Just Diet
 summary(m_diet)
 anova(m_diet)
+
+### Diet when accounting for Drug.
+anova(m_diet_drug) ## diet on its own first
+anova(m_drug_diet) ## diet after drug
+Anova(m_diet_drug) ## Our well know Type II SS.
+
+
+#### Comparing models and getting the Type II SS
+anova(m_drug, m_diet_drug)
+## SS(diet|drug) = R(m_drug) - R(m_diet_drug)
+## Of course, R(m_diet_drut) = R(m_drug_diet)
+## 167.3: RSS from model m_drug
+## 91.8 : RSS from model m_drug_diet
+## 75.5 = 167.3 - 91.8
+
+
+#### F-statistic for Diet
+## (75.45/2)/(91.81/36) = 14.79
+## (SS(diet|drug)/df added by diet)/(R(m_diet_drug)/res.df.m_diet_drug)
+
+### Could do the same with Drug after accounting for Diet
 anova(m_drug)
 anova(m_diet_drug)
 anova(m_diet, m_diet_drug)
-## 124.1: RSS from model m_diet
-## 91.8 : RSS from model m_diet_drub
-## 32.3 = 124.1 - 91.8:
 ## SS(drug|diet) = R(m_diet) - R(m_diet_drug)
-anova(m_drug, m_diet_drug)
-## SS(diet|drug) = R(m_drug) - R(m_diet_drug)
-## 75.5 = 167.3 - 91.8
-Anova(m_diet_drug)
-
-## But also the sum SS here for drug and diet
-Anova(m_int)
+## 124.1: RSS from model m_diet
+## 91.8 : RSS from model m_diet_drug
+## 32.3 = 124.1 - 91.8:
+##
 
 @
+
+But wait!!! In the example above, \textbf{recall we should not be looking at the main effects, as we know the interaction is significant!}. We did that just for the sake of showing where the numbers come from.
 
 
 % ## Finally, for Type III (SKIP this; left here to show it for completeness!!!)
