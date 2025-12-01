@@ -4833,11 +4833,7 @@ K2A <- glht(clm, mcp(Drug = "Tukey",
 confint(glht(clm, linfct = rbind(K1, K2)))
 confint(glht(clm, linfct = rbind(K1A, K2A)))
 
-## Compare with previously computed ones
-## A few change sign as we do HF - M1 instead
-## of M1 - HF
-## chol_mmc2
-## chol_mmc
+
 @
 
 We could just compare, say, Diets:
@@ -5009,9 +5005,19 @@ chol_mmc2
 
 mmcplot(chol_mmc2)
 
+chol_mmc3 <- mmc(clm,
+                 linfct = mcp(Diet = "Tukey",
+                              interaction_average= TRUE,
+                              covariate_average = TRUE))
+chol_mmc3
+
+mmcplot(chol_mmc3)
+
 ## Compare with glht:
-summary(glht(clm, linfct = rbind(K1, K2)))
-summary(glht(clm, linfct = rbind(K1A, K2A)))
+## A few change sign as we do HF - M1 instead
+## of M1 - HF
+confint(glht(clm, linfct = K1))
+confint(glht(clm, linfct = K1A))
 @
 
 
