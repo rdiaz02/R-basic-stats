@@ -4047,7 +4047,7 @@ the right contrasts).
 \vspace*{15pt}
 
 
-And some numbers here:
+And some numbers here, with an old example:
 <<>>=
 ## Recall this:
 ## dcholest <- read.table("Cholesterol.txt", header = TRUE)
@@ -4729,14 +4729,23 @@ And this, by the way, is strongly related to the ``marginality principle'' we ha
 Now you can skip sections \ref{mult-comp-2-way-no-int} and \ref{mult-comp-2-way-int} and continue to section \ref{nonparanova}.
 
 
+
+
+
+
 \subsubsection{Multiple comparisons in two-way ANOVA: example with no
   interactions}\label{mult-comp-2-way-no-int}
 
-I will show a few examples below. % Let us show confidence intervals for the
-% comparisons of all pairs of means.
-We will use function \Rfunction{mmc} from package \CRANpkg{HH} as well as
-function \Rfunction{glht} from package \CRANpkg{multcomp}. I will skip most of
-the syntax here.
+% I will show a few examples below. % Let us show confidence intervals for the
+% % comparisons of all pairs of means.
+% We will use function \Rfunction{mmc} from package \CRANpkg{HH} as well as
+% function \Rfunction{glht} from package \CRANpkg{multcomp}. I will skip most of
+% the syntax here.
+
+I will show a few examples below.
+I will use mostly function \Rfunction{glht} from package \CRANpkg{multcomp}. I will skip most of
+the syntax here. Examples using function \Rfunction{mmc} from package \CRANpkg{HH} are provided later (though the figures might need some time to be understood).
+
 
 % [We could try doing some of the stuff below with menus, but they quickly become
 % limiting, so I'll directly write R commands (that you can evaluate from R
@@ -4749,35 +4758,34 @@ the syntax here.
 For the sake of illustration, let's pretend (even when we know it is wrong!!!)
 that there is no interaction between Drug and Diet in the cholesterol data.
 
-<<>>=
-## We must make sure we are using factors with mmc
-dc2 <- dcholest
-dc2$Drug <- as.factor(dc2$Drug)
-dc2$Diet <- as.factor(dc2$Diet)
-clmA <- lm(y ~ Diet + Drug, data = dc2)
-cholA_mmc <- mmc(clmA, focus = "Diet")
-cholA_mmc
-
-mmcplot(cholA_mmc)
-@
-
 In this two-way ANOVA we might want to compare, simultaneously, the levels of
 Diet and Drug (see the documentation of \CRANpkg{multcomp} (in particular,
 \Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
 
 
-<<>>=
+<<clmAglh>>=
+## We must make sure we are using factors with mmc and
+## turning them to factors is good practice anyway
+dc2 <- dcholest
+dc2$Drug <- as.factor(dc2$Drug)
+dc2$Diet <- as.factor(dc2$Diet)
+clmA <- lm(y ~ Diet + Drug, data = dc2)
 KA1 <- glht(clmA, mcp(Diet = "Tukey"))$linfct
 KA2 <- glht(clmA, mcp(Drug = "Tukey"))$linfct
 clmA_glh <- glht(clmA, linfct = rbind(KA1, KA2))
 
 summary(clmA_glh)
-
-## Note that these are wider than the ones above, as we should expect.
 confint(clmA_glh)
-
 plot(clmA_glh)
 @
+
+We can of course only compare, say, Diet, and these are narrower, as expected:
+<<>>=
+clmD_glh <- glht(clmA, linfct = KA1)
+confint(clmD_glh)
+plot(clmD_glh)
+@
+
 
 You can also obtain the above using \Rfunction{TukeyHSD} (there are further
 comments about the differences below ---bottom line here: when sample sizes are
@@ -4803,47 +4811,27 @@ But we know there are interactions. Let us use that model to compare levels of D
 
 <<>>=
 clm <- lm(y ~ Diet*Drug, data = dc2)
-chol_mmc <- mmc(clm, focus = "Diet")
-
-chol_mmc
-mmcplot(chol_mmc)
-@
-
-What is happening with the interactions? If you read the help of \Rfunction{mmc}
-you will see it mentions options \texttt{interaction\_average} and
-\texttt{covariate\_average}.
-
-What if we set those to false? Notice the warning, and see the differences!
-
-<<>>=
-chol_mmc2 <- mmc(clm,
-                 linfct = mcp(Diet = "Tukey",
-                              `interaction_average`= FALSE,
-                              `covariate_average` = FALSE))
-chol_mmc2
-
-mmcplot(chol_mmc2)
 @
 
 
 
-Using directly \Rfunction{glht} to compare both Diets and Drugs:
+Using directly \Rfunction{glht} to compare both Diets and Drugs (and notice the warnings):
 
 <<>>=
 K1 <- glht(clm, mcp(Diet = "Tukey"))$linfct
 K2 <- glht(clm, mcp(Drug = "Tukey"))$linfct
 
-K1B <- glht(clm, mcp(Diet = "Tukey",
+K1A <- glht(clm, mcp(Diet = "Tukey",
                      interaction_average = TRUE,
                      covariate_average = TRUE))$linfct
 
-K2B <- glht(clm, mcp(Drug = "Tukey",
+K2A <- glht(clm, mcp(Drug = "Tukey",
                      interaction_average = TRUE,
                      covariate_average = TRUE))$linfct
 
 
 confint(glht(clm, linfct = rbind(K1, K2)))
-confint(glht(clm, linfct = rbind(K1B, K2B)))
+confint(glht(clm, linfct = rbind(K1A, K2A)))
 
 ## Compare with previously computed ones
 ## A few change sign as we do HF - M1 instead
@@ -4851,6 +4839,12 @@ confint(glht(clm, linfct = rbind(K1B, K2B)))
 ## chol_mmc2
 ## chol_mmc
 @
+
+We could just compare, say, Diets:
+<<gldint2>>=
+confint(glht(clm, linfct = rbind(K1A)))
+@
+
 
 
 
@@ -4895,38 +4889,12 @@ confint(glht(clm, linfct = rbind(K1B, K2B)))
 % @
 
 
+
+
 But in models with interactions, we might be interested in doing other
 things. For example, comparing the levels of Drug within levels of Diet. There
 are examples in the documentation of \CRANpkg{multcomp} (see
 \Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
-
-Or comparing, simultaneously, the levels of Diet and Drug (again, see the
-vignette):
-
-
-<<>>=
-
-K1 <- glht(clm, mcp(Diet = "Tukey"))$linfct
-K2 <- glht(clm, mcp(Drug = "Tukey"))$linfct
-
-
-K1A <- glht(clm, mcp(Diet = "Tukey",
-                     interaction_average = TRUE,
-                     covariate_average = TRUE))$linfct
-
-K2A <- glht(clm, mcp(Drug = "Tukey",
-                     interaction_average = TRUE,
-                     covariate_average = TRUE))$linfct
-
-
-summary(glht(clm, linfct = rbind(K1, K2)))
-summary(glht(clm, linfct = rbind(K1A, K2A)))
-
-## Compare with previously computed one
-chol_mmc2
-chol_mmc
-@
-
 
 Note that many of those can be obtained, too, using the \Rfunction{TukeyHSD}
 function. For example, as simple as this:
@@ -4934,27 +4902,36 @@ function. For example, as simple as this:
 ## Fit as aov
 clmaov <- aov(y ~ Diet * Drug, data = dc2)
 
-## Compare to, for example, chol_mmc
+## Compare to, for example, confint(glht(clm, linfct = rbind(K1A)))
 TukeyHSD(clmaov, which = "Diet")
 
-## We want all possible contrasts for all combinations
-TukeyHSD(clmaov, which = "Diet:Drug")
 
+## Diet and Drug. Compare to confint(glht(clm, linfct = rbind(K1A, K2A)))
+TukeyHSD(clmaov, which = c("Diet", "Drug"))
+@
+
+
+<<tukey2wayintall>>=
+## If we want all possible contrasts for all combinations
+TukeyHSD(clmaov, which = "Diet:Drug")
 ## Plot them
 ## But make sure y-axis labels are horizontal
 ## and y-axis labels fit
 op <- par(las = 1, mar = c(5, 8, 4, 4))
 plot(TukeyHSD(clmaov, which = "Diet:Drug"))
 par(op) ## return graphical parameters to previous stage
+@
 
-## Though if we only care about the contrasts
-## between all factor combinations maybe we really just want this?
+Again, notice that we have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). We might only care about all comparisons of Drug within each level of Diet, for example (see
+\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+
+
+And a minor point:
+<<tukey2wayhsd>>=
+## If we only care about the contrasts
+## this model uses a different parameterization, but is identical
+## to the one specified as Diet*Drug
 TukeyHSD(aov(y ~ Diet:Drug, data = dc2))
-
-
-## Diet and Drug. Compare to summary(glht(clm, linfct = rbind(K1A, K2A)))
-TukeyHSD(clmaov, which = c("Diet", "Drug"))
-
 @
 
 
@@ -4984,6 +4961,60 @@ flexible than the packages used above (see, for instance,
 latest edition of Fox and Weisberg's ``An R companion to applied regression''
 makes extensive use of \CRANpkg{emmeans} (to obtain confidence intervals and many
 other things).
+
+
+
+
+
+\subsubsection{Multiple comparisons in two-way ANOVA, examples using package \texttt{HH} and function \texttt{mmc}}
+
+This is provided without much comment, for the sake of giving you additional examples. Compare these examples with what we did before.
+
+First, pretending there is no interaction (compare with \texttt{clmA\_glh}, before):
+
+<<mmc1>>=
+
+cholA_mmc <- mmc(clmA, focus = "Diet")
+cholA_mmc
+
+mmcplot(cholA_mmc)
+
+## Note that these are wider than the ones for both Diet and Drug
+## with clmA_glh, above, as we should expect.
+@
+
+Now, with interactions:
+
+<<mmcint2>>=
+clm <- lm(y ~ Diet*Drug, data = dc2)
+chol_mmc <- mmc(clm, focus = "Diet")
+
+chol_mmc
+mmcplot(chol_mmc)
+@
+
+
+What is happening with the interactions? If you read the help of \Rfunction{mmc}
+you will see it mentions options \texttt{interaction\_average} and
+\texttt{covariate\_average}.
+
+What if we set those to false? Notice the warning, and see the differences!
+
+<<>>=
+chol_mmc2 <- mmc(clm,
+                 linfct = mcp(Diet = "Tukey",
+                              `interaction_average`= FALSE,
+                              `covariate_average` = FALSE))
+chol_mmc2
+
+mmcplot(chol_mmc2)
+
+## Compare with glht:
+summary(glht(clm, linfct = rbind(K1, K2)))
+summary(glht(clm, linfct = rbind(K1A, K2A)))
+@
+
+
 
 
 
