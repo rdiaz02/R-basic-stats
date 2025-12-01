@@ -4892,7 +4892,9 @@ things. For example, comparing the levels of Drug within levels of Diet. There
 are examples in the documentation of \CRANpkg{multcomp} (see
 \Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
 
-Note that many of those can be obtained, too, using the \Rfunction{TukeyHSD}
+\vspace*{15pt}
+
+Note that many of those family-wise confidence intervals can be obtained, too, using the \Rfunction{TukeyHSD}
 function. For example, as simple as this:
 <<tukey_multcomp,fig.width=7, fig.height=5,out.width = '12cm', out.height = '10cm'>>=
 ## Fit as aov
@@ -4907,6 +4909,8 @@ TukeyHSD(clmaov, which = c("Diet", "Drug"))
 @
 
 
+What if we want the comparisons for all possible combinations?
+
 <<tukey2wayintall>>=
 ## If we want all possible contrasts for all combinations
 TukeyHSD(clmaov, which = "Diet:Drug")
@@ -4918,7 +4922,7 @@ plot(TukeyHSD(clmaov, which = "Diet:Drug"))
 par(op) ## return graphical parameters to previous stage
 @
 
-Again, notice that we have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). We might only care about all comparisons of Drug within each level of Diet, for example (see
+We have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). Again, we might only care about all comparisons of Drug within each level of Diet, for example (see
 \Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
 
 
