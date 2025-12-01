@@ -3431,6 +3431,16 @@ Before we continue, however, let's do the following thought experiment. Suppose 
 \item How many coefficients will you be estimating in a model with interactions?
 \end{itemize}
 
+%% En la pizarra, do as follows:
+%% First, a 2x3 model.
+%% Write additive model, for each cell
+%% Then, the interaction. See how many more parameters we need.
+%% Precisely as many as taken by df of interaction term
+%% Then, show the difference in # params between additive and
+%% interaction in the 4x7
+
+
+
 % %% Can easily check that
 
 % <<>>=
@@ -3683,6 +3693,7 @@ The Anova table for the cholesterol data shows very strong effects of interactio
 plot(allEffects(cholestanova), ask = FALSE)
 @
 
+This is a plot of how Y changes with Diet, separately for each level of Drug.
 
 What do you see? Do you see the interaction in the plot? Basically, an interaction means that the effect of one
 variable depends on the effect of the other. In this case, even if Drug B
@@ -3707,6 +3718,8 @@ You can also see interaction plots using other functions from R. For example:
 <<out.width = '8cm', out.height = '8cm'>>=
 with(dcholest, interaction.plot(Drug, Diet, y, type = "b"))
 @
+
+The above is a plot of the ``effect''\footnote{Quoted, as effect tends to denote causal relationship, and it need not in an ANOVA.} of switching Drugs (the abscisas) for the different Diets (each of the segments with a different line type).
 
 or using the \CRANpkg{HH} package
 
@@ -3829,7 +3842,7 @@ dcholest2 <- subset(dcholest, subset = Diet != "HF")
 Now do a two-way ANOVA:
 
 <<>>=
-cholest2anova <- (lm(y ~ Diet*Drug, data = dcholest2))
+cholest2anova <- lm(y ~ Diet*Drug, data = dcholest2)
 Anova(cholest2anova)
 @
 
@@ -4614,7 +4627,7 @@ you, well, conduct multiple tests.
 In two-way and, more generally, multi-way ANOVA, computing and displaying multiple comparisons is more complicated than in one-way ANOVA. Among
 other questions you should ask yourself, probably some of the first ones are: At what levels of one variable will I be comparing the other? How does lack of balance affect the contrasts? Do I really want all possible contrasts? A good place to start reading on these issues
 is chapter 14 (and section 5.3.2) of Everitt and Hothorn's ``A handbook of
-statistical analysis using R, 2nd ed'', and then the documentation of \CRANpkg{multcomp}.
+statistical analysis using R, 2nd ed'', and then the documentation of R package \CRANpkg{multcomp}.
 
 \subsubsection{Multiple comparisons in multi-way ANOVA: main messages}
 \label{sec:mult-comp-multi}
@@ -4635,7 +4648,7 @@ Again, it is the main messages that you need to understand. You can skip section
 \item Finally, in both cases, you might want to think if carrying out comparisons
   between \textbf{all} pairs of means is what you really want to do. (Of course,
   you \textbf{must} report what you really did: carrying out comparisons between
-  all pairs and reporting only a few is incorrect, leads to biases, and is scientifically dishonest and poor practice).
+  all pairs and reporting only a few is incorrect, leads to biases, and is poor practice and constitutes scientific fraud).
 \end{itemize}
 
 
@@ -4671,8 +4684,7 @@ a2 & b2 &  2\\
 Please, draw a figure (by hand) with those means, like any of the interaction
 plots we have seen in class.  Please, \textbf{really draw that figure}. Actually,
 \textbf{draw 2 figures}: the first will have A in the X (abscissas) axis, the
-second will have B in the X axis. You will see that in both plots the lines
-clearly cross.
+second will have B in the X axis. You will see that in both plots the lines cross.
 
 
 Now, suppose we want this: "95\% confidence interval for the difference between the
@@ -4776,14 +4788,19 @@ clmA_glh <- glht(clmA, linfct = rbind(KA1, KA2))
 
 summary(clmA_glh)
 confint(clmA_glh)
+## Modify margins to fit the labels
+op <- par(mar = c(5, 6, 4, 1))
 plot(clmA_glh)
+par(op)
 @
 
 We can of course only compare, say, Diet, and these are narrower, as expected:
-<<>>=
+<<clmdglhfig>>=
 clmD_glh <- glht(clmA, linfct = KA1)
 confint(clmD_glh)
+op <- par(mar = c(5, 6, 4, 1))
 plot(clmD_glh)
+par(op)
 @
 
 
@@ -4890,7 +4907,7 @@ confint(glht(clm, linfct = rbind(K1A)))
 But in models with interactions, we might be interested in doing other
 things. For example, comparing the levels of Drug within levels of Diet. There
 are examples in the documentation of \CRANpkg{multcomp} (see
-\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+\Burl{https://cran.r-project.org/web/packages/multcomp/index.html}).
 
 \vspace*{15pt}
 
@@ -4922,9 +4939,10 @@ plot(TukeyHSD(clmaov, which = "Diet:Drug"))
 par(op) ## return graphical parameters to previous stage
 @
 
-We have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). Again, we might only care about all comparisons of Drug within each level of Diet, for example (see
-\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+We have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). Again, we might only care about all comparisons of Drug within each level of Diet, for example (see documentation of R package \CRANpkg{multcomp}).
 
+
+%% FIXME: check emmeans. Maybe simpler and cleaner?
 
 And a minor point:
 <<tukey2wayhsd>>=
@@ -5034,7 +5052,7 @@ ANOVA the Kruskal-Wallis test is popular. For two-way designs with one
 observation per cell the Friedman test and the Quade test. But testing
 interactions is not easy; one needs to use more sophisticated approaches
 as in permutation tests conditioning on permuting only within rows or
-columns, etc. Moreover, as was the case with the Wilcoxon test, nonparametric and permutation procedures might not be testing what you think they are testing, and they can be sensitive to features you are not interested in, or insensitive to what you are really interested in. These procedures, of course, are sometimes what needs to be done, but you should really understand what they are really doing and why an ANOVA will not do. We will not pursue this any further.
+columns, etc. Moreover, as was the case with the Wilcoxon test, nonparametric and permutation procedures might not be testing what you want to test, and they can be sensitive to features you are not interested in, or insensitive to what you are really interested in. These procedures, of course, are sometimes what needs to be done, but you should really understand what they are really doing and why an ANOVA will not do. We will not pursue this any further.
 
 
 \clearpage
@@ -5304,7 +5322,7 @@ Basically:
 \item Prediction interval bands are for the observations; so, in addition to the uncertainty around the regression line, we have the $\sigma$, the variance of the observations around their mean value, around $E[y]$.
 \item To clarify the above, think about this: suppose you take a huge sample, say of size 10 million, of people and do a regression of body mass on body height. You will estimate the regression line with very little uncertainty. In other words, you will be very, very certain about where $E[body\_mass]$ is given $body\_height$. But \ldots no matter your sample size, there is quite a bit of variation in body mass for a given body height. So the prediction bands will be relatively wide, to accomodate this fact.
 
-  This is, by the way, the reason why you can be very certain about an overall trend (the expected value) and yet be unable to really predict any one specific individuals actual value.  It is crucial to understand the difference between predicting the mean and predicting a specific individual's value.
+  This is, by the way, the reason why you can be very certain about an overall trend (the expected value) and yet be unable to really predict any one specific individuals actual value. (This is similar to situation where you can say, for example, that a particular intervention or factor is associated with a change in the probability of event A of 70\%, and yet that might not be a very precise forecast for any specific idividual.)  It is crucial to understand the difference between predicting the mean and predicting a specific individual's value.
 
   In contrast, if $\sigma$ is very, very, very tiny, then the prediction bands will be very, very close to the confidence interval bands.
 \end{itemize}
