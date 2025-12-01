@@ -5557,7 +5557,7 @@ length(resid(mcyst))
 
 
 
-\subsection{Interactions between continuous variables}\label{regr-int}
+\subsection{Interactions between predictor  variables in multiple regression}\label{regr-int}
 Can we add interactions? Yes, of course. Interactions between continuous
 variables, however, are harder to visualize: they represent curved
 surfaces, because the slope of one of the variable changes as the other
