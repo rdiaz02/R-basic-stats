@@ -5716,10 +5716,24 @@ Suppose you have a response variable, Y. And two predictor variables; variable A
 \item The relationship between Y and X increases faster in a1 than in a2. Thus, the regression lines for a1 and a2 are not parallel (and will eventually cross each other).
 \item The relationships between Y and X change at the same rate for a1 and a2. Thus, they are parallel lines. But individuals of group a1 with value X = x have a larger value of Y than individual of group a2 for that value of X. So, as we said, lines are parallel, but they are separate. They have different intercepts.
 \item As the previous case, but now the intercept is the same. So you only see one line.
+\item There is not relationship between Y and X, but the means differ.
 \item There is not relationship between Y and X in any of the groups. (Or, if you insisted on putting a line, it would be of slope 0).
 \end{itemize}
 
-ANCOVA is a procedure for differentiating the above scenarios, starting from the first and moving down. It also works when the discrete group has more than two levels. And, for that matter, we can deal with more than one discrete variable and more than one continuous one, etc, etc: these are just linear models. As said several times already, we will use the name ANCOVA as this might be familiar. But once you understand the process, these are just linear models that allow to flexibly model scientific problems even if they no longer fit in the simple ANCOVA framework.
+ANCOVA is a procedure for differentiating the above scenarios. It also works when the discrete group has more than two levels. And, for that matter, we can deal with more than one discrete variable and more than one continuous one, etc, etc: these are just linear models. As said several times already, we will use the name ANCOVA as this might be familiar. But once you understand the process, these are just linear models that allow to flexibly model scientific problems even if they no longer fit in the simple ANCOVA framework.
+
+To put it differently, these are the steps:
+\begin{enumerate}
+\item \verb@ Y ~ X * Z@. Look at the interaction first (as we \textbf{always do})
+\item If there is no interaction (no different slopes): fit \verb@ Y ~ X + Z@:
+  \begin{enumerate}
+  \item If X is "not-significant": we are left with \verb@ Y ~ Z @ (different means)
+  \item If Z is "not-significant": we are left with \verb@ Y ~ X @ (same slope, single intercept, so same mean conditioned on X)
+  \item Neither X nor Z are significant: single mean for Y.
+  \end{enumerate}
+\end{enumerate}
+
+(I wrote ``not-significant'': use sensible criteria, not just blindly focus on p-values).
 
 
 Oh, and if you want some specific names for variables to draw the above figures, you can do as follows:
@@ -6035,6 +6049,46 @@ anova(longev_b_r_2, longev_b_r)
 
 
 
+\subsection{Another path in the fork: different means}
+\label{sec:another-path-fork:}
+
+
+<<anco3gen,echo=FALSE, results='hide'>>=
+
+set.seed(1)
+X <- runif(n = 40, min = 5, max = 20)
+Z <- sample(c("a", "b", "c"), size = 40, replace = TRUE, prob = c(1, 1, 1))
+Y <- ifelse(Z == "a", 1, ifelse(Z == "b", 2, 3))
+Y <- Y + rnorm(40)
+anco3 <- data.frame(Y = round(Y, 2), X = round(X, 2), Z = Z)
+rm(X, Y, Z)
+write.table(file = "anco3.txt", anco3, row.names = FALSE, quote = FALSE,
+            sep = "\t")
+@
+
+
+<<anco3>>=
+anco3 <- read.table("anco3.txt", header = TRUE, sep = "\t")
+anco3$Z <- factor(anco3$Z)
+
+mfull <- lm(Y ~ X * Z, data = anco3)
+Anova(mfull)
+
+madd <- lm(Y ~ X + Z, data = anco3)
+Anova(madd)
+
+summary(madd)
+
+scatterplot(Y ~ X | Z, data = anco3, smooth = FALSE, by.groups = TRUE)
+
+## or
+
+ancova(Y ~ X * Z, data = anco3)
+@
+
+
+Note, though, that in some cases, when X is a pre-specified covariate, it might be sensible to keep it in the model regardless of p-value. This would be the case if the purpose is ``compare Z, adjusting for X''.
+
 \subsection{More examples}
 
 Section 12.7 of Dalgaard's ``Introductory statistics with R'' contains a
@@ -6044,6 +6098,10 @@ variables, using the \Robject{hellung} dataset included in \CRANpkg{ISwR}.
 
 
 \textbf{To discuss in class}: suppose you had four groups (call if Factor4) and one continuous variable (call it X). How many lines would you see in the figures? What would the ANOVA table(s) look like? (Think about rows and degress of freedom).
+
+
+
+
 
 
 
@@ -6065,7 +6123,10 @@ We can extend the models to incorporate more variables, add interactions,
 etc. Interactions can involve more than two variables, can involve
 continuous and discrete variables, etc, etc.
 
+\subsection{More paths in the fork}
+\label{sec:more-paths-fork}
 
+Of course, things can get more complicated: say there are four groups. Two of them could have the same slope, and the other two groups different slopes. Etc.
 
 \subsection{Parameters, coefficients}
 There is nothing conceptually new here. If you want the details, go to section \nameref{anovaaslm}
@@ -6074,6 +6135,10 @@ coefficients and how many parameters we have.
 
 
 
+\subsection{A complication to discuss in class}
+\label{sec:compl-disc-class}
+
+Suppose the range of X is very different between the Z groups: what if your model finds an interaction? Is this really an interaction, or is the relationship between X and Y different in different parts of the range of X?
 
 
 \section{Interactions, summary}\label{interaction-summ}
