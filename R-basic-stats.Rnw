@@ -5553,6 +5553,33 @@ length(resid(mcyst))
 
 
 
+\subsection{Variance inflation factors}
+\label{sec:vari-infl-fact}
+
+In our pemax example we saw several problems (e.g., the large standard errors in the estimated regression coefficients and the flip in signs) caused by the strong linear relationships between predictors. In the simplest cases, these can be detected by plots, as we did. But that  will not always show the source of the problem, specially when the linear relationship involves groups of variables, where pairwise plots can fail to show a clear pattern.
+
+The variance inflation factor, that we can compute with function \Rfunction{vif} (from \CRANpkg{car}) estimates ``the harm produced by collinearity'' (Fox \& Weisberg, ``An R companion to applied regresssion, 3rd ed'', section 8.8):
+
+<<vif1>>=
+vif(mcyst)
+@
+
+We can see that the standard error for age is about \(\sqrt{8} = 2.8\), so almost three times larger than it would have been without collinearity.
+
+Compare this with a very different model, where we only have age and sex:
+
+<<vif2>>=
+mcystas <- lm(pemax ~ age + sex, data = cystfibr2)
+vif(mcystas)
+@
+which is not surprising, since the data collection is fairly balanced regarding age and sex of the subjects.
+
+Variance inflation factors should be part of your standard modeling and diagnostic tools.
+
+There are no hard cutoffs. Any VIF larger than 1 indicates that, well, there is harm being doing by collinearity. Values larger than 10 are often regarded as very serious collinearity problems. But values larger than 4 already signal a problem: the standard error is twice as large as it would be without collinearity.
+
+
+For terms with multiple degrees of freedom (factors with more than two levels, polynomials, splines, etc), a modified VIF needs to be used, That is provided by the \Rfunction{vif} function in \CRANpkg{car}, too. See details in the help and in Fox \& Weisberg's book.
 
 
 
@@ -6081,8 +6108,8 @@ summary(madd)
 
 scatterplot(Y ~ X | Z, data = anco3, smooth = FALSE, by.groups = TRUE)
 
-## or
-
+## or use ancova from HH,  but note these are sequential (not Type II)
+## SS
 ancova(Y ~ X * Z, data = anco3)
 @
 
@@ -6668,7 +6695,7 @@ For you to read and play around further:
 \item Various diagnostics related to dfbetas allow us to identify
   influential observations in specific terms of the model.
 \item Variance inflation factors help us detect possible problems caused
-  by collinearity (correlations between independent variables).
+  by collinearity (correlations between independent variables). We saw them in \qref{sec:vari-infl-fact}.
 \item Added variable plots are particularly useful in multiple regression
   problems with multiple independent variables; they can help to identify
   influential points (which are easily masked with multiple variables) and
