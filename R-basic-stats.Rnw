@@ -4772,7 +4772,7 @@ that there is no interaction between Drug and Diet in the cholesterol data.
 
 In this two-way ANOVA we might want to compare, simultaneously, the levels of
 Diet and Drug (see the documentation of \CRANpkg{multcomp} (in particular,
-\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}).
+\Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}). (Ooops, that file is no longer available from the repo, though it can still be found on the internet). %% FIXME: locate it?
 
 
 <<clmAglh>>=
@@ -4908,6 +4908,11 @@ But in models with interactions, we might be interested in doing other
 things. For example, comparing the levels of Drug within levels of Diet. There
 are examples in the documentation of \CRANpkg{multcomp} (see
 \Burl{https://cran.r-project.org/web/packages/multcomp/index.html}).
+%% FIXME: multcomp-examples.pdf was great for this! no longer available
+%% see above
+% \Burl{https://cran.r-project.org/web/packages/multcomp/vignettes/multcomp-examples.pdf}). (Ooops, that file is no longer available from the repo, though it can still be found on the internet). %% FIXME: locate it?
+
+
 
 \vspace*{15pt}
 
