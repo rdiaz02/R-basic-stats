@@ -6688,10 +6688,53 @@ For you to read and play around further:
 \item An extended qqplot is available from package \CRANpkg{car},
   \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
   comparison plots'').
+
+
+<<qqPlotexample, echo=FALSE, results='hide', eval=FALSE>>=
+set.seed(1)
+sex <- factor(rep(c("Male", "Female"), c(20, 20)))
+drug <- factor(rep(rep(c("A", "B"), c(10, 10)), 2))
+y <- rep(c(8, 16, 10, 12), rep(10, 4))
+y <- y + rnorm(length(y), sd = 1.5)
+y.data1 <- data.frame(y, sex, drug)
+rm(y, sex, drug)
+with(y.data1, tapply(y, list(sex, drug), mean))
+
+## Fit the model
+myAdditive2 <- lm(y ~ sex + drug, data = y.data1)
+myInteract2 <- lm(y ~ sex * drug, data = y.data1)
+
+plot(myInteract2)
+
+## What is the qqplot on the upper left doing?
+## verify:
+par(mfrow = c(1, 2))
+plot(myInteract2, which = 2)
+qqnorm(rstandard(myInteract2))
+qqline(rstandard(myInteract2))
+
+library(car)
+qqPlot(myInteract2, reps = 2000)
+plot(myInteract2, which = 2)
+
+## Could also do
+plot(myAdditive2, which = 2)
+plot(myAdditive2b, which = 2)
+
+## But here look at the envelope for the outlier one
+qqPlot(myAdditive2, reps = 5000)
+
+## Without the offending
+qqPlot(lm(y ~ sex + drug, data = y.data2[-1, ]), reps = 5000)
+
+@
+
+
+
 \item ``Component+Residual'' (or partial residual\footnote{These plots,
     for each variable, shows a plot of the independent variable, say $x$, on the
-    horizontal axis and, on the ordinates, the ``partial residuals'' $=
-    residual + \hat{\beta}x$.}) plots allow us to
+    horizontal axis and, on the ordinates, the ``partial residuals'' which are the values of the response with the effect of all other predictors removed, i.e., $=
+    residual + \hat{\beta}x = y - \sum_{\mbox{o=all other predictors}} \hat{\beta_o} x_o$. See, for example, Faraway, ``Linear models with R, 2nd ed'', p.~94 and ff. and Fox \& Weisberg, ``An R companion to applied regression, 3rd ed.'', section 8.4.2}) plots allow us to
   examine, in models with multiple regressors, deviations from linearity
   and could suggest the appropriate transformation. ``CERES plots'' are a
   variation of ``Component + Residual'' plots that work well even if
@@ -6741,6 +6784,22 @@ For you to read and play around further:
 
 
 
+% For me: partial and added variable residuals seems similar but are not identical
+% In the added variable, we regress Y on all others.
+% In the partical residual, we regress Y on ALL, and put back the predicted from the affected one. Or, alternatively, compute the residual as
+% Y - the x*beta, where the betas are from the model with all. This shows an example (but this ain't extreme, as no collinearities, etc)
+
+% x1 <- runif(100)
+% x2 <- runif(100)
+% x3 <- runif(100)
+% y <- x1 + 2*x2 + 3* x3 + rnorm(100)
+% df44 <- data.frame(y =y, x1 = x1, x2 = x2, x3 = x3)
+% m44 <- lm(y ~ x1 + x2 + x3, data = df44)
+% pr44 <- residuals(m44, type = "partial")
+% m44_r23 <- residuals(lm(y ~ x2 + x3, data = df44))
+% m44_r12 <- residuals(lm(y ~ x2 + x1, data = df44))
+% plot(pr44[, 1], m44_r23)
+% plot(pr44[, 3], m44_r12)
 
 
 
@@ -6860,7 +6919,7 @@ These are three key features of AIC:
 The importance of the above three results is huge.
 
 
-Now, suppose we have a bunch of models, and we measure the AIC of each. Model selection via AIC will tells us to prefer the model with the largest AIC. (Note: largest if we define AIC as above; we should prefer the model with the smallest AIC if we define AIC as
+Now, suppose we have a bunch of models, and we measure the AIC of each. Model selection via AIC tells us to prefer the model with the largest AIC. (Note: largest if we define AIC as above; we should prefer the model with the smallest AIC if we define AIC as
 $AIC = -2 \ln(\hat{L}) + 2\ k$).
 
 The key idea is that AIC allows us to select models so as to keep the model that has (among the ones we consider) the best predictive performance in future samples.
@@ -6921,13 +6980,16 @@ step(metab_b_r, direction = "both")
 step(longev_b_r, direction = "both")
 @
 
+Notice that \texttt{step} adds or drops one variable at a time. \texttt{step} will not compare the AIC of all possible models. Thus, it could happen that ``the best'' model is never found if there is no path made up of ``drop or add one variable at a time'' from the initial to the best model \footnote{Suppose a model of Y on five variables. Suppose the best model is Y with the first two variables, with an AIC of 1; suppose that all three variable models have an AIC of 3, suppose the model on the first four variables has an AIC of 1.5 and suppose the initial model on all five variables has an AIC of 4. Starting from this last model, you don't reach the best model.}. You could, if you want, write code to compute the AIC of all models (if the number of models is reasonable small or you have infinite patience).
+
+
 \subsection{Differences between model selection using AIC and model comparison
   using \Rfunction{anova} (and hypothesis testing using \Rfunction{Anova})}\label{aic-f-tests}
 
 
 The \textbf{major difference} is that when we compare models using \Rfunction{anova}, or
 examine each of the terms in a fitted model with, say, \textbf{\Rfunction{Anova}, we are
-conducting statistical hypothesis testing}\footnote{The hypotheses tests we conduct with Anova are, in fact, comparisons of models, where we test the null hypothesis that the smaller model is good enough.}. In contrast, the AIC criterion is not
+conducting statistical hypothesis testing}\footnote{The hypotheses tests we conduct with Anova are, in fact, comparisons of models, where we test the null hypothesis that the smaller model is good enough; equivalently, that the larger model does not make any relevant difference (i.e., reduce RSS enough).}. In contrast, the AIC criterion is not
 used to conduct hypothesis testing, but is a criterion related to predictive
 performance; so when we carry out \textbf{model selection using AIC we are trying to find
 the best model where ``best'' is ``best from the point of view of prediction''}.
