@@ -1004,25 +1004,44 @@ drawdag(ptr, xlim = c(0.5, 3.5), ylim = c(-.51, .6))
 (To turn the above into a specific example:
 
 <<dag_ptr22, results='hide', echo=FALSE>>=
+## ptr22 <- dagitty("dag {
+## Diet -> Outcome
+## U_g -> Exercise
+## U_c  -> Exercise
+## U_g -> Outcome
+## U_c  -> Diet
+## }")
 ptr22 <- dagitty("dag {
-Diet -> Outcome
-U_g -> Exercise
-U_c  -> Exercise
+Exercise -> Outcome
+U_g -> ChildhoodBMI
+U_c  -> ChildhoodBMI
 U_g -> Outcome
-U_c  -> Diet
+U_c  -> Exercise
 }")
 @
 
 <<plot_dag_ptr22, fig.width = 4, fig.height=2.73, fig.lp='fig:', results = 'hide', echo=FALSE, fig.align = 'center', fig.cap='A pretreatment collider; Uc: country, Ug: genetics.',out.width='9cm', fig.pos= "!h">>=
-coordinates(ptr22) <- list(x = c(Exercise = 1, Diet = 2,
+## coordinates(ptr22) <- list(x = c(Exercise = 1, Diet = 2,
+##                                  Outcome = 3,
+##                                  U_g = 0.8,
+##                                  U_c = 0.8),
+##                            y = c(Exercise = 0,
+##                                  Diet = 0,
+##                                  Outcome = 0,
+##                                  U_c = .5,
+##                                  U_g = -.5))
+
+coordinates(ptr22) <- list(x = c(ChildhoodBMI = 1,
+                                 Exercise = 2,
                                  Outcome = 3,
                                  U_g = 0.8,
                                  U_c = 0.8),
-                           y = c(Exercise = 0,
-                                 Diet = 0,
+                           y = c(ChildhoodBMI = 0,
+                                 Exercise = 0,
                                  Outcome = 0,
                                  U_c = .5,
                                  U_g = -.5))
+
 
 drawdag(ptr22, xlim = c(0.5, 3.5), ylim = c(-.51, .6))
 ## text(x = 2, y = 1.2, labels ="a)", cex = 1.2)
@@ -1031,7 +1050,7 @@ drawdag(ptr22, xlim = c(0.5, 3.5), ylim = c(-.51, .6))
 )
 
 
-You know the answer. No, do not adjust for L (Exercise): it is a collider ($U_1$ and $U_2$
+You know the answer. No, do not adjust for L (Childhood BMI): it is a collider ($U_1$ and $U_2$
 are its parents) on the backdoor path between X and Y. If we adjust for L, it
 will induce a non-causal association between X and Y\footnote{The bias induced is
   sometimes called \textit{M-bias}.}.
