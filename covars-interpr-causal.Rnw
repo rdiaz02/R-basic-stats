@@ -375,7 +375,10 @@ confounded by Age having effects on both Exercise and
 Cholesterol\footnote{When dealing with categorical variables, this pattern,
   where the association of two variables changes, or even reverts its sign, when
   we account for another, is also called Simpson's paradox.}. Age is a
-\textbf{confounder}.% : there is \textbf{confounding} due to Age in the estimate of
+\textbf{confounder}. And notice that ``confounder'' is something we define with respect to measuring causal effects, so the causal perspective is essential for identifying (and correcting for) confounders\footnote{Pearl elaborates on this at length, when he discusses the so-called ``Simpson's paradox'': it only seems paradoxical when viewed purely as a statistical phenomenon, without causal reasoning.}.
+
+
+% : there is \textbf{confounding} due to Age in the estimate of
 % the effect of Exercise on Cholesterol.
 
 % Or, unless we adjust for Age, there will be \textbf{confounding}: the
@@ -624,13 +627,13 @@ More systematically:
 \item Chain: X and Y are associated. But conditioning on Z will render X and Y
   independent (there will be no association). The conditional and unconditional
   dependencies are (you can ignore this if it does not help you):
-  $X \upmodels Y | Z$, \quad $X \cancel{\upmodels} Y$.
+  $X \upmodels Y \ | \ Z$, \quad $X \nupmodels Y$.
 
 
 
 \item Fork: X and Y are associated. But conditioning on Z will render X and Y
-  independent (there will be no association). $X \upmodels Y | Z$, \quad
-  $X \cancel{\upmodels} Y$.
+  independent (there will be no association). $X \upmodels Y\ | \ Z$, \quad
+  $X \nupmodels Y$. %%$X \cancel{\upmodels} Y$
 
   This is the usual example of \textbf{confounding}, where we see association
   because of a common cause.
@@ -638,8 +641,8 @@ More systematically:
 \item Inverted fork with collider: X and Y are independent. But conditioning on Z
   will make X and Y associated\footnote{If these were numerical variables and we
     assume a linear model, they would be correlated. Association and
-    non-independence are more general concepts than correlation.}
-  $X \cancel{\upmodels} Y | Z$, \quad $X \upmodels Y$.
+    non-independence are more general concepts than correlation.}:
+  $X \nupmodels Y\ | \ Z$, \quad $X \upmodels Y$.
 
 
 \end{enumerate}
@@ -650,7 +653,7 @@ avoid confounding the estimate of the relationship between X and Y. It is the
 presence of confounding that leads to the ``correlation is not necessarily
 causation'' \citep[][p.\ 58]{westreich2019}.  (For more details about confounding
 see chapter 7 in \citealp{hernan2020}; a brief discussion in section 3.5.1, pp.\
-58 and ff.\ in \citealp{westreich2019})
+58 and ff., in \citealp{westreich2019})
 
 
 %% ZZ FIXME : give the example of Y must compensate whatever X has
@@ -661,7 +664,7 @@ we have a collider, sometimes seem counterintuitive. This structure is behind
   ``Why are handsome men such jerks?'' ---and, I guess, a similar phenomenon with
   women:
   \url{http://www.slate.com/blogs/how_not_to_be_wrong/2014/06/03/berkson_s_fallacy_why_are_handsome_men_such_jerks.html}
-  .}  . A simple example: suppose there is no association between bone fracture
+  .}. A simple example: suppose there is no association between bone fracture
 and pneumonia in the general population. But if you only look at people who go to
 the emergency room in a hospital, you are likely to find a negative association
 between pneumonia and bone fracture (think about why people go to hospitals
@@ -864,7 +867,7 @@ These are the consequences:
   \item X and W are independent if we condition on  Z.
   \item Y and W are independent if we condition on Z.
   \end{enumerate}
-  % $X \cancel{\upmodels} Y | W$.
+  % $X \nupmodels Y | W$.
 
 \item As above: conditioning on W does not make X and Y independent.
 
@@ -876,7 +879,7 @@ These are the consequences:
   \item Y and W are independent if we condition on Z.
   \end{enumerate}
   % $X
-  % \cancel{\upmodels} Y | W$.
+  % \nupmodels Y | W$.
 
 \item \textbf{Pay attention here}: conditioning on W will make X and Y
   associated. This is the general rule: \textbf{conditioning on a collider} (as
@@ -893,8 +896,8 @@ These are the consequences:
   \item Y and W are independent if we condition on Z.
   \end{enumerate}
   % $X
-  % \cancel{\upmodels} Y | W$ (and $X
-  % \cancel{\upmodels} Y | Z$,  \quad $X \upmodels
+  % \nupmodels Y | W$ (and $X
+  % \nupmodels Y | Z$,  \quad $X \upmodels
   % Y$).
 
 \item Conditioning on W will not render X and Y independent. Notice also that \textbf{now Z is
@@ -920,9 +923,9 @@ In addition:
   \end{enumerate}
 
 
-\item Now Z is a collider with respect to all three pairs of variables X, Y, W.
+\item Now Z is a collider with respect to all three variables X, Y, W.
   \begin{enumerate}[label=\arabic*.]
-    \item X and Y are independent (we saw this before).
+  \item X and Y are independent (we saw this before).
   \item X and W are independent.
   \item Y and W are independent.
   \item X and W are associated if we condition on Z (Z is a collider).
@@ -1194,6 +1197,8 @@ to correctly interpret the effects from your experimental manipulations. Moreove
 causal inference from experimental data arguably makes use of counterfactuals
 (see \qref{counterf}).
 
+And regardless of whether you work with observational or experimental data, the causal framework is the appropriate framework to think about confounding, as we have seen above. This cannot be emphasized strongly enough, and if you have doubts, look at the example in \qref{pretreat-no}.
+
 
 \subsection{But I need to know at least something about the phenomenon I am
   dealing with to do any of this!!!!}\label{need-know}
@@ -1291,7 +1296,7 @@ drawdag(dire3, xlim = c(0.5, 5), ylim = c(-.1, 1.6))
 @
 
 If you only adjust by Qualification, your estimates of direct effect will be
-biased because Qualification is a collider (a descendant of both Income and
+biased because Qualification is a collider (a descendant of both SocioecStatus and
 Gender). If you wanted an unbiased estimate of the direct effect, you would need
 to measure and condition on both Qualification and SocioecStatus.
 
@@ -1392,12 +1397,12 @@ model without confounders).
 
 Using the backdoor criterion is very well explained in, for example:
 \begin{itemize}
-\item Section 4.2, pp.\ 109 and ff.\ of \citet{morgan_counterfactuals_2015} (I
+\item Section 4.2, pp.\ 109 and ff., of \citet{morgan_counterfactuals_2015} (I
   particularly like how their explanation combines the original Pearl's criterion
   with further generalizations).
-\item Section 7.2 and 7.3, pp.\ 85 and ff.\ of \citet{hernan2020}.
-\item Section 3.3, pp.\ 61 and ff.\ of \citet{pearl_causal_2016}.
-\item Section 3.5.1, pp.\ 59 and ff.\ of \citet{westreich2019}.
+\item Section 7.2 and 7.3, pp.\ 85 and ff., of \citet{hernan2020}.
+\item Section 3.3, pp.\ 61 and ff., of \citet{pearl_causal_2016}.
+\item Section 3.5.1, pp.\ 59 and ff., of \citet{westreich2019}.
 \end{itemize}
 
 They are all saying the same thing: how to look for sets of variables that block
@@ -1432,7 +1437,7 @@ In a causal DAG, a
 
 % But we might prefer a less terse explanation.
 
-In section 4.2, pp.\ 109 and ff.\
+In section 4.2, pp.\ 109 and ff.,
 of \citet{morgan_counterfactuals_2015} the following two-step process is given:
 
 \begin{quoting}
@@ -1525,7 +1530,7 @@ have seen above (for example, \citealp{morgan_counterfactuals_2015} only use the
 term d-separation in one footnote, though their procedure, which we have copied
 above, actually implicitly uses the definition of d-separation). Anyway,
 d-separation is well explained in Definition 2.4.1, p.\ 46 of
-\citet{pearl_causal_2016} or in section ``Fine point 6.1'', p. 76 of
+\citet{pearl_causal_2016} or in section ``Fine point 6.1'' of
 \citet{hernan2020} and is very useful if you want to find all the
 independencies and conditional independencies implied by a DAG.
 
@@ -1622,7 +1627,7 @@ DAGs).
 
 Key message: even if you don't care about DAGs or making causal inferences
 from observational data, counterfactuals are key for your inferences from
-experimental data. In fact, you most likely thing counterfactually (pun intended) a lot of the time: would you have had so much fun for the last hour or so had you not been reading these notes? \smiley{}
+experimental data. In fact, you most likely think counterfactually (pun intended) a lot of the time: would you have had so much fun for the last hour or so had you not been reading these notes? \smiley{}
 
 
 \section{Lord's paradox}
