@@ -176,7 +176,7 @@ understand if consuming red wine affects (i.e., has an effect on) cardiovascular
 health. We might want to do this so that we can make public health
 recommendations or take personal action (should I start drinking a little bit of
 wine?).  Intuitively, if a variable, X, has a causal effect on a variable, Y,
-manipulating X will change the value of Y\footnote{The philosopher James Woodward, in \citet{woodward2003}, defends a manipulationist or interventionist account of causality; the informal ideas introduced in these notes fall under that umbrella.}.
+manipulating X will change the value of Y\footnote{The philosopher James Woodward, in \citet{woodward_making_2003}, defends a manipulationist or interventionist account of causality; the informal ideas introduced in these notes fall under that umbrella.}.
 
 And what do we mean by \textbf{causal effects}? ``(...) causal effects in
 populations, that is, \textbf{numerical quantities} that measure changes in the
@@ -1233,7 +1233,7 @@ making stronger assumptions.
 the causes of an effect and finding \textbf{sufficient causes}, nor on trying to
 find the causal DAGs from a set of data. We have focused ``just'' on measuring
 the effects of causes. For more on those topics, go to \citealp{hernan2020};
-\citealp{morgan_counterfactuals_2015}; \citealp{neal_causality_2020}, \citealp{peters_causal_2017}).
+\citealp{morgan_counterfactuals_2015}; \citealp{neal_causality_2020}, \citealp{peters2017}).
 
 %% ZZ FIXME  what variables to add to a DAG
 
@@ -1653,7 +1653,7 @@ inferences from randomized experiments, and to understand what we are trying to
 do when we try to eliminate confounding to try to do causal inference from
 observational data. See further details in \citet{rosenbaum2017},
 \citet{hernan2020}, \citet{morgan_counterfactuals_2015},
-\citet{pearl2016} (and \citealp{woodward2003} and \citealp[][ch.~5]{otsuka2023} for philosophical discussion). (\citealp{rosenbaum2017}, does not use DAGs at all; the others
+\citet{pearl2016} (and \citealp{woodward_making_2003} and \citealp[][ch.~5]{otsuka2023} for philosophical discussion). (\citealp{rosenbaum2017}, does not use DAGs at all; the others
 do, and draw ---pun intended--- connections between counterfactuals and
 DAGs).
 
@@ -1698,185 +1698,185 @@ adjust for the covariate.
 
 %% FIXME: in the future, use \bibliographystyle{jss2}
 {\small
-  % \bibliography{refs}
-  % \bibliographystyle{myplainnat}
+  \bibliography{refs-causal}
+  \bibliographystyle{jss2}
 
-  \begin{thebibliography}{16}
-\providecommand{\natexlab}[1]{#1}
-\providecommand{\url}[1]{\texttt{#1}}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi: #1}\else
-  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+  % \begin{thebibliography}{16}
+  %   \providecommand{\natexlab}[1]{#1}
+  %   \providecommand{\url}[1]{\texttt{#1}}
+  %   \expandafter\ifx\csname urlstyle\endcsname\relax
+  %     \providecommand{\doi}[1]{doi: #1}\else
+  %     \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
 
-\bibitem[Cole and Hern{\'a}n(2002)]{cole2002}
-Cole, S.~R. and Hern{\'a}n, M.~A.
-\newblock Fallibility in estimating direct effects.
-\newblock \emph{International Journal of Epidemiology}, 31\penalty0
-  (1):\penalty0 163--165, February 2002.
-\newblock ISSN 0300-5771.
-\newblock \doi{10.1093/ije/31.1.163}.
-\newblock URL \url{https://doi.org/10.1093/ije/31.1.163}.
+  % \bibitem[Cole and Hern{\'a}n(2002)]{cole2002}
+  %   Cole, S.~R. and Hern{\'a}n, M.~A.
+  %   \newblock Fallibility in estimating direct effects.
+  %   \newblock \emph{International Journal of Epidemiology}, 31\penalty0
+  %   (1):\penalty0 163--165, February 2002.
+  %   \newblock ISSN 0300-5771.
+  %   \newblock \doi{10.1093/ije/31.1.163}.
+  %   \newblock URL \url{https://doi.org/10.1093/ije/31.1.163}.
 
-\bibitem[Hernan and Robins(2020)]{hernan2020}
-Hernan, M.~A. and Robins, J.~M.
-\newblock \emph{What If. {{Causal Inference}}}.
-\newblock {CRC Press}, 2020.
-\newblock ISBN 978-1-4200-7616-5.
-\newblock URL
-  \url{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
+  % \bibitem[Hernan and Robins(2020)]{hernan2020}
+  %   Hernan, M.~A. and Robins, J.~M.
+  %   \newblock \emph{What If. {{Causal Inference}}}.
+  %   \newblock {CRC Press}, 2020.
+  %   \newblock ISBN 978-1-4200-7616-5.
+  %   \newblock URL
+  %   \url{https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}.
 
-\bibitem[{Hernandez-Diaz} et~al.(2006){Hernandez-Diaz}, Schisterman, and
-  Hernan]{hernandez-diaz2006}
-{Hernandez-Diaz}, S., Schisterman, E.~F., and Hernan, M.~A.
-\newblock The {{Birth Weight}} "{{Paradox}}" {{Uncovered}}?
-\newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
-  1115--1120, September 2006.
-\newblock ISSN 0002-9262, 1476-6256.
-\newblock \doi{10.1093/aje/kwj275}.
-\newblock URL
-  \url{https://academic.oup.com/aje/article-lookup/doi/10.1093/aje/kwj275}.
+  % \bibitem[{Hernandez-Diaz} et~al.(2006){Hernandez-Diaz}, Schisterman, and
+  %   Hernan]{hernandez-diaz2006}
+  %   {Hernandez-Diaz}, S., Schisterman, E.~F., and Hernan, M.~A.
+  %   \newblock The {{Birth Weight}} "{{Paradox}}" {{Uncovered}}?
+  %   \newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
+  %   1115--1120, September 2006.
+  %   \newblock ISSN 0002-9262, 1476-6256.
+  %   \newblock \doi{10.1093/aje/kwj275}.
+  %   \newblock URL
+  %   \url{https://academic.oup.com/aje/article-lookup/doi/10.1093/aje/kwj275}.
 
-\bibitem[{Hern{\'a}ndez-D{\'i}az} et~al.(2006){Hern{\'a}ndez-D{\'i}az},
-  Schisterman, and Hern{\'a}n]{hernandez-diaz2006a}
-{Hern{\'a}ndez-D{\'i}az}, S., Schisterman, E.~F., and Hern{\'a}n, M.~A.
-\newblock Hern\'andez-{{D\'iaz}} et al. {{Respond}} to ``{{The Perils}} of
-  {{Birth Weight}}''.
-\newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
-  1124--1125, December 2006.
-\newblock ISSN 0002-9262.
-\newblock \doi{10.1093/aje/kwj277}.
-\newblock URL \url{https://doi.org/10.1093/aje/kwj277}.
+  % \bibitem[{Hern{\'a}ndez-D{\'i}az} et~al.(2006){Hern{\'a}ndez-D{\'i}az},
+  %   Schisterman, and Hern{\'a}n]{hernandez-diaz2006a}
+  %   {Hern{\'a}ndez-D{\'i}az}, S., Schisterman, E.~F., and Hern{\'a}n, M.~A.
+  %   \newblock Hern\'andez-{{D\'iaz}} et al. {{Respond}} to ``{{The Perils}} of
+  %   {{Birth Weight}}''.
+  %   \newblock \emph{American Journal of Epidemiology}, 164\penalty0 (11):\penalty0
+  %   1124--1125, December 2006.
+  %   \newblock ISSN 0002-9262.
+  %   \newblock \doi{10.1093/aje/kwj277}.
+  %   \newblock URL \url{https://doi.org/10.1093/aje/kwj277}.
 
-\bibitem[Kline(2015)]{kline2015}
-Kline, R.~B.
-\newblock \emph{Principles and {{Practice}} of {{Structural Equation
-  Modeling}}, {{Fourth Edition}}}.
-\newblock {The Guilford Press}, {New York}, 2015.
-\newblock ISBN 978-1-4625-2334-4.
+  % \bibitem[Kline(2015)]{kline2015}
+  %   Kline, R.~B.
+  %   \newblock \emph{Principles and {{Practice}} of {{Structural Equation
+  %   Modeling}}, {{Fourth Edition}}}.
+  %   \newblock {The Guilford Press}, {New York}, 2015.
+  %   \newblock ISBN 978-1-4625-2334-4.
 
-\bibitem[McElreath(2020)]{rethinking_2020}
-McElreath, R.
-\newblock \emph{Statistical Rethinking: A {{Bayesian}} Course with Examples in
-  {{R}} and {{Stan}}, 2nd Ed.}
-\newblock {CRC Press}, 2020.
-\newblock ISBN 978-0-367-13991-9.
+  % \bibitem[McElreath(2020)]{rethinking_2020}
+  %   McElreath, R.
+  %   \newblock \emph{Statistical Rethinking: A {{Bayesian}} Course with Examples in
+  %   {{R}} and {{Stan}}, 2nd Ed.}
+  %   \newblock {CRC Press}, 2020.
+  %   \newblock ISBN 978-0-367-13991-9.
 
-\bibitem[Morgan and Winship(2015)]{morgan_counterfactuals_2015}
-Morgan, S.~L. and Winship, C.
-\newblock \emph{Counterfactuals and Causal Inference: Methods and Principles
-  for Social Research, 2nd Ed}.
-\newblock {Cambridge University Press}, {New York, NY}, 2015.
-\newblock ISBN 978-1-107-58799-1 978-1-107-06507-9 978-1-107-69416-3.
-\newblock URL \url{http://dx.doi.org/10.1017/CBO9781107587991}.
+  % \bibitem[Morgan and Winship(2015)]{morgan_counterfactuals_2015}
+  %   Morgan, S.~L. and Winship, C.
+  %   \newblock \emph{Counterfactuals and Causal Inference: Methods and Principles
+  %   for Social Research, 2nd Ed}.
+  %   \newblock {Cambridge University Press}, {New York, NY}, 2015.
+  %   \newblock ISBN 978-1-107-58799-1 978-1-107-06507-9 978-1-107-69416-3.
+  %   \newblock URL \url{http://dx.doi.org/10.1017/CBO9781107587991}.
 
-\bibitem[Neal(2020)]{neal_causality_2020}
-Neal, B.
-\newblock \emph{Introduction to {{Causal Inference}}}.
-\newblock 2020.
-\newblock URL
-  \url{https://www.bradyneal.com/Introduction_to_Causal_Inference-Dec17_2020-Neal.pdf}.
-
-
-\bibitem[Otsuka(2023)]{otsuka2023}
-Otsuka, J.
-\newblock \emph{Thinking about Statistics: The Philosophical Foundations}.
-\newblock {Routledge}, {New York, NY}, 2023.
-\newblock ISBN 978-1-03-232610-8
+  % \bibitem[Neal(2020)]{neal_causality_2020}
+  %   Neal, B.
+  %   \newblock \emph{Introduction to {{Causal Inference}}}.
+  %   \newblock 2020.
+  %   \newblock URL
+  %   \url{https://www.bradyneal.com/Introduction_to_Causal_Inference-Dec17_2020-Neal.pdf}.
 
 
+  % \bibitem[Otsuka(2023)]{otsuka2023}
+  %   Otsuka, J.
+  %   \newblock \emph{Thinking about Statistics: The Philosophical Foundations}.
+  %   \newblock {Routledge}, {New York, NY}, 2023.
+  %   \newblock ISBN 978-1-03-232610-8
 
 
 
-\bibitem[Pearl(2009)]{pearl_causality_2009}
-Pearl, J.
-\newblock \emph{Causality: Models, Reasoning, and Inference, 2nd Ed}.
-\newblock {Cambridge Univ. Press}, {New York, NY}, 2009.
-\newblock ISBN 978-0-521-89560-6.
-
-\bibitem[Pearl(2016)]{pearl2016}
-Pearl, J.
-\newblock Lord's {{Paradox Revisited}} \textendash{} ({{Oh Lord}}!
-  {{Kumbaya}}!).
-\newblock \emph{Journal of Causal Inference}, 4\penalty0 (2), 2016.
-\newblock ISSN 2193-3677.
-\newblock \doi{10.1515/jci-2016-0021}.
-\newblock URL
-  \url{https://www.degruyter.com/view/j/jci.2016.4.issue-2/jci-2016-0021/jci-2016-0021.xml}.
-
-\bibitem[Pearl and Mackenzie(2018)]{pearl2018}
-Pearl, J. and Mackenzie, D.
-\newblock \emph{The Book of Why: The New Science of Cause and Effect.}
-\newblock {Basic Books}, {New York, N.Y.}, 2018.
-
-\bibitem[Pearl et~al.(2016)Pearl, Glymour, and Jewell]{pearl_causal_2016}
-Pearl, J., Glymour, M., and Jewell, N.~P.
-\newblock \emph{Causal Inference in Statistics: A Primer}.
-\newblock {John Wiley \& Sons}, {Chichester, UK}, 2016.
-\newblock ISBN 978-1-119-18684-7.
 
 
-\bibitem[Peters et~al.(2017)Peters, Janzing, Scholkopf]{peters_causal_2017}
-Peters, J., Janzing, D., and Sch{\"o}lkopf, B.
-\newblock \emph{Elements of Causal Inference}.
-\newblock {MIT Press}
-\newblock ISBN 978-0-262-03731-0.
-\newblock URL
-  \url{https://library.oapen.org/bitstream/id/056a11be-ce3a-44b9-8987-a6c68fce8d9b/11283.pdf}
+% \bibitem[Pearl(2009)]{pearl_causality_2009}
+% Pearl, J.
+% \newblock \emph{Causality: Models, Reasoning, and Inference, 2nd Ed}.
+% \newblock {Cambridge Univ. Press}, {New York, NY}, 2009.
+% \newblock ISBN 978-0-521-89560-6.
+
+% \bibitem[Pearl(2016)]{pearl2016}
+% Pearl, J.
+% \newblock Lord's {{Paradox Revisited}} \textendash{} ({{Oh Lord}}!
+%   {{Kumbaya}}!).
+% \newblock \emph{Journal of Causal Inference}, 4\penalty0 (2), 2016.
+% \newblock ISSN 2193-3677.
+% \newblock \doi{10.1515/jci-2016-0021}.
+% \newblock URL
+%   \url{https://www.degruyter.com/view/j/jci.2016.4.issue-2/jci-2016-0021/jci-2016-0021.xml}.
+
+% \bibitem[Pearl and Mackenzie(2018)]{pearl2018}
+% Pearl, J. and Mackenzie, D.
+% \newblock \emph{The Book of Why: The New Science of Cause and Effect.}
+% \newblock {Basic Books}, {New York, N.Y.}, 2018.
+
+% \bibitem[Pearl et~al.(2016)Pearl, Glymour, and Jewell]{pearl_causal_2016}
+% Pearl, J., Glymour, M., and Jewell, N.~P.
+% \newblock \emph{Causal Inference in Statistics: A Primer}.
+% \newblock {John Wiley \& Sons}, {Chichester, UK}, 2016.
+% \newblock ISBN 978-1-119-18684-7.
+
+
+% \bibitem[Peters et~al.(2017)Peters, Janzing, Scholkopf]{peters_causal_2017}
+% Peters, J., Janzing, D., and Sch{\"o}lkopf, B.
+% \newblock \emph{Elements of Causal Inference}.
+% \newblock {MIT Press}
+% \newblock ISBN 978-0-262-03731-0.
+% \newblock URL
+%   \url{https://library.oapen.org/bitstream/id/056a11be-ce3a-44b9-8987-a6c68fce8d9b/11283.pdf}
 
 
 
-\bibitem[Rosenbaum(2017)]{rosenbaum2017}
-Rosenbaum, P.
-\newblock \emph{Observation and {{Experiment}}: An {{Introduction}} to {{Causal
-  Inference}}}.
-\newblock {Harvard University Press}, {Cambridge, Massachusetts}, August 2017.
-\newblock ISBN 978-0-674-97557-6.
+% \bibitem[Rosenbaum(2017)]{rosenbaum2017}
+% Rosenbaum, P.
+% \newblock \emph{Observation and {{Experiment}}: An {{Introduction}} to {{Causal
+%   Inference}}}.
+% \newblock {Harvard University Press}, {Cambridge, Massachusetts}, August 2017.
+% \newblock ISBN 978-0-674-97557-6.
 
-\bibitem[Sober(2024)]{sober2024}
-Sober, E.
-\newblock Thoughts on {{Jun Otsuka}}'s {{Thinking}} about {{Statistics}} -- the {{Philosphical Foundations}}.
-\newblock \emph{Asian Journal of Philosophy}, 3\penalty0 (1), 2024.
-\newblock ISSN 2731-4642
-\newblock \doi{10.1007/s44204-024-00173-8}.
-\newblock URL
+% \bibitem[Sober(2024)]{sober2024}
+% Sober, E.
+% \newblock Thoughts on {{Jun Otsuka}}'s {{Thinking}} about {{Statistics}} -- the {{Philosphical Foundations}}.
+% \newblock \emph{Asian Journal of Philosophy}, 3\penalty0 (1), 2024.
+% \newblock ISSN 2731-4642
+% \newblock \doi{10.1007/s44204-024-00173-8}.
+% \newblock URL
 
- \url{https://link.springer.com/10.1007/s44204-024-00173-8}
-
-
-\bibitem[VanderWeele(2015)]{vanderweele2015}
-VanderWeele, T.
-\newblock \emph{Explanation in {{Causal Inference}}: Methods for {{Mediation}}
-  and {{Interaction}}}.
-\newblock {Oxford University Press}, {New York}, 2015.
-\newblock ISBN 978-0-19-932587-0.
-
-\bibitem[VanderWeele and Shpitser(2011)]{vanderweele2011}
-VanderWeele, T.~J. and Shpitser, I.
-\newblock A {{New Criterion}} for {{Confounder Selection}}.
-\newblock \emph{Biometrics}, 67\penalty0 (4):\penalty0 1406--1413, 2011.
-\newblock ISSN 1541-0420.
-\newblock \doi{10.1111/j.1541-0420.2011.01619.x}.
-\newblock URL
-  \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1541-0420.2011.01619.x}.
-
-\bibitem[Westreich(2019)]{westreich2019}
-Westreich, D.
-\newblock \emph{Epidemiology by {{Design}}: A {{Causal Approach}} to the
-  {{Health Sciences}}}.
-\newblock {Oxford University Press}, {New York, NY}, 2019.
-\newblock ISBN 978-0-19-066576-0.
+%  \url{https://link.springer.com/10.1007/s44204-024-00173-8}
 
 
-\bibitem[Woodward(2003)]{woodward2003}
-Woodward, J.
-\newblock \emph{Making Things Happen: A Theory of Causal Explanation}.
-\newblock {Oxford University Press}, {New York, NY}, 2003.
-\newblock ISBN 978-0-19-803533-6.
+% \bibitem[VanderWeele(2015)]{vanderweele2015}
+% VanderWeele, T.
+% \newblock \emph{Explanation in {{Causal Inference}}: Methods for {{Mediation}}
+%   and {{Interaction}}}.
+% \newblock {Oxford University Press}, {New York}, 2015.
+% \newblock ISBN 978-0-19-932587-0.
 
-\end{thebibliography}
+% \bibitem[VanderWeele and Shpitser(2011)]{vanderweele2011}
+% VanderWeele, T.~J. and Shpitser, I.
+% \newblock A {{New Criterion}} for {{Confounder Selection}}.
+% \newblock \emph{Biometrics}, 67\penalty0 (4):\penalty0 1406--1413, 2011.
+% \newblock ISSN 1541-0420.
+% \newblock \doi{10.1111/j.1541-0420.2011.01619.x}.
+% \newblock URL
+%   \url{https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1541-0420.2011.01619.x}.
+
+% \bibitem[Westreich(2019)]{westreich2019}
+% Westreich, D.
+% \newblock \emph{Epidemiology by {{Design}}: A {{Causal Approach}} to the
+%   {{Health Sciences}}}.
+% \newblock {Oxford University Press}, {New York, NY}, 2019.
+% \newblock ISBN 978-0-19-066576-0.
 
 
-}
+% \bibitem[Woodward(2003)]{woodward2003}
+% Woodward, J.
+% \newblock \emph{Making Things Happen: A Theory of Causal Explanation}.
+% \newblock {Oxford University Press}, {New York, NY}, 2003.
+% \newblock ISBN 978-0-19-803533-6.
+
+% \end{thebibliography}
+
+
+% }
 
 
 
