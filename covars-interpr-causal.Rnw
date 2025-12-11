@@ -1296,7 +1296,7 @@ are what we have been mostly concerned with here.
 
 But suppose the way things really are is the one shown in Figure
 \ref{fig:dag_direct_conf}, where ``SocioecStatus'' is the socioeconomic status of
-the family of the persons being hired.
+the family of the persons being hired (this is from \citealp{pearl_causal_2016}, Fig.~312, p.~77, ---but  I have substituted ``Income'' byt ``SocioecStatus'').
 
 <<dag_direct_conf, results='hide', echo=FALSE,fig.width = 3.5, fig.height=2, fig.lp='fig:', fig.align = 'center', fig.cap='Direct effects and confounding',out.width='8.2cm', fig.pos= "!h">>=
 dire3 <- dagitty("dag {
@@ -1332,6 +1332,19 @@ adjustment of the mediator in the presence of confounding are also given in
 \citet{cole2002}, using hypothetical examples from the Physicians' Health
 Study. Estimating direct and indirect effects is related to the study of
 mediation, and a book-length treatment is \citet{vanderweele2015}.
+Finally, for figure \ref{fig:dag_direct_conf}, \citealp{pearl_causal_2016} discuss the difference between conditioning on ``Qualification'' and \textit{fixing it constant} by \textit{intervening} on it, which allows us to compute the \textit{Controlled Direct Effect (CDE)} (the change in Hiring by intervening on both Gender and Qualification, where the presence of SocioecStatus no longer bothers us, since we are manipulation Qualification); we will not discuss this further; \citet{morgan_counterfactuals_2015} explain them in ch.~11, and \citet{hernan2020} on Technical point 22.1 and sections 23.2 and ff.
+
+
+Of course, you can turn the examples above into a completely different example that could be easier to relate to. For example, with scarce display of imagination on my side:
+\begin{itemize}
+\item Gender is Gene A, whose expression you can manipulate.
+\item Qualification is Gene B
+\item SocioecStatus is Gene C
+\item Hiring is some desired outcome
+\end{itemize}
+
+Please, make this more elaborate (e.g., think about some of the variables above being, say, a particular therapy, etc).
+
 
 
 \subsection{Revisiting the fungus example}\label{revisit-fungus}
