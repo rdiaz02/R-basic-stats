@@ -857,6 +857,14 @@ Now, what we have done is basically the following:
 \end{itemize}
 
 
+
+%% FIXME
+\red{FIXME: change the example along the following lines.}
+
+Amodei says risk of extinction from AI is about 25\%, Musk about 30\% (get citations). Now, suppose someone (e.g., some politician, or some VC investor into AI) says: ``there is no evidence of risk of extinction from AI; what is your p-value?''. We can (should!) turn that around. We can thus say: ``I want strong evidence that risk of extinction is not larger than 1 in 100 million''\footnote{Where is the 1/100000000 figure from? This is a figure given by Stuart Russell in Steven Bartlett's podcast ``The diary of a CEO'' \Burl{https://stevenbartlett.com/doac/}, on 4 December 2025, around 1h 33' 30'' into the podcast (here is a link to the YouTube video and time \Burl{https://youtu.be/P7Y-fynYsgE?t=5610}). The logic is as follows: for nuclear plants we demand a risk no more than 1 in a million of a meltdown per year; we can also estimate the risk of extinction from a meteorite to be somewhere around 1 in 500 million to 1 in 1000 million (1 American billion) as a kind of background risk of extinction from other things. So, just to get the reasoning going, suppose we settle that we want the risk of extinction from AI to be no larger than 1 in a 100 million ---taking into account that human extinction is arguably much, much, much more serious than the meltdown of a nuclear plant, it does not seem exaggerated to demand a risk at least 100 times smaller, which is still larger than risks from meteorites.}.
+
+
+
 The above would be an example of an ``inferiority'' test (there are also ``non-inferiority'' tests, that test the opposite, for example that a new treatment has not less effect  than a standard treatment).
 
 A related cases is equivalence testing. On typical example involves comparing two drugs. Suppose the standard, widely used drug, to control for cholesterol is drug A (produced by ACME labs). Now, we want to assess if a given generic, drug B, is equivalent to the established drug A. For example, suppose we would allow pharmacies to sell drug B if drug B has effects that are within 1\% of the effects of A.
