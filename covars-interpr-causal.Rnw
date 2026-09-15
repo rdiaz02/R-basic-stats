@@ -65,7 +65,10 @@
 \usepackage[authoryear, round, sort]{natbib}
 %% \usepackage[square,numbers,sort&compress]{natbib}
 
+%% Could I just use either one? Nope. For BM-1/2 I am using gitinfo
+%% in R-basic-stats gitinfo2. Will move to gitinfo2 everywhere
 \usepackage{gitinfo2}
+% \usepackage{gitinfo}
 
 
 \setlength{\parskip}{0.35em}
@@ -79,6 +82,12 @@
 require(knitr)
 opts_knit$set(concordance = TRUE)
 opts_knit$set(stop_on_error = 2L)
+## Wrapping of the R output, so that it does not run past the right
+## margin; see the comments in knitr-setup.R
+source("knitr-setup.R")
+## with 30 mm margins and Courier, code at \normalsize would only fit
+## about 64 characters per line; \small fits the 68 we can produce
+opts_chunk$set(size = "small")
 ## next are for listings, to produce HTML
 ##listings-knitr-html%%options(formatR.arrow = TRUE)
 ##listings-knitr-html%%render_listings()
@@ -129,7 +138,7 @@ opts_knit$set(stop_on_error = 2L)
 
 
 \section*{License and copyright}\label{license}
-This work is Copyright, \copyright, 2025, Ramon Diaz-Uriarte, and is
+This work is Copyright, \copyright, 2021-2026, Ramon Diaz-Uriarte, and is
 licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -139,10 +148,7 @@ International License:
 
 
 All the original files for the document are available (again, under a Creative
-Commons license) from
-\Burl{https://github.com/rdiaz02/R-basic-stats}.
-% \Burl{https://github.com/rdiaz02/BM-1}.
-(Note that in the
+Commons license) from \Burl{https://github.com/rdiaz02/R-basic-stats}. (Note that in the
 github repo you will not see the PDF, or R files, nor many of the data files,
 since those are derived from the Rnw file). This file is called \texttt{covars-interpr-causal.Rnw}.
 
