@@ -106,7 +106,7 @@ BiocStyle::latex()
 
 
 \section{License and copyright}\label{license}
-This work is Copyright, \copyright, 2014-2022, Ramon Diaz-Uriarte,
+This work is Copyright, \copyright, 2014-2026, Ramon Diaz-Uriarte,
 and is licensed under a \textbf{Creative Commons } Attribution-ShareAlike
 4.0 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -2023,7 +2023,7 @@ Before we move on: what is the role of symmetry in the paired t-test? To try to 
 
 Don't do the following:
 \begin{enumerate}
-\item Carry out a test for normality (I guess for each group separately if and independent-samples t-test ---testing for normality collapsing the two groups would be absolutely nonsensical).
+\item  Carry out a test for normality (I guess for each group separately if this is a two samples t-test ---testing for normality collapsing the two groups would be absolutely nonsensical).
 \item If failed, use a nonparametric test. Otherwise a t-test.
 \end{enumerate}
 
@@ -2034,9 +2034,9 @@ There are several problems with the above procedure, among them:
 \begin{itemize}
 \item Tests for normality do not have a power of 1, and in fact can have
   very low power with small sample sizes.
-\item They can have power to detect a minor and irrelevant deviation from
-  normality (e.g., slightly heavy tails) that have no effects on, say, a
-  t-test. So we should really prefer a t-test, but we might be mislead
+  \item They can have power to detect a minor and irrelevant deviation from
+  normality (e.g., slightly heavy tails) that have no effects on a
+  t-test. So with very large sample size, an a slightlye ``heavier tails than a Normal'', where a t-test is just fine, we might be mislead
   into doing a Wilcoxon.
 \item They might fail to detect a large deviation from normality in a very
   non-normal small sample where we really, given our ignorance, might want
@@ -2048,7 +2048,9 @@ There are several problems with the above procedure, among them:
 
 Even if this procedure is (or was) common in some circles, you now know why it is a bad idea. Please, do not do this.
 
-Again, this is the type of ``cargo-cult statistics''\footnote{``going through the motions with scant understanding''; Stark and Saltelli, 2018. Cargo-cult statistics and scientific crisis. \textit{Significance}, 15.} that does no body any good. Think about your data, what you want to test (is it means? or is it something else?), what are reasonable assumptions (heavy tails, asymmetries, etc) and whether the deviations are likely to cause trouble. The above simple-minded (brain-dead, actually) procedure is no substitute for thinking.
+Again, this is the type of ``cargo-cult statistics''\footnote{``going through the motions with scant understanding''; Stark and Saltelli, 2018. Cargo-cult statistics and scientific crisis. \textit{Significance}, 15. This applies to statistics the ``cargo-cult science'' idea from Richard Feynman.} that does no body any good. Think about your data, what you want to test (is it means? or is it something else?), what are reasonable assumptions (heavy tails, asymmetries, etc) and whether the deviations are likely to cause trouble. The above procedure is wrong, and it is no substitute for thinking.
+
+
 
 
 
@@ -2775,14 +2777,14 @@ better).
 \textbf{Multiple testing corrections} are needed because we are now
 conducting three separate tests (in general, if there are $K$ groups and
 if you compare all pairs of means you carry out ${K \choose 2} = \frac{K
-  (K-1)}{2}$ tests). Here, we will control the family-wise error rate, the
+  (K-1)}{2}$ tests). Here, we will control the family-wise error rate \textbf{(FWER)}, the
 probability of falsely rejecting one or more tests over the family of
 tests performed ---three in our case. The logic is somewhat like that of
 being struck by lightning: the chances of it happening are extremely
 small, but every year people die from lightning because the probability
 that at least one person is killed is huge since we have lots of people
 exposed to the risk. So even if all null hypotheses for our three tests
-are true:
+are true  (the ``complete null''):
 \begin{itemize}
 \item $\mu_{Morning} = \mu_{Lunch}$
 \item $\mu_{Morning} = \mu_{Afternoon}$
@@ -2792,11 +2794,10 @@ are true:
 if we run the three comparisons, the chances of incorrectly rejecting at
 least one of the null hypotheses is larger than, say, 0.05 if we simply
 look at each one of the three p-values and keep any with a p-value $\leq
-0.05$.  You will see more about multiple testing below (\nameref{sec:mult-comp-fdr}).
+0.05$.  You will see more about multiple testing below (\nameref{sec:mult-comp-fdr}). For now, remember, we are focusing on controlling the FWER: the probability of rejecting one or more null hypotheses when we shouldn't.
 
 
-
-Understanding what we just said is crucial. So we will use another two examples, a depressing and an uplifting one. If you understand them, you understand why we need multiple comparisons:
+Since understanding what we just said is crucial, we will use another two examples, a depressing and an uplifting one. If you understand them, you understand why we need multiple comparisons:
 
 \begin{itemize}
 \item Russian roulette. (Important note: we of course strongly discourage playing Russian roulette!). Suppose you have two friends, ``A'' and ``B''. ``A'' intends to play Russian roulette once a year, ``B'' intends to play it ten times a year\footnote{We say ``intends to'': obviously, the first time that the gun fires is the last time the player plays the game.}. Whose funeral are you likely to attend first?
@@ -2863,7 +2864,7 @@ confint(Pairs) # confidence intervals
 
 <<tukey1,fig.cap='Plot of pairwise differences with Tukey contrasts', fig.lp='fig:', fig.width=5,fig.height=5, fig.show='hold', results='hide'>>=
 cld(Pairs) # compact letter display
-old.oma <- par(oma = c(0,5,0,0))
+old.oma <- par(oma = c(0, 5, 0, 0))
 plot(confint(Pairs))
 par(old.oma) ## restore graphics windows settings
 @
@@ -2887,7 +2888,19 @@ interval around it. The plot title says ``95\% family-wise confidence
 interval'', and that indicates that multiple testing correction has been
 used. (You might want to make that even more explicit by using a title
 such as ``95\% family-wise confidence interval using Tukey contrasts'').
-Again, notice the output says ``simultaneous'': as emphasized in Lukas Meier's ``ANOVA and Mixed Models'' (2025, CRC Press; HTML from \Burl{https://people.math.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html\#sec-tukey-hsd}), ``these confidence intervals are simultaneous, meaning that the probability that they all cover the corresponding true difference at the same time is 95\%.''.
+Again, notice the output says ``simultaneous'': as emphasized in Lukas Meier's ``ANOVA and Mixed Models'' (2025, CRC Press; HTML from \Burl{https://people.math.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html\#sec-tukey-hsd}):
+``these confidence intervals are simultaneous, meaning that the probability that they all cover the corresponding true difference at the same time is 95\%.''.
+%()%% because emacs gets confused with paren.
+Notice the ``all cover the corresponding true difference is 95\%''; why?
+Because: \(\mbox{FWER} = P( \ge \mbox{1 false rejection})  \le 1 - P(\mbox{all CIs cover the truth}) = 0.05 \)
+%()%% because emacs gets confused with paren.
+\footnote{Technical point: And why the last \( \le \)?
+Because the FWER control has to work both under the complete null, when all nulls are true, but also when only some nulls are true. Under the complete null, when all nulls are true, we would write
+\( P( \ge \mbox{1 false rejection}) = 1 - P(\mbox{all CIs cover the truth}\).
+In the second case, when only some nulls are true,
+\(P( \ge \mbox{1 false rejection})  < 1 - P(\mbox{all CIs cover the truth})\);
+the CI for a truly false null might not cover its true value, and this would not be a Type I error. This is why on this second case, FWER is strictly less than \(1 - P(\mbox{all CIs cover the truth})\).}.
+
 
 Given how far two of the contrasts are from 0.0, it seems those are highly
 significant differences. %% Let's go to the numerical output.
@@ -3059,9 +3072,8 @@ Intro Using R '', 2025, CRC Press; on-line at  \Burl{https://stat.ethz.ch/~meier
 
 
 \subsection{t-test as ANOVA}
-Of course, in general, you can just carry out any two-group comparison as
-an ANOVA. There is nothing wrong with that (and there is a simple
-correspondence between a t statistic and an F statistic).
+Of course, you can just carry out any two-group comparison as
+an ANOVA. There is a simple correspondence between a t statistic and an F statistic, and this is the kind of t-test where we assume the variance of the two groups is equal\footnote{It is possible to compare the means of two or more groups, in an ANOVA-like way, without assuming equal variances; see function \texttt{oneway.test}. More complex models, such as mixed-effects models and generalized least squares (e.g., \texttt{lme} and \texttt{gls} in package \texttt{nlme}), also allow variances to differ between groups, or to depend on other factors.}.
 
 \subsection{Several ways of obtaining summaries}
 
@@ -3087,7 +3099,7 @@ with(dmit, by(activ, ftraining,
 
 
 
-\subsection{Can you do an ANOVA with only one sample per group?}\label{anova-only-one}
+\subsection{Can you do an ANOVA with a sample size of 1 per group?}\label{anova-only-one}
 Why or why not?
 
 
@@ -3339,8 +3351,11 @@ take a look at a three-page one by W.\ Noble, in \textit{Nature
 %% section of lm and anova, and do it as in BM-1
 \section{Two-way ANOVA}\label{twoway}
 
+In a two-way ANOVA, we are interested in the effects of two factors, not just one. For example, our experiment might involve simultaneously changing diet and drug.
+
+
 A key issue in models with two or more predictor variables (such as two-way
-ANOVA) are interactions. What is an interaction? The phenomenon of interaction should be familiar to you: it is very common in life in general, and in biology you might have previously seen at as epistasis in genetics; or take a look at the `Interactions'' section in the leaflet (prospecto) of any drug you take.
+ANOVA) are interactions. What is an interaction? The phenomenon of interaction should be familiar to you: it is very common in life in general, and in biology you might have previously seen at as epistasis in genetics; or take a look at the `Interactions'' section in the leaflet (prospecto) of any drug.
 
 
 % If this is not clear, we will
@@ -5569,13 +5584,14 @@ length(resid(mcyst))
 
 In our pemax example we saw several problems (e.g., the large standard errors in the estimated regression coefficients and the flip in signs) caused by the strong linear relationships between predictors. In the simplest cases, these can be detected by plots, as we did. But that  will not always show the source of the problem, specially when the linear relationship involves groups of variables, where pairwise plots can fail to show a clear pattern.
 
-The variance inflation factor, that we can compute with function \Rfunction{vif} (from \CRANpkg{car}) estimates ``the harm produced by collinearity'' (Fox \& Weisberg, ``An R companion to applied regresssion, 3rd ed'', section 8.8):
+The variance inflation factor, that we can compute with function \texttt{vif}, estimates ``the harm produced by collinearity'' (Fox \& Weisberg, ``An R companion to applied regresssion, 3rd ed'', section 8.8):
 
 <<vif1>>=
 vif(mcyst)
 @
 
 We can see that the standard error for age is about \(\sqrt{8} = 2.8\), so almost three times larger than it would have been without collinearity.
+
 
 Compare this with a very different model, where we only have age and sex:
 
@@ -5919,7 +5935,7 @@ anova(mcyst3, mcyst2)
 
 This is a comparison of two models using an F test: it tests whether the
 larger (more complex, with more terms) model is significantly better than
-the smaller one. It clearly shows that, in this case,  the larger
+the smaller one\footnote{This is just detail, and you can skip it. The $F$ statistic is the ratio of the difference in RSS divided by the 2 df of difference over the MS of the large model: $\frac{\frac{(16734 - 15590)}{2}}{\frac{15590}{21}}$ and the $p-$value is the area to the right of that value, in an $F$ distribution with 2 and 21 df; in R \texttt{pf((1144/2)/(15590/21), 2, 21, lower.tail = FALSE)}}. It clearly shows that, in this case,  the larger
 model (the one with both a main effect of ``sex'' and an
 interaction) is not significantly better than the one without ``sex''. So
 we can just keep model \Robject{mcyst3}: there is no statistical evidence
@@ -5933,7 +5949,7 @@ Three additional comments here:
   one of the models is a subset of terms of the other). Beware that R does
   not check this, and you could easily do meaningless
   things\footnote{There are ways to compare non-nested models using other
-    procedures, for instance based on AIC.}.
+    procedures, for instance based on AIC ---section \ref{sec:aic-intr}.}.
 \item Whether you type \verb@anova(mcyst2, mcyst3)@ or
   \verb@anova(mcyst3, mcyst2)@ is inconsequential for the F statistic and
   p-values.
@@ -6892,7 +6908,7 @@ strategies use model-comparison criteria such as AIC (e.g., with the \Rfunction{
 
 
 \subsubsection{A very brief introduction to AIC}
-\label{sec:very-brief-intr}
+\label{sec:aic-intr}
 
 AIC stands for Akaike Information Criterion. This is the AIC of a model:
 
@@ -6900,12 +6916,20 @@ AIC stands for Akaike Information Criterion. This is the AIC of a model:
 
 where \(k\) is the number of parameters, \(\hat{L}\) is the likelihood of the model at the maximum likelihood parameters (and \(\ln\) is the  base \(e\) logarithm). (Many definitions of AIC multiply the above by \(-1\), as we will see below, but that is irrelevant; so if with our definition better models are those with larger AIC, if you multiply by -1, better models are those with smaller AIC).
 
-And what is the likelihood? You should now this already. If not, ask in class, but essentially, \(L(\theta)\), is the probability of the data under parameter \(\theta\) (it is better to think of the joint density, as that includes, then, continuous distributions). For a data set, we can find the value of \(\theta\), the parameters, that makes that likelihood as large as it can be; this would be the maximum likelihood estimate of the parameter(s) \(\theta\).  So in the expression above, \(\hat{L}\) is the value of the likelihood when evaluated with the paramenters that make that likelihood as large as possible, i.e., at the value(s) that make the data as likely as possible. In a regression example, this would be the value of the likelihood when the regression coefficientes (and the intercept) take the values estimated by your regression software.
+And what is the likelihood? You should know this already. If not, ask in class, but essentially, \(L(\theta)\), is the probability of the data under parameter \(\theta\) (it is better to think of the joint density, as that includes, then, continuous distributions). For a data set, we can find the value of \(\theta\), the parameters, that makes that likelihood as large as it can be; this would be the maximum likelihood estimate of the parameter(s) \(\theta\).  So in the expression above, \(\hat{L}\) is the value of the likelihood when evaluated with the paramenters that make that likelihood as large as possible, i.e., at the value(s) that make the data as likely as possible. In a regression example, this would be the value of the likelihood when the regression coefficientes (and the intercept) take the values estimated by your regression software.
 
 What is AIC computing then? The log of the likelihood penalized by the number of parameters. In other words, AIC is showing the trade-off between good fit (to the current data) and number of parameters: models with many parameters might be able to adjust the data better (i.e., have larger likelihood), but slight increases in likelihood might not justify some of those parameters. So AIC says something like ``larger likelihood is good, but do not get carried away adding too many parameters''. With too many parameters, the model might be just too complex. Too complex for what? Not for the present data (the likelihood increased), but too complex for making good predictions in other data sets. Too many parameters increase the risk of \textbf{overfitting}.
 
 
 These are three key features of AIC:
+
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=0.70\paperwidth,keepaspectratio]{aic-otsuka.png}
+    \caption{\label{aic-otsuka} AIC as estimate of expected likelihood.  From J.\ Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations.}, Routledge, Figure 4.2, p.~116.}
+  \end{center}
+\end{figure}
+
 
 \begin{enumerate}
 \item AIC (under certain assumptions) is an unbiased estimate of the predictive accuracy of the model: the expected likelihood of the model when applied to new data (see Figure \ref{aic-otsuka}, from Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations}.).
@@ -6913,18 +6937,12 @@ These are three key features of AIC:
 \item AIC is equivalent to leave-one-out cross-validation for (many) linear models (including linear regression and mixed-effects).
 \end{enumerate}
 
-\begin{figure}[h!]
-  \begin{center}
-    \includegraphics[width=0.40\paperwidth,keepaspectratio]{aic-otsuka.png}
-    \caption{\label{aic-otsuka} AIC as estimate of expected likelihood.  From J.\ Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations.}, Routledge, Figure 4.2, p.~116.}
-  \end{center}
-\end{figure}
 
 
 The importance of the above three results is huge.
 
 
-Now, suppose we have a bunch of models, and we measure the AIC of each. Model selection via AIC tells us to prefer the model with the largest AIC. (Note: largest if we define AIC as above; we should prefer the model with the smallest AIC if we define AIC as
+Now, suppose we have a bunch of models, and we measure the AIC of each. Model selection via AIC tell us to prefer the model with the largest AIC. (Note: largest if we define AIC as above; we should prefer the model with the smallest AIC if we define AIC as
 $AIC = -2 \ln(\hat{L}) + 2\ k$).
 
 The key idea is that AIC allows us to select models so as to keep the model that has (among the ones we consider) the best predictive performance in future samples.
@@ -6988,13 +7006,13 @@ step(longev_b_r, direction = "both")
 Notice that \texttt{step} adds or drops one variable at a time. \texttt{step} will not compare the AIC of all possible models. Thus, it could happen that ``the best'' model is never found if there is no path made up of ``drop or add one variable at a time'' from the initial to the best model \footnote{Suppose a model of Y on five variables. Suppose the best model is Y with the first two variables, with an AIC of 1; suppose that all three variable models have an AIC of 3, suppose the model on the first four variables has an AIC of 1.5 and suppose the initial model on all five variables has an AIC of 4. Starting from this last model, you don't reach the best model.}. You could, if you want, write code to compute the AIC of all models (if the number of models is reasonable small or you have infinite patience).
 
 
-\subsection{Differences between model selection using AIC and model comparison
-  using \Rfunction{anova} (and hypothesis testing using \Rfunction{Anova})}\label{aic-f-tests}
+\subsection{Differences between model selection using AIC, on the one hand, and hypothesis testing and model comparison using \Rfunction{anova} and \Rfunction{Anova}, on the other}\label{aic-f-tests}
+
 
 
 The \textbf{major difference} is that when we compare models using \Rfunction{anova}, or
 examine each of the terms in a fitted model with, say, \textbf{\Rfunction{Anova}, we are
-conducting statistical hypothesis testing}\footnote{The hypotheses tests we conduct with Anova are, in fact, comparisons of models, where we test the null hypothesis that the smaller model is good enough; equivalently, that the larger model does not make any relevant difference (i.e., reduce RSS enough).}. In contrast, the AIC criterion is not
+conducting hypothesis testing}\footnote{The hypotheses tests we conduct with Anova are, in fact, comparisons of models, where we test the null hypothesis that the smaller model is good enough.}. In contrast, the AIC criterion is not
 used to conduct hypothesis testing, but is a criterion related to predictive
 performance; so when we carry out \textbf{model selection using AIC we are trying to find
 the best model where ``best'' is ``best from the point of view of prediction''}.
@@ -7067,9 +7085,11 @@ Anova(mcystL_r2)
 anova(mcystL_r2, mcystL_r)
 @
 
+\subsection{AIC was not the issue: this model should not be fitted this way}
 
-A final one, with another type of data (but make sure to read section
-\nameref{wrong}, as this is probably not a sensible model)
+This is an example, with another type of data.
+The moral of this example is not really AIC, but the problems of the fit:  make sure to read section
+\nameref{wrong}, as this is not a sensible model as fitted.
 
 <<>>=
 data(Prestige)
@@ -7105,6 +7125,8 @@ par(op)
 
 \section{Side issue: a interesting case where some things went wrong
   without us noticing}\label{wrong}
+
+The moral of this example is not really AIC, but the problems of the fit.
 
 This once happened in a class. This seems innocuous if we just quickly
 throw together a model:
