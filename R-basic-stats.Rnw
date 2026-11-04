@@ -51,6 +51,10 @@ opts_knit$set(stop_on_error = 2L)
 ## next are for listings, to produce HTML
 ##listings-knitr-html%%options(formatR.arrow = TRUE)
 ##listings-knitr-html%%render_listings()
+
+## Wrapping of the R output, so that it does not run past the right
+## margin; see the comments in knitr-setup.R
+source("knitr-setup.R")
 @
 
 %% BiocStyle needs to be 1.2.0 or above
@@ -86,8 +90,8 @@ BiocStyle::latex()
 
 \author{Ramon Diaz-Uriarte\\
   Dept. Biochemistry, Universidad Aut\'onoma de Madrid \\
-  Instituto de Investigaciones Biom\'edicas ``Alberto Sols'' (UAM-CSIC)\\
-  Madrid, Spain{\footnote{r.diaz@uam.es, rdiaz02@gmail.com}} \\
+  Instituto de Investigaciones Biom\'edicas Sols-Morreale (IIBM), UAM-CSIC\\
+  Madrid, Spain{\footnote{r.diaz@uam.es}} \\
 %% {\footnote{rdiaz02@gmail.com}} \\
 {\small \Burl{https://ligarto.org/rdiaz}} \\
  }
@@ -591,6 +595,34 @@ In class we will very briefly cover how the confidence interval is constructed. 
 Please, read \textbf{now} and do the exercise in \externalf
   \myhref{CI-p-value-examples.pdf}.
 
+This might help understand the CI. It comes from p.~98 of the recommended book by Dalgaard (``Introductory Statistics with R, 2nd ed'', Springer). He refers to a 95\% CI and writes: ``This is a 95\% confidence interval for the true mean; that is, the set of (hypothetical) mean values from which the data do not deviate significantly. It is based on inverting the t test by solving for the values of \(\mu_0\) [\(\mu_0\) is the hypothesized true mean] that cause t to lie within its acceptance region.''
+
+That wording is not contradictory with the usual ``A 95\% CI is something (a range of values) we construct following a procedure that guarantees that, if we were to repeat it many, many times, it would cover/capture the true mean (or the true difference in means, if comparing two groups) 95\% of the time.''
+
+Both definitions are about the same object (the confidence interval). The first describes what that set of values is, the second a crucial property of the procedure we use to construct it.
+
+The CI is not one test; it is the result of asking, for every candidate \(\mu_0\), ``would I reject this?'' and keeping the ones I would not reject. Or, to put it differently: the CI collects the answers to a whole family of tests, one for each possible $\mu_0$: the interval is the set of $\mu_0$ that survive.
+
+The virtue of the first wording is that it is closer to what we often want: what values are compatible with what we observed?
+
+
+
+(This is somewhat technical.) Notice that this ``compatibility'' is in a frequentist sense, \(P(\mbox{rare data}|\mu_0)\), not in a  Bayesian sense, \(P(\mu_0|\mbox{data})\). The frequentist sense compatibility, \(P(\mbox{rare data}|\mu_0)\) means that, if \(\mu_0\) were the true mean, data like ours would not be unusual; this is an assertion about the data given the parameter, not about the parameter given the data. (We mention Bayesian procedures briefly later.)
+
+% I have mu = 4. I construct that CI and it goes from 5 to 6? What gives?
+% Because what this is saying is, since it did not capture 4 (the
+% hypothesized true mean), that something like that, a CI that did not
+% capture 4, will happen 5 % of the time, or less.
+% El estadistico no asume H0 = 4. t = (bar{X} - \mu)/se es un pivote: se
+% distribuye como t_{n-1} sea cual sea la mu verdadera. El test de mu0 = 4
+% usa el pivote con mu = 4; el CI usa el pivote con mu libre y lo invierte,
+% es decir, corre simultaneamente el test para todos los mu0. Que 4 quede
+% fuera dice exactamente que el test de mu0 = 4 rejected. No hay
+% contradiccion; hay una familia de tests y tu miraste uno. Si los
+% estudiantes no tienen el concepto de pivote, la inversion les parece
+% magia; si lo tienen, es obvia.
+
+
 
 
 
@@ -668,6 +700,75 @@ When comparing means between two groups, A and B, we can think of three scenario
 
 
 The first scenario, the most common one, is called a two-tailed test. We sum both tails of the distribution. Deviations from \(H_0\) in both directions (A being larger than B, and A being smaller than B) count against the null.
+
+\subsection{One-tailed, examples}
+
+For the examples below, suppose, for the sake of the argument, that the denominator of the t-statistic is 1 (so we can just focus on the difference in means). For these examples, I'll assume the degrees of freedom are 100.
+
+
+\subsubsection{Example 1: \(H_0: \mu_A \le \mu_B. \ \  \bar{X}_A = 3, \bar{X}_B = 1\)}
+
+\begin{itemize}
+\item \(\bar{X}_A - \bar{X}_B = 2 \)
+\item The t-statistic is \(2\).
+\item What is a deviation from the null that is as extreme as, or more extreme than, the observed one?
+  \begin{itemize}
+  \item We observed \(\bar{X}_A - \bar{X}_B = 2\).
+  \item The null says \(\mu_A \le \mu_B\).
+  \item A deviation more extreme is any t-statistic as extreme as, or more extreme than, \(2\): further in the direction of the alternative, i.e., larger values of the t-statistic.
+  \item Thus, anything to the right of 2, i.e., to the right of the red line below.
+  \end{itemize}
+
+  <<onet-1, out.width='7cm', out.height='7cm', echo = FALSE>>=
+  curve(dt(x, df = 100), from = -4, to = 4)
+  abline(v = 2, lty = 2, col = "red")
+  axis(1, at = 2, labels = "2", col.axis = "red")
+  text(x = 3, y = 0.3,
+       paste("p-value = ", round(pt(2, 100, lower.tail = FALSE), 3)))
+
+  xs <- seq(2, 4, length.out = 200)
+  polygon(c(2, xs, 4), c(0, dt(xs, df = 100), 0),
+          col = "red", border = NA)
+  @
+\end{itemize}
+
+
+
+
+\subsubsection{Example 2: \(H_0: \mu_A \le \mu_B. \ \  \bar{X}_A = 1, \bar{X}_B = 3\)}
+Like the above, but now we flip the observed values (not the null).
+
+\begin{itemize}
+\item \(\bar{X}_A - \bar{X}_B = -2 \)
+\item The t-statistic is \(-2\).
+\item What is a deviation from the null that is as extreme as, or more extreme than, the observed one?
+  \begin{itemize}
+  \item We observed \(\bar{X}_A - \bar{X}_B = -2\).
+  \item The null says \(\mu_A \le \mu_B\).
+  \item A deviation more extreme is any t-statistic larger than \(-2\): further in the direction of the alternative, i.e., larger values of the t-statistic.
+
+ \item Thus, anything to the right of -2, i.e., to the right of the red line below.
+  \end{itemize}
+
+  <<onet-2, out.width='7cm', out.height='7cm', echo = FALSE>>=
+  curve(dt(x, df = 100), from = -4, to = 4)
+  abline(v = -2, lty = 2, col = "red")
+  axis(1, at = -2, labels = "-2", col.axis = "red")
+  text(x = 3, y = 0.3,
+       paste("p-value = ", round(pt(-2, 100, lower.tail = FALSE), 3)))
+  xs <- seq(-2, 4, length.out = 200)
+  polygon(c(-2, xs, 4), c(0, dt(xs, df = 100), 0),
+          col = "red", border = NA)
+  @
+\end{itemize}
+
+In this example, we know our p-value will be at least 0.5: we are asking for the area to the right of \(-2\), so we know we already have half of the area (to the right of 0), plus something else.
+
+
+
+Technical point. The null is composite (\(H_0: \mu_A \le \mu_B\)) instead of just a single value (\(\mu_A = \mu_B\) so \(\mu_A - \mu_B = 0\)).  The p-value is computed at the boundary case because that is the value in the null that makes the observed result most likely (it gives the largest p-value over the null)
+
+\subsection{Some issues with one-sided tests}
 
 Now, suppose you find \(\bar{X}_A > \bar{X}_B\) (i.e., the sample mean of group A is larger than the sample mean of group B). You do a two-tailed t-test and find a t-statistic \(t_1\) with a p-value of 0.06. This means that the area under the curve that is larger than \(t_1\) is 0.03, and the area under the curve that is smaller than \(-t_1\) is 0.03. \red{Make sure you understand this!!! Draw a picture of the t-distribution right now and place, in that figure, \(t_1\)! }
 
@@ -858,28 +959,25 @@ Now, what we have done is basically the following:
 
 
 
-%% FIXME
+%% FIXME: get the numbers
 \red{FIXME: change the example along the following lines.}
+A different example.  Dario Amodei says risk of extinction from AI is about 25\%, Musk about 30\% (get citations). Now, suppose someone (e.g., some politician, or some VC investor into AI) says: ``there is no evidence of risk of extinction from AI; what is your p-value?''. We can (should!) turn that around. We can thus say: ``I want strong evidence that risk of extinction is not larger than 1 in 100 million''\footnote{Where is the 1/100000000 figure from? This is a figure given by Stuart Russell in Steven Bartlett's podcast ``The diary of a CEO'' \Burl{https://stevenbartlett.com/doac/}, on 4 December 2025, around 1h 33' 30'' into the podcast (here is a link to the YouTube video and time \Burl{https://youtu.be/P7Y-fynYsgE?t=5610}). The logic is as follows: for nuclear plants we demand a risk no more than 1 in a million of a meltdown per year; we can also estimate the risk of extinction from a meteorite to be somewhere around 1 in 500 million to 1 in 1000 million (1 American billion) as a kind of background risk of extinction from other things. So, just to get the reasoning going, suppose we settle that we want the risk of extinction from AI to be no larger than 1 in a 100 million ---taking into account that human extinction is arguably much, much, much more serious than the meltdown of a nuclear plant, it does not seem exaggerated to demand a risk at least 100 times smaller, which is still larger than risks from meteorites.}.
 
-Amodei says risk of extinction from AI is about 25\%, Musk about 30\% (get citations). Now, suppose someone (e.g., some politician, or some VC investor into AI) says: ``there is no evidence of risk of extinction from AI; what is your p-value?''. We can (should!) turn that around. We can thus say: ``I want strong evidence that risk of extinction is not larger than 1 in 100 million''\footnote{Where is the 1/100000000 figure from? This is a figure given by Stuart Russell in Steven Bartlett's podcast ``The diary of a CEO'' \Burl{https://stevenbartlett.com/doac/}, on 4 December 2025, around 1h 33' 30'' into the podcast (here is a link to the YouTube video and time \Burl{https://youtu.be/P7Y-fynYsgE?t=5610}). The logic is as follows: for nuclear plants we demand a risk no more than 1 in a million of a meltdown per year; we can also estimate the risk of extinction from a meteorite to be somewhere around 1 in 500 million to 1 in 1000 million (1 American billion) as a kind of background risk of extinction from other things. So, just to get the reasoning going, suppose we settle that we want the risk of extinction from AI to be no larger than 1 in a 100 million ---taking into account that human extinction is arguably much, much, much more serious than the meltdown of a nuclear plant, it does not seem exaggerated to demand a risk at least 100 times smaller, which is still larger than risks from meteorites.}.
+Likewise, with drugs, it is not uncommon to want to examine if a new drug, B, is not inferior to an established drug, A. Drug B might be a good choice if it is not worse than A by some pre-specified threshold.  These are examples of (non-)inferiority testing.
 
 
+The above would be examples of ``inferiority'' tests (there are also ``non-inferiority'' tests, that test the opposite, for example that a new treatment has not less effect  than a standard treatment).
 
-The above would be an example of an ``inferiority'' test (there are also ``non-inferiority'' tests, that test the opposite, for example that a new treatment has not less effect  than a standard treatment).
-
-A related cases is equivalence testing. On typical example involves comparing two drugs. Suppose the standard, widely used drug, to control for cholesterol is drug A (produced by ACME labs). Now, we want to assess if a given generic, drug B, is equivalent to the established drug A. For example, suppose we would allow pharmacies to sell drug B if drug B has effects that are within 1\% of the effects of A.
-
+A related cases is equivalence testing.
+One typical example involves comparing two drugs. Suppose the standard, widely used drug, to control for cholesterol is drug A (produced by ACME labs). Now, we want to assess if a given generic, drug B, is equivalent to the established drug A. For example, suppose we would allow pharmacies to sell drug B if drug B has effects that are within 1\% of the effects of A.
 How can we do this?
 
 We can approach this problem as one of finding evidence against a (new null) hypothesis that things differ by more of the specified tolerance, in our case that 1\% difference in effects; in other words, we set up a new null that says that the true value falls outside the equivalence bounds. If we can reject our new null that the groups differ by more than a given threshold (that the true difference falls outside the equivalence bounds), we have established that they are equivalent.  In some cases it is relatively straightforward to do this (such as with the TOST ---two one-sided tests --- procedure), in many others it is not.
 
 Again, this is like inverting the burden of proof:  now we want evidence in favor of a hypothesis that says that things do not differ by more than a given, small, value (i.e., it seems we now want evidence in favor of what is often the null). In other words, we want strong evidence that the true value is inside the equivalence bounds, the bounds that say that ``things are similar, or equivalent''.
 
-Figure \ref{fig-equiv}, from Lakens et al. 2018\footnote{Lakens et al.(2018). Equivalence Testing for Psychological Research: A Tutorial. \textit{Advances in Methods and Practices in Psychological Science}, 1(2): 259--269. \Burl{https://doi.org/10.1177/2515245918770963}}, shows equivalence testing alongside the usual null hypothesis significance testing, as well as other tests. % Which of the four cases represented corresponds to the chlorine example in the notes?
-In some cases it is relatively straightforward to test for equivalence (such as with the TOST procedure), in many others it is not.
-
-
-
+Figure \ref{fig-equiv}, from Lakens et al.~ 2018\footnote{Lakens et al.(2018). Equivalence Testing for Psychological Research: A Tutorial. \textit{Advances in Methods and Practices in Psychological Science}, 1(2): 259--269. \Burl{https://doi.org/10.1177/2515245918770963}}, shows equivalence testing alongside the usual null hypothesis significance testing, as well as other tests. % Which of the four cases represented corresponds to the chlorine example in the notes?
+What case would represent examining if the effects of the brand name drug and a generic are similar?
 
 
 \begin{figure}[h!]
@@ -892,10 +990,11 @@ In some cases it is relatively straightforward to test for equivalence (such as 
 
 
 
-We will not pursue this any further. But, please, think of other examples of similar cases. Examples involving, for example, human disease and certain environmental changes, or secondary effects of drugs, or that two drugs (say, brand and generic) are for all practical purposes identical. What case would represent examining if the effects of the brand name drug and a generic are similar?
+ We will not pursue this any further. But, please, think of other examples of similar cases. Examples involving, for example, human disease and certain environmental changes, or secondary effects of drugs, or that two drugs (say, brand and generic) are for all practical purposes identical.
 
 
-Oh, and, of course, this section emphasizes another idea: a large p-value is not evidence in favor of the null!!!
+A few ideas to repeat here. Which is the null, even in non-bioequivalence testing cases, can make a whole lot of difference.  And, of course, that a large p-value is not evidence in favor of the null. Finally, ``the usual null hypothesis testing approach'' might not cover all cases you might be interested in.
+
 
 
 
