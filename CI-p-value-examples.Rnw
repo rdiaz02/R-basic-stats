@@ -78,6 +78,12 @@
 require(knitr)
 opts_knit$set(concordance = TRUE)
 opts_knit$set(stop_on_error = 2L)
+## Wrapping of the R output, so that it does not run past the right
+## margin; see the comments in knitr-setup.R
+source("knitr-setup.R")
+## with 30 mm margins and Courier, code at \normalsize would only fit
+## about 64 characters per line; \small fits the 68 we can produce
+opts_chunk$set(size = "small")
 ## next are for listings, to produce HTML
 ##listings-knitr-html%%options(formatR.arrow = TRUE)
 ##listings-knitr-html%%render_listings()
@@ -106,7 +112,7 @@ opts_knit$set(stop_on_error = 2L)
 ## suppressMessages(library(Rcmdr, quietly = TRUE, warn.conflicts = FALSE))
 ## suppressMessages(library(RcmdrPlugin.HH, quietly = TRUE, warn.conflicts = FALSE))
 ## suppressMessages(library(RcmdrPlugin.KMggplot2, quietly = TRUE, warn.conflicts = FALSE))
-options(width = 60)
+## options(width = 60)
 @
 
 % %% BiocStyle needs to be 1.2.0 or above
@@ -158,7 +164,7 @@ options(width = 60)
 
 
 \section*{License and copyright}\label{license}
-This work is Copyright, \copyright, 2025, Ramon Diaz-Uriarte, and is
+This work is Copyright, \copyright, 2024-2026, Ramon Diaz-Uriarte, and is
 licensed under a \textbf{Creative Commons } Attribution-ShareAlike 4.0
 International License:
 \Burl{http://creativecommons.org/licenses/by-sa/4.0/}.
@@ -189,7 +195,7 @@ Please, \textbf{respect the copyright and license}. This material is
 \label{sec:what-this-about}
 
 
-Clarify the relationship between confidence intervals and p-values, using examples from the two-sample t-test.
+A document to clarify the relationship between confidence intervals and p-values, using examples from the two-sample t-test.
 
 \section{CI and p-value relationships in the t-test}
 First, we read the data as we did in the main notes:
