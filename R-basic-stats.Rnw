@@ -247,7 +247,7 @@ information to more information'' we can organize scales this way:
 \item[Interval or ratio scale] You can take differences and ratios, and
   they do have meaning\footnote{Some authors make a distinction between
     ratio and interval scales; I won't. The only difference is that ratio
-    scales have a natural zero.}. If a subject has a value of 6 for the
+    scales have a natural zero, so ratios only make sense on a ratio scale (not, e.g., with log-expression values or Ct values).}. If a subject has a value of 6 for the
   expression of gene PTEN, another a value of 3, and another a value of 1,
   then the first has six times more RNA of PTEN than the last, and two
   times more than the second.
@@ -322,7 +322,7 @@ par(op)
 
 Note that I used the \Rfunction{Boxplot}, but we could have used
 \Rfunction{boxplot}. The first is from \CRANpkg{car} and provides added
-functionality. The \verb@op <- par(mfrow = c(1,2))@ and \verb@par(op)@ are a
+functionality. The \verb@op <- par(mfrow = c(2, 2))@ and \verb@par(op)@ are a
 minor detail to restore options as they were.
 
 Likewise, I have used \Rfunction{Hist} and
@@ -636,7 +636,7 @@ independence is a serious and pervasive problem (and one form of
 non-independence is also referred to as ``pseudoreplication'' \footnote{A
   major paper, a long while ago, in the journal \textit{Ecological
     Monographs} by Hurlbert dealt with this and made ``pseudoreplication''
-  a well known term: Hurlbert, S.H. 2004. Psudoreplication and the design of
+  a well known term: Hurlbert, S.H. 1984. Psudoreplication and the design of
   ecological field experiments. \textit{Ecological Monographs}, 54, 187--211}).
 
 
@@ -650,7 +650,7 @@ when variances are hugely different: do you really want to do that?
 What about normality? It matters, but not as much, especially as sample size gets
 larger. Deviations from normality because of skewness (asymmetry) can have a
 large effect. Deviations because of kurtosis (tails heavier than the normal) have
-very minor effects. That is why we often say ``data are sufficiently close to
+very minor effects on the Type I error rate (they can, however, reduce power). That is why we often say ``data are sufficiently close to
 normality''. And in the ``sufficiently close'' we worry mainly about
 asymmetries. And things tend to get ``sufficiently close'' as sample size grows
 larger (a consequence of the central limit theorem); how large is large enough?
@@ -670,7 +670,7 @@ normality, etc, we are talking about the data distribution of \textbf{each
 
 Finally, \textbf{outliers} can be a serious concern (by the way, outliers,
 or potential outliers ---under some definition of outlier--- get flagged
-by function \Rfunction{Boxplots} in R). In general, points very far from
+by function \Rfunction{Boxplot} in R). In general, points very far from
 the rest of the points will have severe effects on the value computed for
 the mean (not the median ---this is also related to why nonparametric
 procedures can be more robust). What to do, however, is not obvious. An
@@ -695,7 +695,7 @@ When comparing means between two groups, A and B, we can think of three scenario
 \begin{enumerate}
 \item We are asking if the means are different. \(H_0: \mu_A = \mu_B\).
 \item We are asking if the mean of A is larger than the mean of B. \(H_0: \mu_A \le \mu_B\).
-\item We are asking if the mean of A is smaller than the mean of A. \(H_0: \mu_A \ge \mu_B\).
+\item We are asking if the mean of A is smaller than the mean of B. \(H_0: \mu_A \ge \mu_B\).
 \end{enumerate}
 
 
@@ -766,7 +766,7 @@ In this example, we know our p-value will be at least 0.5: we are asking for the
 
 
 
-Technical point. The null is composite (\(H_0: \mu_A \le \mu_B\)) instead of just a single value (\(\mu_A = \mu_B\) so \(\mu_A - \mu_B = 0\)).  The p-value is computed at the boundary case because that is the value in the null that makes the observed result most likely (it gives the largest p-value over the null)
+Technical point. The null is composite (\(H_0: \mu_A \le \mu_B\)) instead of just a single value (\(\mu_A = \mu_B\) so \(\mu_A - \mu_B = 0\)).  The p-value is computed at the boundary because that is the value in the null that makes results as extreme as, or more extreme than, the observed one most likely.
 
 \subsection{Some issues with one-sided tests}
 
@@ -817,7 +817,7 @@ In most cases, when comparing means, the two-sided test is often the scientifica
 We will say more about ideas related to the sides of tests in section \qref{bioequiv}.
 
 
-\section{Power of a test}
+\section{Power of a test}\label{sec:power}
 
 
 If there is a true difference in means we would like to detect it. Power refers to our ability to reject the null when it is false. This figure might help; rows refer to the true state of the Universe and columns to your decision.
@@ -962,7 +962,7 @@ Now, what we have done is basically the following:
 A different example: existential risks from AI.
 Some influential AI executives have given figures as large as 25\% (e.g., Dario Amodei's 25\% figure in the Axios AI+ DC Summit on 17-September-2025\footnote{\Burl{https://www.axios.com/2025/09/17/anthropic-dario-amodei-p-doom-25-percent}}; Elon Musk has given figures of 10\% to 20\%\footnote{For example, in The Joe Rogan Experience \#2281, 28-February-2025, \Burl{https://youtu.be/sSOxPJD-VNo?t=8364}, \Burl{https://www.businessinsider.com/elon-musk-only-chance-of-annihilation-with-ai-2025-2}. Now, this has been quoted or reproduced sometimes as something like ``only 20\% chance of annihilation vs.~80\% awesome''. Personally, that some people find solace in ``only 20\%'' seems to me an alien, risk-prone behavior that I doubt is common even in BASE jumpers or wingsuit flyers: I would not get on an airplane with that chance of a crash, even if it had an 80\% chance of taking me to paradise otherwise, would you? And, even more, would you force your whole family and all of your friends to join you on that trip?}).
 Even if you discount these as hype or marketing, other estimates are still arguably non-negligible. For example, you can find detailed, careful studies of forecasts of impact, including extinction risks, from domain experts and ``superforecasters'' in the technical reports from the Forecasting Research Institute (FRI) (\Burl{https://forecastingresearch.org/})\footnote{For example, Karger et al., 2023, ``Forecasting Existential Risks: Evidence from a Long-Run Forecasting Tournament'', \Burl{https://forecastingresearch.org/research/existential-risk-persuasion-tournament}, and assessments of near-term accuracy (for questions that had been resolved by mid-2025) in %Kučinskas
-Ku\v{c}inskas et al., 2025, ``Assessing Near-Term Accuracy in the Existential Risk Persuasion Tournament'' (abstract and summary in  \Burl{https://forecastingresearch.org/research/near-term-xpt-accuracy}; full PDF in  \Burl{https://forecastingresearch.org/pdf/near-term-xpt-accuracy.pdf}).}. The Longitudinal Expert AI Panel (LEAP) (\Burl{https://leap.forecastingresearch.org/}) is an ongoing study (by the FRI) that ``(...) tracks the views of leading computer scientists, industry professionals, policy researchers, and economists on the trajectory of artificial intelligence.''. This includes the ``Probability of a Global AI Catastrophe'' (\Burl{https://leap.forecastingresearch.org/forecasts/ai-catastrophic-risk}), updated on 11-August-2026, where ``(...) the median expert assigns a probability of 0.3\% by 2030, 2\% by 2050, and 5\% by 2100'' (with 43 computer science, 45 economics, 37 industry, and 67 policy experts, and 53 superforecasters). Now, suppose someone (e.g., some politician, or some VC investor in AI) says: ``there is no evidence of risk of extinction from AI; what is your p-value?''. We can (should!) turn that around. We can thus say: ``I want strong evidence that risk of extinction is not larger than 1 in 100 million''\footnote{Where is the 1/100000000 figure from? This is a figure given by Stuart Russell in Steven Bartlett's podcast ``The diary of a CEO'' \Burl{https://stevenbartlett.com/doac/}, on 4 December 2025, around 1h 33' 30'' into the podcast (here is a link to the YouTube video and time \Burl{https://youtu.be/P7Y-fynYsgE?t=5610}).}. The logic is as follows: for nuclear plants we demand a risk of no more than 1 in a million of a meltdown per year; we can also estimate the risk of extinction from a meteorite to be somewhere around 1 in 500 million to 1 in 1000 million (1 American billion) as a kind of background risk of extinction from other things. So, just to get the reasoning going, suppose we settle that we want the risk of extinction from AI to be no larger than 1 in 100 million ---taking into account that human extinction is arguably much, much, much more serious than the meltdown of a nuclear plant, it does not seem exaggerated to demand a risk at least 100 times smaller, which is still larger than risks from meteorites. So, bottom line: we demand strong evidence that risk is no larger than 1 in 100 million before relaxing and letting things run their course (instead of demanding a tiny p-value against the null of no-risk before worrying).
+Ku\v{c}inskas et al., 2025, ``Assessing Near-Term Accuracy in the Existential Risk Persuasion Tournament'' (abstract and summary in  \Burl{https://forecastingresearch.org/research/near-term-xpt-accuracy}; full PDF in  \Burl{https://forecastingresearch.org/pdf/near-term-xpt-accuracy.pdf}).}. The Longitudinal Expert AI Panel (LEAP) (\Burl{https://leap.forecastingresearch.org/}) is an ongoing study (by the FRI) that ``(...) tracks the views of leading computer scientists, industry professionals, policy researchers, and economists on the trajectory of artificial intelligence.''. This includes the ``Probability of a Global AI Catastrophe'' (\Burl{https://leap.forecastingresearch.org/forecasts/ai-catastrophic-risk}), updated on 11-August-2026, where ``(...) the median expert assigns a probability of 0.3\% by 2030, 2\% by 2050, and 5\% by 2100'' (with 43 computer science, 45 economics, 37 industry, and 67 policy experts, and 53 superforecasters). Now, suppose someone (e.g., some politician, or some VC investor in AI) says: ``there is no evidence of risk of extinction from AI; what is your p-value?''. We can (should!) turn that around. We can thus say: ``I want strong evidence that risk of extinction is not larger than 1 in 100 million''\footnote{Where is the 1/100000000 figure from? This is a figure given by Stuart Russell in Steven Bartlett's podcast ``The diary of a CEO'' \Burl{https://stevenbartlett.com/doac/}, on 4 December 2025, around 1h 33' 30'' into the podcast (here is a link to the YouTube video and time \Burl{https://youtu.be/P7Y-fynYsgE?t=5610}).}. The logic is as follows: for nuclear plants we demand a risk of no more than 1 in a million of a meltdown per year; we can also estimate the risk of extinction from a meteorite to be somewhere around 1 in 500 million to 1 in 1000 million (1 American billion) per year as a kind of background risk of extinction from other things. So, just to get the reasoning going, suppose we settle that we want the risk of extinction from AI to be no larger than 1 in 100 million ---taking into account that human extinction is arguably much, much, much more serious than the meltdown of a nuclear plant, it does not seem exaggerated to demand a risk at least 100 times smaller, which is still larger than risks from meteorites. So, bottom line: we demand strong evidence that risk is no larger than 1 in 100 million before relaxing and letting things run their course (instead of demanding a tiny p-value against the null of no-risk before worrying). (The time horizons differ: the nuclear plant and meteorite figures are per year, the LEAP figures are cumulative probabilities by a given year. This does not change the argument. Even 0.3\% by 2030 is several orders of magnitude above 1 in 100 million per year.)
 
 Likewise, with drugs, it is not uncommon to want to examine if a new drug, B, is not inferior to an established drug, A. Drug B might be a good choice if it is not worse than A by some pre-specified threshold.
 
@@ -1118,9 +1118,10 @@ dmyc <- data.frame(myc = round(y, 3),
 ## t.test(dmyc$myc[1:12] - dmyc$myc[13:24])
 ## summary(lm(myc ~ id + cond, data = dmyc))
 
-
 write.table(dmyc, file = "MYC.txt", col.names = TRUE,
             row.names = FALSE, sep = "\t", quote = FALSE)
+
+rm(y, id, s, cond) ## prevent mistakes further down
 @
 
 <<>>=
@@ -1171,7 +1172,7 @@ dmyc
 
 However, to ensure that order is OK we could have pre-ordered the data
 by patient ID and by condition within patient (this second step isn't
-really needed in this case, but is in general):
+really needed in this case, but is generally good practice, as we ensure a consistent ordering, so if we put the values in odd-numbered rows in one vector and the even-numbered ones in another, we ensure they are from the same patient, and each vector corresponds to a given condition or treatment):
 
 <<>>=
 dmycO <- dmyc[order(dmyc$id, dmyc$cond), ]
@@ -1379,7 +1380,7 @@ library(tidyr)
 (merged4 <- spread(dmyc, cond, myc))
 @
 
-You can compare with \texttt{merged3} and \texttt{merged2} and \texttt{merged},
+You can compare with \texttt{merged3}, \texttt{merged2} and \texttt{dmycWide},
 and verify they have the same data.
 
 
@@ -1635,7 +1636,7 @@ very good idea. % In fact, I will now create them from scratch directly from R
 % the case in our data, but need not be; see details in section \ref{ptr})
 
 <<fig.width=5.5, fig.height=5.5, echo=TRUE, fig.show = 'hold'>>=
-Boxplot( ~ diff.nc.c, data = merged3, xlab = "",
+Boxplot(diff.nc.c, xlab = "",
          ylab = "Intra-subject difference (NC - Cancer)", main = "MYC")
 @
 
@@ -1655,7 +1656,7 @@ We can also create a violin plot with the boxplot inside and the points jittered
 <<diff-violin, fig.width=4.5, fig.height=4.5, echo=TRUE, fig.show = 'hold'>>=
 library(ggplot2)
 
-dftmp <- data.frame(y = dmycWide$diff.nc.c)
+dftmp <- data.frame(y = diff.nc.c)
 theplot <- ggplot(data = dftmp, aes(x = factor(1), y = y)) +
   geom_violin() + geom_boxplot(width = 0.2) +
   geom_jitter(colour = "black", width = 0.1, height = 0) +
@@ -1856,7 +1857,7 @@ are:
 \item What about the relative efficiency of the non parametric procedure?
   (relative efficiency refers to the sample size required for two
   different procedures that have similar type I error rate to achieve the
-  same power ---more on power later). When assumptions are met, parametric
+  same power ---see section \ref{sec:power} on power, above). When assumptions are met, parametric
   methods do have more power (though not always a lot more). When
   assumptions are not met, nonparametric methods might have more power, or
   the correct Type I error, etc. Note that very, very, very small p-values
@@ -1897,7 +1898,7 @@ Wilcoxon as with the t-test. Nonparametric tests are not
 This test applies to data of ordinal and interval scales. The basic logic
 is: put all the observations together, rank them, and examine if the sum
 of the ranks of one of the groups is larger (or smaller) than the
-sum of the ranks from the other\footnote{The actual test statistic reported by R is not this one, but is one that is linearly related to it. Likewise, the equivalent Mann-Whitney U test uses another different statistic, but the test results are identical.}. If this makes sense to you, you should
+sum of the ranks from the other\footnote{The actual test statistic reported by R is not this one, but is one that is linearly related to it. Likewise, the equivalent Mann-Whitney U test uses a different statistic, but the test results are identical. See the help of \texttt{wilcox.test}, in particular the ``Note'', for the statistic reported by R.}. If this makes sense to you, you should
 understand why you can use both ordinal and interval scales.
 
 
@@ -2026,6 +2027,9 @@ wilcox.test(x, y)
 <<>>=
 ### Will not reject
 ##  Contrary to Conover, not really testing F(x)= G(x)
+## We set the seed so that we all get the same numbers. Without it,
+## about 5% of the time we would reject (the null is true here).
+set.seed(2)
 x <- rnorm(10000, mean = 0, sd = 1)
 y <- rnorm(10000, mean = 0, sd = 20)
 wilcox.test(x, y)
@@ -2044,8 +2048,8 @@ y <- rep(c(-4, -2, 2, 4), 1000)
 wilcox.test(x, y)
 
 ## Oh, you say you dislike the many identical values?
-x <- x + rnorm(1000, 0, sd = 0.001)
-y <- y + rnorm(1000, 0, sd = 0.002)
+x <- x + rnorm(length(x), 0, sd = 0.001)
+y <- y + rnorm(length(y), 0, sd = 0.002)
 ## No identical values
 length(unique(c(x, y)))
 wilcox.test(x, y)
@@ -2134,10 +2138,7 @@ There are several problems with the above procedure, among them:
 \begin{itemize}
 \item Tests for normality do not have a power of 1, and in fact can have
   very low power with small sample sizes.
-  \item They can have power to detect a minor and irrelevant deviation from
-  normality (e.g., slightly heavy tails) that have no effects on a
-  t-test. So with very large sample size, an a slightlye ``heavier tails than a Normal'', where a t-test is just fine, we might be mislead
-  into doing a Wilcoxon.
+  \item They can have power to detect minor and irrelevant deviations from  normality (e.g., slightly heavy tails) that are not problematic for a t-test. Suppose we have a very large sample size, and slightly heavier tails than a Normal:  we might be mislead  into doing a Wilcoxon.
 \item They might fail to detect a large deviation from normality in a very
   non-normal small sample where we really, given our ignorance, might want
   to conduct a Wilcoxon test.
@@ -2629,17 +2630,13 @@ that important, but I'll use those terms as they might be more familiar to
 you.
 
 \subsection{Files we will use}
-
 \begin{itemize}
 \item This one
 \item \Robject{MIT.txt}
 \item \Robject{Cholesterol.txt}
 \item \Robject{AnAge\_birds\_reptiles.txt}
 \item \Robject{CystFibr2.txt}
-
 \end{itemize}
-
-
 
 \clearpage
 \section{Comparing more than two groups}
@@ -2996,10 +2993,10 @@ Because: \(\mbox{FWER} = P( \ge \mbox{1 false rejection})  \le 1 - P(\mbox{all C
 %()%% because emacs gets confused with paren.
 \footnote{Technical point: And why the last \( \le \)?
 Because the FWER control has to work both under the complete null, when all nulls are true, but also when only some nulls are true. Under the complete null, when all nulls are true, we would write
-\( P( \ge \mbox{1 false rejection}) = 1 - P(\mbox{all CIs cover the truth}\).
+\( P( \ge \mbox{1 false rejection}) = 1 - P(\mbox{all CIs cover the truth})\).
 In the second case, when only some nulls are true,
 \(P( \ge \mbox{1 false rejection})  < 1 - P(\mbox{all CIs cover the truth})\);
-the CI for a truly false null might not cover its true value, and this would not be a Type I error. This is why on this second case, FWER is strictly less than \(1 - P(\mbox{all CIs cover the truth})\).}.
+the CI for a truly false null might not cover its true value, and this would not be a Type I error. This is why on this second case (when only some nulls are true), FWER is strictly less than \(1 - P(\mbox{all CIs cover the truth})\).}.
 
 
 Given how far two of the contrasts are from 0.0, it seems those are highly
@@ -5123,8 +5120,9 @@ cholA_mmc
 
 mmcplot(cholA_mmc)
 
-## Note that these are wider than the ones for both Diet and Drug
+## Note that these are narrower than the ones for both Diet and Drug
 ## with clmA_glh, above, as we should expect.
+## (They are also identical to clmD_glh, above)
 @
 
 Now, with interactions:
@@ -7032,9 +7030,9 @@ These are three key features of AIC:
 
 
 \begin{enumerate}
-\item AIC (under certain assumptions) is an unbiased estimate of the predictive accuracy of the model: the expected likelihood of the model when applied to new data (see Figure \ref{aic-otsuka}, from Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations}.).
+\item AIC (under certain assumptions) is, asymptotically, an unbiased estimate of the predictive accuracy of the model: the expected likelihood of the model when applied to new data (see Figure \ref{aic-otsuka}, from Otsuka (2023), \textit{Thinking about statistics. The philosophical foundations}.).
 \item AIC measures (again, under certain assumptions) how close to the true values are the predictions of the model\footnote{Here, ``how close'' is evaluated using the Kullback-Leibler divergence, a measure of distance between probability distributions.}.
-\item AIC is equivalent to leave-one-out cross-validation for (many) linear models (including linear regression and mixed-effects).
+\item AIC is asymptotically equivalent to leave-one-out cross-validation for (many) linear models (including linear regression and mixed-effects).
 \end{enumerate}
 
 
