@@ -311,7 +311,7 @@ with(dp53, Hist(p53, groups = cond, col = "darkgray"))
 
 <<fig.height=10, fig.width=8,results='hide'>>=
 op <- par(mfrow = c(2, 2)) ## to show 2 by 2 on the same figure
-Boxplot(p53 ~ cond, data = dp53, id.method = "y")
+Boxplot(p53 ~ cond, data = dp53)
 plotMeans(dp53$p53, dp53$cond, error.bars = "se",
   xlab = "Condition", ylab = "P53 expression levels")
 stripchart(p53 ~ cond, vertical = TRUE, method = "jitter",
@@ -2711,7 +2711,7 @@ You are advised to also plot the data. For instance, this
 will do:
 
 <<results='hide', fig.width=5, fig.height=5>>=
-Boxplot(activ ~ ftraining, data = dmit, id.method = "y")
+Boxplot(activ ~ ftraining, data = dmit)
 @
 
 (The output might show a ``2''; that is the identifier ---row name--- of a
@@ -2824,8 +2824,8 @@ and that is what we do next.
 \subsection{So which means are different? Multiple comparisons}
 \label{multcomp1}
 That small p-value leads us to reject the null hypothesis $\mu_{Morning}  =
-\mu_{Lunch} = \mu_{Afternoon}$. So there is strong evidence that all three
-means are not equal. But which one(s) is(are) different from the other(s)?
+\mu_{Lunch} = \mu_{Afternoon}$. So there is strong evidence that the three
+means are not all equal. But which one(s) is(are) different from the other(s)?
 
 
 Let us get some summary data. I will do it in two different ways. This is
@@ -2858,10 +2858,12 @@ You can get an idea: it seems that Morning and Lunch are very similar to
 each other, but Afternoon is very different. This agrees with the
 impression we got from the boxplot. But we would like a more formal
 procedure: we are going to compare all pairs of means and we will take
-into account that we are carrying out multiple comparisons (tests of pairs
-of means when the ANOVA is not significant are rarely
-justified\footnote{Unless some specific, small number of, tests of
-  specific pairs had been planned before the experiment.}.
+into account that we are carrying out multiple comparisons (we will carry
+out the pairwise comparisons after a significant ANOVA, which is common
+practice, although procedures such as Tukey's control the FWER by themselves
+and do not require it\footnote{And some specific, small number of, tests of
+  specific pairs planned before the experiment can be carried out
+  regardless of the ANOVA result.}).
 
 
 
@@ -2982,9 +2984,9 @@ of what is happening with the p-values in
 Look carefully at the plot in Figure \ref{fig:tukey1}: for each difference
 (for each \textbf{contrast}), it shows the estimate and a 95\% confidence
 interval around it. The plot title says ``95\% family-wise confidence
-interval'', and that indicates that multiple testing correction has been
+level'', and that indicates that multiple testing correction has been
 used. (You might want to make that even more explicit by using a title
-such as ``95\% family-wise confidence interval using Tukey contrasts'').
+such as ``95\% family-wise confidence intervals using Tukey contrasts'').
 Again, notice the output says ``simultaneous'': as emphasized in Lukas Meier's ``ANOVA and Mixed Models'' (2025, CRC Press; HTML from \Burl{https://people.math.ethz.ch/~meier/teaching/anova/contrasts-and-multiple-testing.html\#sec-tukey-hsd}):
 ``these confidence intervals are simultaneous, meaning that the probability that they all cover the corresponding true difference at the same time is 95\%.''.
 %()%% because emacs gets confused with paren.
@@ -3094,7 +3096,7 @@ plot(allEffects(AnovaMIT), ask=FALSE, main = "Training: effect plot")
 tmp <- cld(.Pairs) ## silent assignment
 old.oma <- par(oma=c(0, 5, 0, 0))
 plot(confint(.Pairs),
-     main = "95% family-wise confidence interval using Tukey contrasts")
+     main = "95% family-wise confidence intervals using Tukey contrasts")
 par(old.oma) ## restore graphics windows settings
 @
 
@@ -3249,7 +3251,7 @@ In section \nameref{multcomp1} we covered multiple comparisons. Here we go
 into a little bit more detail before continuing with ANOVA. As in section
 \nameref{multcomp1}, suppose we are testing a number of null hypothesis. Table
 \ref{table-multcomp} shows a depiction of what we are concerned about,
-where the letters in each cell refer to the number of means tested that fall in
+where the letters in each cell refer to the number of hypotheses tested that fall in
 each case.
 
 
@@ -3396,8 +3398,9 @@ How do we interpret this? Here I will only cover the very basics. But go
 back a couple of paragraphs, and re-read the definition of adjusted
 p-value for the FDR. So, for example, if we keep as ``significant'' all
 the genes with a p-value (not adjusted p-value, but p-value, so the last
-first three) $\leq 0.030$, the FDR (the expected number of false
-discoveries) will be 0.040 (the FDR-adjusted p-value for the gene with
+first three) $\leq 0.030$, the FDR (the expected fraction of false
+discoveries among the genes declared significant) will be controlled at
+0.040 (the FDR-adjusted p-value for the gene with
 $p-$value of 0.03).
 
 
@@ -3443,9 +3446,6 @@ take a look at a three-page one by W.\ Noble, in \textit{Nature
 
 \clearpage
 
-% FIXME: start first without interactions!!! Use the data from orderfactors
-%% FIXME: change this, and make it like in BM-1 when we remove above
-%% section of lm and anova, and do it as in BM-1
 \section{Two-way ANOVA}\label{twoway}
 
 In a two-way ANOVA, we are interested in the effects of two factors, not just one. For example, our experiment might involve simultaneously changing diet and drug.
