@@ -989,7 +989,7 @@ Taking into account that human extinction is arguably much, much, much more seri
 So, bottom line: we demand strong evidence that the existential risk from AI is no larger than 1 in 100 million per year before relaxing and letting things run their course (instead of demanding a tiny p-value against the null of no risk before worrying). In other words: our null is now ``the annual risk of extinction from AI is 1 in 100 million or larger'', and we need strong evidence against it before proceeding.
 
 
-Before we leave these examples: are we suggesting that we always need to ask for evidence that doing X will not kill fish, drug Z will not have teratogenic effects, or technology W will not lead to doom? Sure, we can't go around checking every crackpot's deliriums (or, more formally, every fringe theory or wild claim). But sometimes there are reasons to think chlorine will kill fish, some drugs might have teratogenic effects, and the potential harm is serious or irreversible (Stuart Russell, Yoshua Bengio, or Geoffrey Hinton are not crackpots); and we are back to the precautionary principle.
+Before we leave these examples: are we suggesting that we always need to ask for evidence that doing X will not kill fish, drug Z will not have teratogenic effects, or technology W will not lead to doom? Sure, we can't go around checking every crackpot's deliriums (or, more formally, every fringe theory or wild claim). But sometimes there are reasons to think chlorine will kill fish, some drugs might have teratogenic effects, and the potential harm of AI is serious or irreversible (Stuart Russell, Yoshua Bengio, or Geoffrey Hinton are not crackpots); and we are back to the precautionary principle.
 
 
 \subsection{Equivalence testing}\label{sec:equiv-equiv}
