@@ -5447,7 +5447,7 @@ Basically:
 \begin{itemize}
 \item Confidence interval bands are for the regression line itself which is the same as saying that they are for the expected value of the response variable. (We are modeling $E[y] = \alpha + \beta x$). The more uncertain we are about the overall trend, about the line, the wider the confidence interval bands will be.
 
-\item Prediction interval bands are for the observations; so, in addition to the uncertainty around the regression line, we have the $\sigma$, the variance of the observations around their mean value, around $E[y]$.
+\item Prediction interval bands are for the observations; so, in addition to the uncertainty around the regression line, we have the $\sigma$, the standard deviation of the observations around their mean value, around $E[y]$.
 \item To clarify the above, think about this: suppose you take a huge sample, say of size 10 million, of people and do a regression of body mass on body height. You will estimate the regression line with very little uncertainty. In other words, you will be very, very certain about where $E[body\_mass]$ is given $body\_height$. But \ldots no matter your sample size, there is quite a bit of variation in body mass for a given body height. So the prediction bands will be relatively wide, to accomodate this fact.
 
   This is, by the way, the reason why you can be very certain about an overall trend (the expected value) and yet be unable to really predict any one specific individuals actual value. (This is similar to situation where you can say, for example, that a particular intervention or factor is associated with a change in the probability of event A of 70\%, and yet that might not be a very precise forecast for any specific idividual.)  It is crucial to understand the difference between predicting the mean and predicting a specific individual's value.
@@ -5562,7 +5562,10 @@ summary(mcyst)
 confint(mcyst)
 @
 
-You should be able to interpret all output without problems.
+You should be able to interpret all output without problems. Note also
+that the coefficient for height is negative, even though pemax increases
+with height (we will see this below, in the scatterplot matrix); the
+coefficient is tiny and far from significant, though.
 
 %% <<>>=
 %% print(scatter3d(pemax~age+height, data=cystfibr2,
@@ -5655,7 +5658,7 @@ all.equal(
 all.equal(summary(mcyst)$sigma^2,
           sum(residuals(mcyst)^2)/21)
 
-## and where is the (25 = 21 - 4) 4 from
+## and where is the (21 = 25 - 4) 4 from
 21 == (length(residuals(mcyst)) - length(coefficients(mcyst)))
 
 all.equal(
@@ -5692,7 +5695,7 @@ The variance inflation factor, that we can compute with function \texttt{vif}, e
 vif(mcyst)
 @
 
-We can see that the standard error for age is about \(\sqrt{8} = 2.8\), so almost three times larger than it would have been without collinearity.
+We can see that the standard error for age is about \(\sqrt{8} = 2.8\) times (so almost three times) larger than it would have been without collinearity.
 
 
 Compare this with a very different model, where we only have age and sex:
@@ -5943,10 +5946,10 @@ scatterplot(pemax~age | sex,
 @
 
 (yes, the best fitting slopes are slightly different, but they are not
-significantly different, as shown by the the ``age:sex[T.Female]'' term in
+significantly different, as shown by the the ``age:sexFemale'' term in
 the model above, so no evidence for different slopes).
 
-The different intercepts are captured by the term ``sex[T.Female]'' (that
+The different intercepts are captured by the term ``sexFemale'' (that
 is not significant in this example either). Anyway, we can often have
 models where we have no evidence of different slopes (no interaction), but
 evidence of different intercepts: these means parallel lines (we will see
@@ -6171,7 +6174,18 @@ confint(longev_b_r)
 
 In this case, lines are not parallel: the rate of change of longevity with
 body mass is faster in reptiles than in birds (note the coefficient
-``logBodyMass:Class[T.Reptilia]'').
+``logBodyMass:ClassReptilia'').
+
+
+(For the sake of comparison, we can use the \texttt{contr.Treatment} contrasts from package \texttt{car} (the ones R Commander uses by default), which sometimes make the labelling clearer: see this
+<<>>=
+longev_b_r_cT <- lm(logLongevity ~ logBodyMass * Class, data = anage_a_r,
+                    contrasts = list(Class = "contr.Treatment"))
+summary(longev_b_r_cT)
+confint(longev_b_r_cT)
+rm(longev_b_r_cT) ## rm to prevent unintended misuse
+@
+This is shown and used in more detail in section \qref{another-ex-contr-sum}.)
 
 
 How do things look?
@@ -6306,8 +6320,9 @@ setting or value of variable B.
 The three main types are:
 
 \begin{description}
-\item[Between factors] There is one level for each combination of the
-  factors, as in the example in section \nameref{2way-int}.
+\item[Between factors] The effect of one factor (the difference between
+  its levels) is not the same at every level of the other factor, as in
+  the example in section \nameref{2way-int}.
 \item[Betwen a factor and a continuous variable] What we saw in ANCOVA, in
   section \nameref{ancova}: a different slope for each group. (Parallel slopes
   is not an interaction).
@@ -6434,7 +6449,10 @@ idea of leverage that makes a lot of sense in regression ---see below---
 is not that useful here). Notice how this plot shows four vertical lines
 in both models, the additive and the interaction one, but plots on the
 upper left and bottom left differ in the apparent number of vertical
-lines. Do you understand why?
+lines. Do you understand why? (Hint: in the interaction model the fitted
+values are the cell means, and here two of the four cell means are, by
+chance, almost identical: look at the coefficient of ``sexMale'' in
+\Robject{myInteract}, and at the cell where the outlier is.)
 
 
 An issue about syntax: if you want the plots to show, in the upper part of the
@@ -6446,8 +6464,7 @@ call to also allow to plot several figures at once: \verb@par(oma=c(0,0,3,0), mf
 \subsection{Diagnostics: examples with some of the regression models}\label{diag-regr}
 
 We will now use the two simple regression models we fitted in section
-\nameref{regr}. Make the first one (\Robject{metab}) active and go to
-``Models'', ``Graphs'', ``Basic diagnostic plots''.
+\nameref{regr}, starting with \Robject{metab}.
 
 <<fig.show='hold', fig.cap='Model diagnostics for metabolic rate model without log transformation ', fig.width=6.5, fig.height=6.5>>=
 oldpar <- par(oma=c(0,0,3,0), mfrow=c(2,2))
@@ -6527,7 +6544,7 @@ the discrete values you observe in two of the plots). However, the
 qqplot\footnote{``qqplot'': ``quantile-quantile plot''} of residuals is a little
 bit ugly, but it is hard to tell from relatively so little data\footnote{Again,
   this is an interesting case, since these data are simulated from a normal
-  distribution}. Finally, \Robject{AnovaModel.1}, from section \nameref{oneway},
+  distribution}. Finally, \Robject{AnovaMIT} and \Robject{LinearModel.1}, from section \nameref{oneway},
 looks just fine. Please look at all of these yourself to see them.
 
 
@@ -6857,11 +6874,11 @@ qqPlot(lm(y ~ sex + drug, data = y.data2[-1, ]), reps = 5000)
 \item ``Component+Residual'' (or partial residual\footnote{These plots,
     for each variable, shows a plot of the independent variable, say $x$, on the
     horizontal axis and, on the ordinates, the ``partial residuals'' which are the values of the response with the effect of all other predictors removed, i.e., $=
-    residual + \hat{\beta}x = y - \sum_{\mbox{o=all other predictors}} \hat{\beta_o} x_o$. See, for example, Faraway, ``Linear models with R, 2nd ed'', p.~94 and ff. and Fox \& Weisberg, ``An R companion to applied regression, 3rd ed.'', section 8.4.2}) plots allow us to
+    residual + \hat{\beta}x = y - \hat{\alpha} - \sum_{\mbox{o=all other predictors}} \hat{\beta_o} x_o$. See, for example, Faraway, ``Linear models with R, 2nd ed'', p.~94 and ff. and Fox \& Weisberg, ``An R companion to applied regression, 3rd ed.'', section 8.4.2}) plots allow us to
   examine, in models with multiple regressors, deviations from linearity
   and could suggest the appropriate transformation. ``CERES plots'' are a
   variation of ``Component + Residual'' plots that work well even if
-  relationships are strongly nonlinear. Both also available from
+  the predictors are strongly nonlinearly related to each other. Both also available from
   \CRANpkg{car}.
 \item Various diagnostics related to dfbetas allow us to identify
   influential observations in specific terms of the model.
