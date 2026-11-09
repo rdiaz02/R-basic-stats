@@ -22,7 +22,7 @@
 \newcommand{\Burl}[1]{{\textcolor{blue}{\url{#1}}}}
 %\usepackage{tikz}
 %\usetikzlibrary{arrows,shapes,positioning}
-\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
 %\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[copyright]{ccicons} %% for the CC license icons
@@ -626,7 +626,7 @@ The virtue of the first wording is that it is closer to what we often want: what
 
 
 
-\subsection{Assumptions of the t-test}
+\subsection{Assumptions of the t-test}\label{sec:assumptions-t}
 
 One key assumption is \textbf{independence} of the data. This is the case
 for the t-test but is also the case for many statistical tests. We return
@@ -1863,7 +1863,10 @@ are:
   the correct Type I error, etc. Note that very, very, very small p-values
   are often not achievable with non-parametric methods (because of the way
   they work), and this is a concern with multiple testing adjustments in
-  omics experiments (this will be covered in the next lesson).
+  omics experiments (for example, with 4 vs 4 observations the smallest
+  two-sided p-value a rank-sum test can give is $2/70 = 0.029$, so after
+  adjusting for thousands of tests nothing can ever be significant,
+  whatever the data).
 \item Is this test flexible enough? In particular, can I accommodate
   additional experimental factors?
 \end{itemize}
@@ -2123,7 +2126,7 @@ Before we move on: what is the role of symmetry in the paired t-test? To try to 
 
 
 \subsection{A bad (very bad, terrible!) way to choose between nonparametric and parametric
-  procedures}
+  procedures}\label{sec:bad-way-choose}
 
 Don't do the following:
 \begin{enumerate}
@@ -4279,7 +4282,7 @@ with(y.data, tapply(y, list(sex, drug), mean))
 @
 
 Just by eye, it seems the difference between sexes is around 2, and the
-difference between drugs of about 4. And no, there is no interaction:
+difference between drugs of about 4. And no, there is no evidence of an interaction (we simulated none):
 
 <<>>=
 summary(lm(y ~ sex * drug, data = y.data))
@@ -4600,7 +4603,7 @@ Do you understand what is going on?
 \subsection{Another quick two-way example}
 \label{sec:another-quick-two}
 
-We will use the \texttt{coking} data from the \texttt{ISwR} package (the one associated with Dalgaard's book \textit{Introductory statistics with R}). You can access that data using the menu ``Data -> Data in packages''. Please, look at the description of the data. Now, we will fit a model and summarize it.
+We will use the \texttt{coking} data from the \texttt{ISwR} package (the one associated with Dalgaard's book \textit{Introductory statistics with R}). You can access that data with \texttt{data(coking, package = "ISwR")}. Please, look at the description of the data. Now, we will fit a model and summarize it.
 
 You should make sure what kinds of variables these are (i.e., do we have factors or numeric variables for \texttt{width} and \texttt{temp}?)
 
@@ -5722,10 +5725,10 @@ variables, however, are harder to visualize: they represent curved
 surfaces, because the slope of one of the variable changes as the other
 variable changes, whereas an additive model is just a plane ---or
 hyperplane\footnote{If you want to play around with a regression plane or
-  regression surfaces, go to ``Graphs'', ``3D graph'', ``3D
-  scatterplot''. In options, you can choose a plane or three different
-  surfaces ---you might need to play with the degrees of freedom if you
-  get errors. You can zoom in and out with the mouse wheel and move/rotate
+  regression surfaces, use function \Rfunction{scatter3d} from package
+  \CRANpkg{car}. With its argument \texttt{fit} you can choose a plane or
+  three different surfaces ---you might need to play with the degrees of
+  freedom if you get errors. You can zoom in and out with the mouse wheel and move/rotate
   the figure. Try doing that during your TFM defense! Of course, that
   allows only for up to one dependent variable and two independent ones:
   our brains do not seem ready for 4D and higher.}.
@@ -6125,9 +6128,10 @@ summary(metab_b_r)
 confint(metab_b_r)
 @
 
-The output is clear: parallel lines (i.e., different intercepts, but same
-slope). Note that this is not a silly or irrelevant biological detail:
-metabolic rates scales with body mass in the same way in an endothermic
+The output is clear: no evidence of different slopes (the CI for the
+interaction is narrow and includes 0), but different intercepts: parallel
+lines. Note that this is not a silly or irrelevant biological detail:
+metabolic rates scales with body mass in (nearly) the same way in an endothermic
 group (birds) and a ectothermic one (reptiles), but their metabolic rates
 are not the same (birds' are higher).
 
@@ -6353,7 +6357,10 @@ In general, for linear models (ANOVAs, regressions, etc) we want to check:
   variables). Often referred to as ``homoscedasticity'' (where
   ``heteroscedasticity'' is the opposite).
 \item Linearity (for regression).
-\item Approximate normality of residuals.
+\item Approximate normality of residuals (for a t-test or an ANOVA this is
+  the same as normality of the data within each group, as in section
+  \nameref{sec:assumptions-t}: a residual is an observation minus its group
+  mean; for a regression only the residuals version makes sense).
 \item Possible highly influential points (i.e., do our results depend on
   one or two points that are driving the model one way or another?).
 \item Possible outliers.
@@ -6826,8 +6833,7 @@ diff(range(hii3)) ## not constant
 For you to read and play around further:
 \begin{itemize}
 \item An extended qqplot is available from package \CRANpkg{car},
-  \Rfunction{qqPlot} (and in R Commander under ``Residual quantile
-  comparison plots'').
+  \Rfunction{qqPlot}.
 
 
 <<qqPlotexample, echo=FALSE, results='hide', eval=FALSE>>=
@@ -7023,7 +7029,7 @@ The book by Frank Harrell, ``Regression modeling strategies'' contains great dis
 \subsection{Model selection using AIC and \Rfunction{step}}
 
 If you really need automated or semiautomated procedures, then reasonable
-strategies use model-comparison criteria such as AIC (e.g., with the \Rfunction{step} function) are much more sensible.  But the focus, now, is different: we are doing \textbf{model selection}, not variable selection. And we are trying to achieve a different objective: we are trying to \textbf{find the best model to make predictions}. In other words, we are trying to find the model that, when applied to new data, will give the best predictions (we will explain what we mean by ``best predictions'').% \footnote{The meaning of ``best predictions'' can be made precise; for instance the Kullback-Leibler divergence from the true distribution or the cross-validated Mean Squared Error of prediction, etc.}
+strategies use model-comparison criteria such as AIC (e.g., with the \Rfunction{step} function) are much more sensible. But note that \Rfunction{step} is still a stepwise procedure: it is just as unstable, and the p-values in \Rfunction{summary} or \Rfunction{Anova} of the model it selects are not valid (they are too small), so do not report them as if the model had been chosen in advance. The same caveat applies, in milder form, to the manual simplifications of sections \nameref{ancova} and \nameref{model-comp}: the p-values of the final model are conditional on the earlier tests (the ``sequential testing'' problem of section \nameref{sec:bad-way-choose}). With one or two steps decided in advance from subject-matter knowledge the distortion is small; with many steps it is not. But the focus, now, is different: we are doing \textbf{model selection}, not variable selection. And we are trying to achieve a different objective: we are trying to \textbf{find the best model to make predictions}. In other words, we are trying to find the model that, when applied to new data, will give the best predictions (we will explain what we mean by ``best predictions'').% \footnote{The meaning of ``best predictions'' can be made precise; for instance the Kullback-Leibler divergence from the true distribution or the cross-validated Mean Squared Error of prediction, etc.}
 
 
 \subsubsection{A very brief introduction to AIC}
@@ -7195,6 +7201,8 @@ summary(mcystL)
 Anova(mcystL)
 
 mcystL_r <- step(mcystL, direction = "both")
+## Remember: p-values of a model selected by step are not valid
+## (they are too small)
 summary(mcystL_r)
 Anova(mcystL_r)
 
@@ -7207,8 +7215,9 @@ anova(mcystL_r2, mcystL_r)
 \subsection{AIC was not the issue: this model should not be fitted this way}
 
 This is an example, with another type of data.
-The moral of this example is not really AIC, but the problems of the fit:  make sure to read section
-\nameref{wrong}, as this is not a sensible model as fitted.
+The moral of this example is not really AIC, but the problems of the fit: the
+VIFs are huge, because of the interactions of uncentered variables. Make sure to
+read section \nameref{wrong} for why, and for what to do.
 
 <<>>=
 data(Prestige)
@@ -7216,7 +7225,7 @@ data(Prestige)
 
 mI <- lm(prestige ~ women * education * type, data = Prestige)
 
-## Notice degrees of freedom of three and four way interactions
+## Compare with Anova(mI2) in the next section: here the dfs are OK
 Anova(mI)
 summary(mI)
 ## Check model!!! Always check models using standard diagnostics!!!
@@ -7388,7 +7397,7 @@ sizes to the different \textbf{levels of variation}?
  with) a statistician as soon as you can. Some high-profile mistakes in the
  literature are derived from misunderstanding experimental design (a
  somewhat amusing half-page comment about this by G.\ Churchill in
- \textit{Science}, 2013, v.\ 343, p.\ 370). In fact, some mistakes made
+ \textit{Science}, 2014, v.\ 343, p.\ 370, ``Misleading Results: Don't Blame the Mice''). In fact, some mistakes made
  during the experimental design phase just cannot be corrected
  later\footnote{R.\ Fisher, one of the fathers of modern statistics, as
    well as modern quantitative and evolutionary genetics, is often quoted
@@ -7554,9 +7563,9 @@ anova(lm(Ratio ~ Group, data = data1))
 
 The lines are perfectly parallel, but the test for ratios says they
 differ. Why? Because it is forcing a regression through the origin. Note
-the the linear model does get the results right: there are no differences
-in the rate of change of Y relative to X, but the groups differ in
-intercept. As you can see, the analysis with ratios is misleading.
+the the linear model does get the results right: there is no evidence of
+differences in the rate of change of Y relative to X (we simulated the same
+slope for both groups), but the groups differ in intercept. As you can see, the analysis with ratios is misleading.
 
 
 
@@ -7652,6 +7661,27 @@ This should get you going. From here, you will probably want to look at
 generalized linear models, mixed effects models, nonlinear models, generalized
 additive models, and survival analysis, which are some key extensions of linear
 models that you might want to use with your own data.
+
+
+A few more details about additional references:
+
+
+For mixed effects models, I'd start with Fox and Weisberg's (2018, Sage) ``An R companion to applied regression, 3rd ed.''  and Faraway's (2016, CRC Press) ``Extending the linear model with R: Generalized linear, mixed effects and nonparametric regression models, second edition''.  Mixed effects models are also covered in more detail and with different (and, for an applied user, possibly helpfully complementary) perspectives in West, Welch, and Ga{\l}ecki (2022, CRC Press) ``Linear Mixed Models. A Practical Guide Using Statistical Software, 3rd ed.'' ; Ga{\l}ecki and Burzykowski (2013, Springer) `` Linear mixed-effects models using R: A step-by-step approach'', and Zuur, Ieno, Walker, Saveliev, and Smith (2009, Springer) ``Mixed effects models and extensions in ecology with R''.
+
+The book by Gelman and Hill (2007, Cambridge Univ.~Press) ``Data analysis using regression and multilevel hierarchical models'' provides a Bayesian perspective on multilevel models. The more recent Gelman, Hill, Vehtari (2020, Cambridge Univ.~Press) ``Regression and other stories''  keeps the Bayesian perspective and covers, in addition to ``the usual multiple regression'', causal inference, generalized linear models, and some multilevel models.
+
+For generalized additive models, S.\ Wood's ``Generalized Additive Models: An Introduction with R, 2nd ed'' (Chapman \& Hall) is probably a good place to start.
+
+
+
+(The next is taken from the ``Lesson 4'' document, but might be worth repeating here:)
+
+We spent time covering linear models. Generalized linear models extend linear models for responses that are not necessarily numerical, or that can be numerical but are not at all Gaussian. Briefly, generalized linear models allow us to put, on the left of an expression like ``\verb@y ~ x + u + ...@'' \  a random variable \(Y\) that can be a proportion, for example.
+
+
+A common example is logistic regression, where we model, on the left of the ``\verb@ ~ @'', the probability of an event. So we can model the probability of response (healed vs.\ non-healed) as a function of a bunch of variables. The simplest generalized linear models reduce to a contingency table, but generalized linear models allow us to model much more complex dependencies. We can have additive effects, interactions, etc. Moreover, they provide estimates of effects and the same principled ways of addressing modeling questions we saw for linear models.  Generalized linear models can also be used to model categorical data that fall into more than two categories (multinomial data) or counts (Poisson data), and so on, ---and even, with a little extra work, censored survival data. These topics are covered by Kateri, M. (2014). (``Contingency table analysis: Methods and implementation using R''. Springer. https://doi.org/10.1007/978-0-8176-4811-4), Agresti (2012; ``Categorical data analysis, 3rd ed''.  and 2018. An introduction to categorical data analysis, 3rd ed. Wiley.), and Bilder and Loughin  (2024. ``Analysis of categorical data with R, 2nd ed''  Chapman and Hall/CRC.), as well as Fox and Weisberg, and Faraway (even if the last two do not explicitly have ``categorical'' in their title). Generalized linear models are an amazing unifying idea in statistics. They were introduced in 1972 by Nelder and Wedderbrun, and much of their spread owes to the GLIM software and to the book by McCullagh and Nelder  (1989. ``Generalized linear models, 2nd ed.'' Chapman and Hall/CRC ---first edition, 1983), which, once you are comfortable with linear models, is still a delightful and insightful book to read.\footnote{That is, if your library has a copy, or you can find it used at a reasonable price---that is how I got my copy more than 25 years ago---because the price, new, is outrageous.} Their discussion of aliasing and parameterizations, for instance, is the first one I often go back to.
+
+
 
 
 \appendix
@@ -8156,7 +8186,7 @@ But the actual coefficients differ, of course, since the reference is different:
 S(m1)
 S(m2)
 @
-The interaction coefficient for ``m1'' is the deviation of the cell for a2 and b2 from the expected under the additive model. Thus it is $2 - (3 + 4 -2)$, where 3 is the reference, a1, b1; 4 is the change from going from a1 to a2 (from 3 to 7); and 2 is the change from going from b1 to b2 (3 to 1). This we saw before.
+The interaction coefficient for ``m1'' is the deviation of the cell for a2 and b2 from the expected under an additive model, with an effect for row a2 and column b2, starting from the reference cell (not an ``additive model'' as if we did \texttt{lm(y ~ A + B, data = df1)}). Thus it is $2 - (3 + 4 -2)$, where 3 is the reference, a1, b1; 4 is the change from going from a1 to a2 (from 3 to 7); and 2 is the change from going from b1 to b2 (3 to 1). This we saw before.
 
 In ``m2'' we use a different reference and measure the coefficient as the deviation of a1:b2 from the expected: $1 - (7 - 4 - 5)$ (7 is the reference, a2:b1; and -4 and -5 are the deviations from moving to a1 and b2, respectively).
 
@@ -8222,7 +8252,7 @@ Why did we have an estimate of the coefficient of interaction of 3 (or -3, depen
 When we compute the sums of squares for interaction we first fit a model with an overall (or common) mean, and rows and columns effects and then estimate the deviations of all cells from it to find the sums of squares. In other words, the deviations that are squared and then summed are the deviations of all the observed cell means from a model with a common mean (the overall mean) and rows and columns effects (the marginal means) that combine additively. We are computing the variation due to interaction, the variation in cell means that deviates from the additive model.  In our case, when we computed the SS each of those cell deviations terms were $0.75$ or $-0.75$.
 
 
-When we computed the coefficient of the interaction, say \texttt{Aa1:Bb2} we subtracted the mean of one cell (e.g., bottom right) from the sum of another cell (top left) as reference and the other two (bottom left and top right) as the ones that dictate the effect. So the reference and the other two cells were modelled perfectly, and all the deviation was placed in the remaining cell.
+When we computed the coefficient of the interaction, say \texttt{Aa2:Bb2} we subtracted the mean of one cell (e.g., bottom right) from the sum of another cell (top left) as reference and the other two (bottom left and top right) as the ones that dictate the effect. So the reference and the other two cells were modelled perfectly, and all the deviation was placed in the remaining cell.
 
 
 We just said that when we computed the SS each of those cell deviations terms were $0.75$ or $-0.75$; this is the same as ``spreading'' the coefficient of $3$ (or $-3$) over all four cells equally: $3/4 = 0.75$. The $3$ (or the $-3$), in contrast, has just collapsed all of those differences in all the cells in a single cell. When computing predicted (fitted) values it makes no difference, but this is not what we want for computing sums of squares.
