@@ -1,7 +1,7 @@
 I teach an introductory course on statistics with R for biomedical
 graduate students (PRSTR). The notes are in
 /home/ramon/charlas-cursos/R-basic-stats/R-basic-stats.Rnw (knitr/LaTeX,
-about 8250 lines). I start teaching in a few days.
+about 8260 lines). I start teaching in a few days.
 
 TASK: check PART {N} of the notes (see the table below) for statistical
 blunders: statements that are wrong, or seriously misleading for a
@@ -27,7 +27,7 @@ WHAT NOT TO REPORT
 - Suggestions for extra material or reorganization.
 - Anything inside LaTeX comments (lines starting with %), FIXMEs, or
   commented-out code.
-- Three chunks have eval=FALSE (lines 1702, 3679, 6816). Their code is
+- Three chunks have eval=FALSE (lines 1702, 3679, 6833). Their code is
   not run and their output is deliberately not shown; do not report
   "output missing" around them.
 
@@ -91,9 +91,9 @@ PARTS (line numbers are approximate; use the section headings)
   factors, type of sums of squares, one observation per cell, more
   than two factors, multiple comparisons in two-way ANOVA,
   nonparametric alternatives).
-- PART 5: lines 5191-6930. "Simple linear regression", "Multiple
+- PART 5: lines 5191-6947. "Simple linear regression", "Multiple
   regression", ANCOVA, "Interactions, summary", "Diagnostics".
-- PART 6: lines 6931-8247. "Variable and model selection" through the
+- PART 6: lines 6948-8264. "Variable and model selection" through the
   end (experimental design, covariate adjustment and causal comments,
   ratios, and the appendices on Anova tables and the two-way ANOVA by
   hand).
