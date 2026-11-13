@@ -200,7 +200,27 @@ A document to clarify the relationship between confidence intervals and p-values
 
 \section{One-sample t}
 
-Here we show, with an example, the ``This is a 95\% confidence interval for the true mean; that is, the set of (hypothetical) mean values from which the data do not deviate significantly. It is based on inverting the t test by solving for the values of \(\mu_0\) [\(\mu_0\) is the hypothesized true mean] that cause t to lie within its acceptance region.''.
+Here we show, with an example, Dalgaard's statement (p.\ 98 of ``Introductory Statistics with R'', 2nd ed.): ``This is a 95\% confidence interval for the true mean; that is, the set of (hypothetical) mean values from which the data do not deviate significantly. It is based on inverting the t test by solving for the values of \(\mu_0\) [\(\mu_0\) is the hypothesized true mean] that cause t to lie within its acceptance region.''
+
+\textbf{Two scales; keep them apart.}
+\begin{itemize}
+\item \textbf{The t-scale.} For a test of \(H_0: \mu = \mu_0\) we compute \(t = (\bar{x} - \mu_0)/se\). With 95\% coverage, the acceptance region is \((-t^*, t^*)\), where \(t^* = t_{0.975, df}\). These limits depend \emph{only} on the degrees of freedom and the coverage. They do not depend on \(\bar{x}\), on \(se\), or on \(\mu_0\). The acceptance region never moves.
+\item \textbf{The \(\mu\)-scale.} The confidence interval lives here: \(\bar{x} \pm t^* \cdot se\). This is where \(\bar{x}\) and \(se\) come in.
+\end{itemize}
+
+Each candidate \(\mu_0\) is sent from the \(\mu\)-scale to the t-scale by \(\mu_0 \mapsto (\bar{x} - \mu_0)/se\). The confidence interval is the set of \(\mu_0\) that land inside the (fixed) acceptance region.
+
+Why don't we need to build a new t distribution ``around'' each candidate \(\mu_0\)? Because, if \(\mu_0\) is the true mean, \((\bar{X} - \mu_0)/se\) has the same t distribution whatever the value of \(\mu_0\) is (this kind of quantity is called a \emph{pivotal quantity}, or \emph{pivot}; if you think about this, this is a blast). And \(\mu_0\) enters the statistic only through the difference \(\bar{x} - \mu_0\). Given \(se\) and the coverage, that difference is all that matters; again, notice how it simplifies the reasoning.
+
+The whole inversion fits in one line (though in class we can show it in all the glory of its five or six steps):
+\[
+\left| \frac{\bar{x} - \mu_0}{se} \right| < t^*
+\quad \Longleftrightarrow \quad
+\bar{x} - t^* \cdot se \; < \; \mu_0 \; < \; \bar{x} + t^* \cdot se
+\]
+The left side is the test: is \(\bar{x}\) within \(t^* \cdot se\) of \(\mu_0\)? The right side is the confidence interval: is \(\mu_0\) within \(t^* \cdot se\) of \(\bar{x}\)? It is the same distance, read from either end.
+
+The code below checks this numerically.
 
 
 
@@ -232,9 +252,11 @@ all.equal(ts1$stderr, sqrt(var(data1)/length(data1)))
 
 ## What values of mu are covered by the CI?
 ##   all mu such that their computed t statistic
-##   lies inside the rejection region
+##   lies inside the acceptance region
 
-## What is the rejection region?
+## What is the acceptance region? These are its limits
+## (everything outside them is the rejection region).
+## Note: they depend only on df and coverage.
 c(qt(0.025, 19), qt(0.975, 19))
 ## or, equivalently
 c(-qt(0.975, 19),  qt(0.975, 19))
@@ -251,9 +273,11 @@ are_you_inside_the_CI <- function(candidate_mu,
                                   sample_mean = mean(data1),
                                   stderr = sqrt(var(data1)/length(data1)),
                                   n = length(data1)) {
-  CI_t_limits <- c(-qt(1 - (1 - cover)/2, df = (n - 1)),  qt(1 - (1 - cover)/2, df = (n - 1)))
+  CI_t_limits <- c(-qt(1 - (1 - cover)/2, df = (n - 1)),
+                   qt(1 - (1 - cover)/2, df = (n - 1)))
   the_computed_t <- my_t(candidate_mu, sample_mean, stderr)
-  if ((CI_t_limits[1] < the_computed_t) && (the_computed_t < CI_t_limits[2])) {
+  if ((CI_t_limits[1] < the_computed_t) &&
+        (the_computed_t < CI_t_limits[2])) {
     return(TRUE)
   } else {
     return(FALSE)
@@ -285,7 +309,36 @@ axis(1, at = limits, labels = limits)
 set.seed(NULL) ## reset seed
 @
 
-Now: how would the CI be larger or smaller if we asked for a 99\% or a 90\% CI?
+The grid search above works, but it hides the structure. Here is the same thing as a picture. The computed t, as a function of the candidate \(\mu_0\), is a straight line with slope \(-1/se\). The acceptance region is a fixed horizontal band, \((-t^*, t^*)\). The line crosses the band exactly at the limits of the confidence interval (red vertical lines).
+
+<<t_vs_mu0>>=
+xbar <- mean(data1)
+se <- sd(data1)/sqrt(length(data1))
+df <- length(data1) - 1
+tcrit <- qt(0.975, df)
+mu0 <- seq(xbar - 5 * se, xbar + 5 * se, length.out = 500)
+t_mu0 <- (xbar - mu0) / se
+plot(mu0, t_mu0, type = "l", xlab = expression(mu[0]), ylab = "t")
+abline(h = c(-tcrit, tcrit), lty = 2)                  # fixed acceptance region
+abline(v = xbar + c(-1, 1) * tcrit * se, col = "red")  # CI limits
+## Compare with the CI from t.test
+xbar + c(-1, 1) * tcrit * se
+t.test(data1)$conf.int
+@
+
+We can also plot the p-value as a function of \(\mu_0\). The 95\% confidence interval is the set of \(\mu_0\) where the curve is above 0.05. Other coverages are just other horizontal lines: the 90\% CI is where the curve is above 0.10, the 99.9\% CI where it is above 0.001. (This answers the question below, and we will see the same idea again in the two-sample example.) And where is the spike? Exactly at the value of $\mu_0 = \bar{X}$.
+
+
+<<pvalue_vs_mu0>>=
+p_mu0 <- 2 * pt(-abs(t_mu0), df)
+plot(mu0, p_mu0, type = "l", xlab = expression(mu[0]), ylab = "p-value")
+legend(x = 2.73, y = 0.8, legend = c(0.1, 0.05, 0.001), lty = 2,
+       col = c("orange", "blue", "red"))
+abline(h = c(0.10, 0.05, 0.001), lty = 2, col = c("orange", "blue", "red"))
+abline(v = xbar + c(-1, 1) * tcrit * se, col = "blue", lty = 3)
+@
+
+Now: how would the CI be larger or smaller if we asked for a 99\% or a 90\% CI? Well... we just gave the answer in the figure.
 
 
 \section{CI and p-value relationships in the t-test}
@@ -361,7 +414,7 @@ The figure shows lines that delimit four regions:
 \item \textbf{0.0314}. This is ``our test''.  The black lines denote rejection regions for tests at the \(\alpha = 0.0314\): the area to right of the right black line + the area to the left of the left black line add to 0.0314. So any value of the t-statistic larger than 2.34 or smaller than -2.34 (hey! our test statistic) will lead to rejection at \(\alpha = 0.0314\).  A test with a test statistic of exactly -2.34 will have a p-value of exactly 0.0314; just like our test.
 
 
-\item \textbf{0.001}. The red line. At test with a test statistic of exactly 3.95 will have a p-value of 0.001.
+\item \textbf{0.001}. The red line. A test with a test statistic of exactly 3.95 will have a p-value of 0.001.
 
 \end{itemize}
 
