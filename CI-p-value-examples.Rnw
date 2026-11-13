@@ -195,7 +195,98 @@ Please, \textbf{respect the copyright and license}. This material is
 \label{sec:what-this-about}
 
 
-A document to clarify the relationship between confidence intervals and p-values, using examples from the two-sample t-test.
+A document to clarify the relationship between confidence intervals and p-values, using first a one-sample t-test and then examples from the two-sample t-test.
+
+
+\section{One-sample t}
+
+Here we show, with an example, the ``This is a 95\% confidence interval for the true mean; that is, the set of (hypothetical) mean values from which the data do not deviate significantly. It is based on inverting the t test by solving for the values of \(\mu_0\) [\(\mu_0\) is the hypothesized true mean] that cause t to lie within its acceptance region.''.
+
+
+
+<<>>=
+set.seed(1)
+data1 <- rnorm(20, mean = 2, sd = 1)
+mean(data1)
+
+t.test(data1)
+
+## A value of the null just barely outside the CI. Notice the confidence
+## interval does not change
+t.test(data1, mu = 1.76)
+
+## A value of the null at the boundary of the CI (within rounding error)
+t.test(data1, mu = 1.76311)
+
+## How is this CI computed, using the numbers from the t.test itself?
+ts1 <- t.test(data1)
+
+## Lower limit: t_{0.975, 19}: the 0.975 quantile of a t distr. with 19 df
+## mean - s * t_{0.975, 19}
+mean(data1) - ts1$stderr * qt(0.975, 19)
+## Upper limit: same thing, but with a +
+mean(data1) + ts1$stderr * qt(0.975, 19)
+
+## Of course
+all.equal(ts1$stderr, sqrt(var(data1)/length(data1)))
+
+## What values of mu are covered by the CI?
+##   all mu such that their computed t statistic
+##   lies inside the rejection region
+
+## What is the rejection region?
+c(qt(0.025, 19), qt(0.975, 19))
+## or, equivalently
+c(-qt(0.975, 19),  qt(0.975, 19))
+
+## How do we compute the t?
+my_t <- function(candidate_mu,
+                 sample_mean = mean(data1),
+                 stderr = sqrt(var(data1)/length(data1))) {
+  return((sample_mean -candidate_mu)/stderr)
+}
+
+are_you_inside_the_CI <- function(candidate_mu,
+                                  cover = 0.95,
+                                  sample_mean = mean(data1),
+                                  stderr = sqrt(var(data1)/length(data1)),
+                                  n = length(data1)) {
+  CI_t_limits <- c(-qt(1 - (1 - cover)/2, df = (n - 1)),  qt(1 - (1 - cover)/2, df = (n - 1)))
+  the_computed_t <- my_t(candidate_mu, sample_mean, stderr)
+  if ((CI_t_limits[1] < the_computed_t) && (the_computed_t < CI_t_limits[2])) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+## If mu were 1.6
+my_t(1.6)
+are_you_inside_the_CI(1.6)
+## A few others
+are_you_inside_the_CI(4)
+are_you_inside_the_CI(2)
+
+## Many candidates
+candidates <- seq(from = 1, to = 3, length.out = 50000)
+inside_the_CI <- sapply(candidates, are_you_inside_the_CI)
+first_inside <- which(inside_the_CI)[1]
+last_inside <- which(inside_the_CI)
+last_inside <- last_inside[length(last_inside)]
+limits <- candidates[c(first_inside, last_inside)]
+
+
+plot(x = c(1, 3), y = c(1, 2), axes = FALSE, type = "n", xlab = "", ylab = "")
+segments(x0 = 1, y0 = 1, x1 = limits[1], y1 = 1, col = "salmon", lwd = 2)
+segments(x0 = 3, y0 = 1, x1 = limits[2], y1 = 1, col = "salmon", lwd = 2)
+segments(x0 = limits[1], y0 = 1, x1 = limits[2], y1 = 1, col = "black", lwd = 2)
+axis(1, at = limits, labels = limits)
+
+set.seed(NULL) ## reset seed
+@
+
+Now: how would the CI be larger or smaller if we asked for a 99\% or a 90\% CI?
+
 
 \section{CI and p-value relationships in the t-test}
 First, we read the data as we did in the main notes:
@@ -302,7 +393,7 @@ t.test(p53 ~ cond, data = dp53, conf.level = 0.95)
 <<>>=
 t.test(p53 ~ cond, data = dp53, conf.level = 0.999)
 @
-(The header says ``100 percent confidence interval'': that is 99.9 rounded by R when printing. A true 100\% confidence interval would be the whole real line.)
+If the header says ``100 percent confidence interval'': that is 99.9 rounded by R when printing. A true 100\% confidence interval would be the whole real line.
 
 
 Now, please take a piece of paper and draw a figure like this:
