@@ -1,0 +1,184 @@
+\synctex=1
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{array,booktabs,tabularx}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{PRSTR: plan to increase emphasis on ``model.matrix'' and incorporate ``Regression and other stories''.\\
+  Two meanings of ``contrast'' in R:\\
+  coding the model versus specifying the comparisons, limma's makeContrasth, glht and mcp's contrMat, emmeans, model.matrix, options(contrasts), et al.}
+\author{Ramon Diaz-Uriarte, with a response by Claude}
+\date{17 November 2026}
+
+\begin{document}
+\maketitle
+
+%% ===================================================================
+\section{Ramon writes}
+
+\paragraph{b)} Hay algo potentially confussing.
+
+\paragraph{b.1)} La función ``contrasts'', en R, con valores como ``contr.treatment'' o ``contr.sum'' especifica cómo parametrizamos el modelo; o sea, cómo se construye la model.matrix. Interesante que el cambiar la patemetrización (el uso de \verb|options(contrasts = ...)|, o el mirar el setting vía \verb|options()$contrasts|) no aparece ni una sola vez en el documento de Law. Este uso de la función ``contrasts'' es el estándard y widespread, en R, y en la literatura as far as I remember (McCullagh \& Nelder, ``Generalized Linear Models'').
+
+\paragraph{b.2)} Beyond that, we are interested in comparing (contrasting, testing) specific things. For example, something like ``all the experimental treatments vs.\ the Control'' or ``testing whether all pairs of means are equal'', or ``testing whether the `WT' is the average of `GoodMutation' and `BadMutation'\,''. Note that there is a possible ambiguity of ``treatment'' here, but here treatment are the labels in our factors.
+
+The function makeContrasts in limma is used for this purpose you say ``I want to compare `WT' against the average of `GoodMutation' and `BadMutation'\,'' or ``Compare all treatments against the Control''. This returns the set of linear functions of the parameters so that you test what you want to test.
+
+This is also what the function contrMat constructs in package multcomp. In fact, using Tukey contrasts in the multcomp package does exactly this: return the set of linear functions of the parameters so that you test what you want to test.
+
+\paragraph{b.2)} Regardless of the setting of \verb|options()$contrasts| (e.g., whether ``contrasts.sum'' or ``contrasts.treatment'', or, if using package car, ``contrasts.Sum'', or ``contrasts.Treatment'', etc), you can always specify the comparisons you are interested in as a linear function of the parameters (the things shown under ``coefficients'') of your model. In other words, as linear functions of what is given by ``model.matrix''.
+
+makeContrasts, in limma, makes this more transparent if you want, and you see directly what exactly you are comparing as a function of the model matrix.
+
+contrMat in a sense hides it from you a little bit more (and, at the same time, seems more flexible).
+
+Package emmeans uses yet another way of going around this in the sense that the function names and how one builds comparisons (aka contrasts or sets of hypothesis to test) of interest is somewhat different. (Explained in \url{https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html}) but the ideas are, of course, the same.
+
+\paragraph{b.3)} Interestingly, the Law et al document does not discuss the settings of \verb|options()$contrasts|. The book by Dunn \& Smyth has a very brief section. And the documentation of contrMat does not dwell into it, and that of emmeans discusses it only a little.
+
+It seems that, in particular for limma and makeContrasts, the implicit modus operandi of the authors is: `we will not mess around with changing \verb|options()$contrasts|; i.e., we won't do things like \verb|opt <- options(contrasts = c("contr.sum", "contr.poly"))|'. We just take things as R does them, and directly use the following route instead:
+
+\begin{description}[leftmargin=3em,style=nextline]
+\item[b.3.1:] we either use or not use an intercept (when, why, etc, is explained in the Law et al paper)
+\item[b.3.2:] we use makeContrasts to compare what we care about
+\end{description}
+
+This is also what, to a large extent, ghlt does, and what ``Anova'' from the car package do.
+
+In particular limma seems to say: R will parameterize the model in some way and we are just happy with it, and the only knob we turn is adding, or not, an intercept. That gives a particular model.matrix. Then, use makeContrasts.
+
+I think the above is a reasonable summary of what is done and the sources of confusion. It would be good that it was explained.
+
+\bigskip
+\noindent\rule{\linewidth}{0.4pt}
+
+I am still trying to figure out what ROS does here exactly. They use ``model.matrix'' exactly once in the book and \verb|options()$contrasts| (and realted) are not called even once. I need to look into that with more detail later. I think their logic is very different because, well, they are not asking for ``tests of hypothesis'' (no, no, we are Bayesians) but will eventually ask for posteriors of the things one cares about.
+
+%% ===================================================================
+\section{Claude responds and complements as}
+
+\subsection*{(a) Why stop the reading of Law et al.\ at ``Study of interactions and additivity of treatments''}
+
+Two reasons, one good and one accidental.
+
+\begin{itemize}
+\item \textbf{The good one:} through that section the paper covers what session~2 and the first hour of session~3 teach (one factor, contrasts, two factors with and without interaction). After it come nested factors, time courses, mixed effects and polynomial or cyclical covariates, which go beyond the block.
+\item \textbf{The accidental one:} my read of the page was cut off shortly after, so I recommended within what I had seen.
+\end{itemize}
+
+I would now extend it by one subsection, ``Accounting for factors that are not of interest'' (batch effects), since \code{\textasciitilde{} batch + condition} is the design students will meet most. I have added it as optional.
+
+In the part of the paper I could read, \code{options(contrasts = ...)}, \code{contr.sum}, \code{contr.treatment} and \code{contrasts()} are never named; the only knobs discussed are the default alphanumeric order of factor levels and \code{relevel} to change the reference level.
+
+\subsection*{(b) The summary is right; two refinements}
+
+The confusion is that R uses ``contrast'' for two different objects, and b.1 and b.2 separate them correctly. Here is a way to state it that I think resolves it for students.
+
+\begin{enumerate}
+\item \textbf{The scientific question lives on the group means.} ``WT versus the average of the two mutants'' is a vector $\mathbf{c}$ applied to the vector of group (cell) means $\bm{\mu}$. It does not depend on any coding.
+\item \textbf{The coding decides the model matrix.} \code{contr.treatment}, \code{contr.sum}, or dropping the intercept each give a different \code{model.matrix}, hence different coefficients $\bm{\beta}$ with different meanings, but the same fitted group means.
+\item \textbf{The same question is a different vector under each coding.} Let $L$ be the matrix with one row of the model matrix per group, so that $\bm{\mu} = L\bm{\beta}$. Then
+  \[
+    \mathbf{c}^{\top}\bm{\mu} = (\mathbf{c}^{\top} L)\,\bm{\beta} = \mathbf{k}^{\top}\bm{\beta}.
+  \]
+  Change the coding and $L$, $\bm{\beta}$ and $\mathbf{k}$ change; the estimate of $\mathbf{c}^{\top}\bm{\mu}$, its standard error and its test do not.
+\end{enumerate}
+
+The tools differ only in which of these vectors you type:
+
+\medskip
+\noindent
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.30\linewidth}
+    >{\raggedright}X >{\raggedright\arraybackslash}p{0.27\linewidth}@{}}
+  \toprule
+  Tool & What you specify & Depends on the coding? \\
+  \midrule
+  \code{makeContrasts} (limma)
+    & $\mathbf{k}$, in terms of the design matrix's column names
+    & Yes; hence limma's preference for \code{\textasciitilde{} 0 + group} \\
+  \code{contrMat} and \code{glht(..., mcp())} (multcomp)
+    & $\mathbf{c}$, on the factor's level means; \code{mcp()} translates
+      it to $\mathbf{k}$
+    & No; the translation is done for you \\
+  emmeans
+    & $\mathbf{c}$, on estimated marginal means
+    & No \\
+  By hand
+    & $\mathbf{k}$, on \code{coef(fit)}
+    & Yes \\
+  \bottomrule
+\end{tabularx}
+\medskip
+
+The refinements:
+
+\begin{itemize}
+\item \textbf{\code{contrMat} returns $\mathbf{c}$, not $\mathbf{k}$.} It builds contrasts among level means (Tukey, Dunnett). It is \code{glht} with \code{mcp()} that turns them into linear functions of the model's coefficients, using the model's own coding. So they become linear functions of the parameters only after that step.
+\item \textbf{\code{car::Anova} is not quite in the same family.} Type~II tests are invariant to the coding. Type~III tests are not: they only mean what people expect under sum-to-zero coding. That is the one place in the course where \code{options(contrasts)} changes an answer, and it is already in \S20.6.1 and Appendix~B.3 of the notes.
+\end{itemize}
+
+The reading of limma in b.3 matches what I know: leave R's default coding alone, choose intercept or no intercept, then \code{makeContrasts}. The paper's own stated reason is that in a means model each parameter is a group mean, which makes comparisons simple to write as contrasts, while for a single treatment-versus-control comparison the mean-reference model is more direct, since its parameters already are the differences. One addition: \code{\textasciitilde{} 0 + a + b} only gives full indicator columns for the first factor, which is why the paper merges two factors into one before using a means model.
+
+\subsection*{What ROS does}
+
+I cannot check the book, but the guess above fits how I understand its logic, and it is the Bayesian version of the ``emmeans'' row of the table. You never need $\mathbf{k}$: take the posterior draws of the fitted means for the cells you care about (predictions at chosen inputs), apply $\mathbf{c}$ to each draw, and you have the posterior of the comparison. Coding never enters. Equivalently, multiply the matrix of coefficient draws by $\mathbf{k}$.
+
+That gives a clean link for session~3: the ``WT versus average of mutants'' contrast computed by hand in session~2 becomes, with \code{stan\_glm}, a posterior distribution in two lines.
+
+\subsection*{Implications for the course plan}
+
+Session~2's second hour gets an explicit 10-minute step on the two meanings of ``contrast'', between the two parameterisations and the contrasts by hand, plus a note that the Law et al.\ paper will not make this point for the students.
+
+I could not run R when writing this, so the invariance claim rests on the algebra, not on a run. It is worth a short demonstration in class with \code{contr.treatment} and \code{contr.sum} on the one-way example; the chunk below is an untested sketch of it, not evaluated.
+
+<<invariance, eval=FALSE>>=
+## UNTESTED SKETCH: the same comparison under two codings.
+set.seed(1)
+d <- data.frame(y = rnorm(30),
+                g = factor(rep(c("WT", "GoodMutation", "BadMutation"),
+                               each = 10)))
+d$g <- relevel(d$g, ref = "WT")
+
+f_t <- lm(y ~ g, data = d)  # default coding: contr.treatment
+f_s <- lm(y ~ g, data = d, contrasts = list(g = "contr.sum"))
+
+## L: one row of the model matrix per group
+nd  <- data.frame(g = factor(levels(d$g), levels = levels(d$g)))
+L_t <- model.matrix(delete.response(terms(f_t)), nd,
+                    contrasts.arg = f_t$contrasts)
+L_s <- model.matrix(delete.response(terms(f_s)), nd,
+                    contrasts.arg = f_s$contrasts)
+
+## c: WT versus the average of the two mutants, on the group means
+cc <- c(WT = 1, GoodMutation = -0.5, BadMutation = -0.5)[levels(d$g)]
+
+## k = c' L: different under each coding ...
+k_t <- drop(cc %*% L_t)
+k_s <- drop(cc %*% L_s)
+rbind(k_t, k_s)
+
+## ... but the same estimate and the same standard error
+c(sum(k_t * coef(f_t)), sum(k_s * coef(f_s)))
+c(sqrt(drop(t(k_t) %*% vcov(f_t) %*% k_t)),
+  sqrt(drop(t(k_s) %*% vcov(f_s) %*% k_s)))
+@
+
+%% ===================================================================
+\section*{References}
+
+\begin{itemize}[leftmargin=*]
+\item Law, C.\,W., Zeglinski, K., Dong, X., Alhamdoosh, M., Smyth, G.\,K., Ritchie, M.\,E. (2020). A guide to creating design matrices for gene expression experiments. \emph{F1000Research} 9:1444. \url{https://f1000research.com/articles/9-1444}
+\item Lenth, R. emmeans vignette, ``Comparisons and contrasts in emmeans''. \url{https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html}
+\item McCullagh, P., Nelder, J.\,A. (1989). \emph{Generalized Linear Models}, 2nd ed. Chapman and Hall.
+\item Dunn, P.\,K., Smyth, G.\,K. (2018). \emph{Generalized Linear Models With Examples in R}. Springer.
+\item Gelman, A., Hill, J., Vehtari, A. (2020). \emph{Regression and Other Stories}. Cambridge University Press. \url{https://avehtari.github.io/ROS-Examples/}
+\end{itemize}
+
+\end{document}
