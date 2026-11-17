@@ -110,6 +110,12 @@ The tools differ only in which of these vectors you type:
   emmeans
     & $\mathbf{c}$, on estimated marginal means
     & No \\
+  ROS (\code{posterior\_epred} on a grid of cells)
+    & $\mathbf{c}$, applied to each posterior draw of the cell means
+    & No \\
+  ROS (coefficient draws, \code{as.matrix(fit)})
+    & $\mathbf{k}$, written out by hand on the coefficients
+    & Yes \\
   By hand
     & $\mathbf{k}$, on \code{coef(fit)}
     & Yes \\
@@ -126,20 +132,39 @@ The refinements:
 
 The reading of limma in b.3 matches what I know: leave R's default coding alone, choose intercept or no intercept, then \code{makeContrasts}. The paper's own stated reason is that in a means model each parameter is a group mean, which makes comparisons simple to write as contrasts, while for a single treatment-versus-control comparison the mean-reference model is more direct, since its parameters already are the differences. One addition: \code{\textasciitilde{} 0 + a + b} only gives full indicator columns for the first factor, which is why the paper merges two factors into one before using a means model.
 
-\subsection*{What ROS does}
+\subsection*{What ROS does (checked against the text)}
 
-I cannot check the book, but the guess above fits how I understand its logic, and it is the Bayesian version of the ``emmeans'' row of the table. You never need $\mathbf{k}$: take the posterior draws of the fitted means for the cells you care about (predictions at chosen inputs), apply $\mathbf{c}$ to each draw, and you have the posterior of the comparison. Coding never enters. Equivalently, multiply the matrix of coefficient draws by $\mathbf{k}$.
+This section replaces my earlier guess. I searched the full text of the PDF released on 18 May 2025 (546 pages) and read the relevant sections. Page numbers below are the book's printed page numbers; in that PDF, the PDF page is the printed page plus 14.
 
-That gives a clean link for session~3: the ``WT versus average of mutants'' contrast computed by hand in session~2 becomes, with \code{stan\_glm}, a posterior distribution in two lines.
+\paragraph{What is absent.} \code{model.matrix} appears once, on p.~429 (\S21.2): it is used to get the predictor matrix and swap one column in order to correct the standard error of a two-stage instrumental-variables estimate. It is never used to inspect or explain how a factor is coded. \code{options(contrasts)}, \code{contr.treatment}, \code{contr.sum}, \code{contrasts()} and \code{relevel} never appear. No formula drops the intercept (\code{\textasciitilde{} 0 + g} or \code{\textasciitilde{} g - 1}). The word ``contrast'' appears 29 times, always in its everyday sense (``in contrast''), never in either of the two technical senses of part (b). Tukey or Dunnett families of comparisons do not appear either; ``multiple comparisons'' is mentioned only as one of the ways to obtain spurious statistical significance (pp.~61 and~66).
+
+\paragraph{How factors are coded.} Always with R's default treatment coding, which the book calls the ``baseline'' (occasionally ``reference'' or ``default'') category, and always explained through indicator variables.
+\begin{itemize}
+\item \S7.3 (pp.~99--101) shows, by fake-data simulation, that regressing on a constant gives the mean and regressing on a 0/1 indicator gives the difference in means.
+\item \S10.4 (pp.~136--139) fits \code{factor(ethnicity)} with four levels, explains that R took the alphabetically first level as baseline, and changes the baseline by rebuilding the factor with \code{factor(..., levels = c(...))}. It then walks through how every coefficient shifts by the same amount when the baseline changes, while the coefficients of the other predictors do not. This is the coding-versus-question point of part (b), shown on one example without being stated in general. It also builds the indicators by hand with \code{ifelse}, leaving one out.
+\item \S10.5 (pp.~139--140) writes paired and block designs as \code{y \textasciitilde{} treatment + factor(pairs)} and notes that for the treatment effect it does not matter which block is the baseline.
+\item \S12.5 (pp.~197--199) distinguishes index variables from indicator variables and explains why only $J-1$ of $J$ indicators can go in with an intercept. It mentions dropping the intercept to keep all $J$, and notes that this fails as soon as a second factor is added, so it is simpler to keep the intercept and drop one indicator per factor (the same issue as the two-factor means model in Law et al.). It lists other choices (last level as baseline, a chosen baseline, coefficients constrained to sum to zero) without showing them, and says the option the authors often prefer is a multilevel model, which is beyond the scope of the book.
+\end{itemize}
+
+\paragraph{How comparisons are obtained.} Never by choosing a coding to make a coefficient equal the comparison. The book uses two routes, and both appear.
+\begin{enumerate}
+\item \textbf{Predict the cells, then combine them} (the $\mathbf{c}$ route). \S9.2 (pp.~115--116) introduces \code{posterior\_linpred}, \code{posterior\_epred} and \code{posterior\_predict} on a \code{newdata} grid, and also computes the same draws by hand from \code{as.matrix(fit)}. The clearest instance of the $\mathbf{c}$ route is poststratification in \S17.1 (pp.~314--316): \code{stan\_glm(vote \textasciitilde{} factor(pid))}, then \code{posterior\_epred} on a data frame with one row per cell, then a matrix product of the $n_{\text{sims}}\times J$ draws with the vector of population weights. The weight vector is a $\mathbf{c}$, the grid is our $L$, and the coding never appears. With two factors and their interaction (\code{factor(pid) + male + factor(pid):male}), the book says the remaining steps are unchanged.
+\item \textbf{Combine the coefficient draws by hand} (the $\mathbf{k}$ route). \S9.1--9.2 (p.~115) computes a ratio of two coefficients draw by draw. \S19.4 (pp.~370--373) computes a treatment effect that varies with pre-test as \code{sims[,2] + sims[,4]*x} for each draw, averages it over the data, and writes the population average as $\beta_1+\beta_4\mu_1+\beta_5\mu_2$, noting that its standard error is easier to get from simulations than analytically. That is $\mathbf{k}^\top\bm{\beta}$ written by hand, which depends on the coding.
+\end{enumerate}
+The average predictive comparisons of \S14.4 (pp.~249--252) are the same idea on the probability scale for logistic regression: predictions at two values of one input, averaged over the observed values of the others. There the book computes them from the point estimates \code{coef(fit)}, not from the draws.
+
+\paragraph{So, for part (b).} The guess above was right about the main route and wrong to say $\mathbf{k}$ is never needed. ROS takes R's default coding as given, as limma does, but turns a different knob: limma chooses intercept or no intercept and then types $\mathbf{k}$ with \code{makeContrasts}; ROS keeps the intercept, chooses the baseline by ordering the levels, interprets coefficients as comparisons with that baseline, and for anything else either predicts the cells and applies $\mathbf{c}$ to the draws, or writes $\mathbf{k}$ by hand on the coefficient draws. ROS does not state the general point (that the question lives on the cell means and the coding only changes how it is written in coefficients); \S10.4 shows one instance of it. So, like Law et al., it will not make that point for the students; the course has to.
+
+That still gives a clean link for session~3: the ``WT versus average of mutants'' contrast computed by hand in session~2 becomes, with \code{stan\_glm}, \code{posterior\_epred} on a three-row grid followed by \code{\%*\% c}. That is the same pattern as \S17.1, with contrast weights instead of population weights.
 
 \subsection*{Implications for the course plan}
 
-Session~2's second hour gets an explicit 10-minute step on the two meanings of ``contrast'', between the two parameterisations and the contrasts by hand, plus a note that the Law et al.\ paper will not make this point for the students.
+Session~2's second hour gets an explicit 10-minute step on the two meanings of ``contrast'', between the two parameterisations and the contrasts by hand, plus a note that neither the Law et al.\ paper nor ROS will make this point for the students.
 
-I could not run R when writing this, so the invariance claim rests on the algebra, not on a run. It is worth a short demonstration in class with \code{contr.treatment} and \code{contr.sum} on the one-way example; the chunk below is an untested sketch of it, not evaluated.
+The invariance claim is checked below with \code{lm} under three codings: treatment, sum-to-zero, and the means model. The chunk was run with R~4 (base R only). The $\mathbf{k}$ vectors differ; the estimate and its standard error are identical, and so is $\mathbf{c}$ applied to the predicted cell means, which is the ROS route without the posterior. The \code{stan\_glm} version was not run.
 
-<<invariance, eval=FALSE>>=
-## UNTESTED SKETCH: the same comparison under two codings.
+<<invariance>>=
+## The same comparison under three codings.
 set.seed(1)
 d <- data.frame(y = rnorm(30),
                 g = factor(rep(c("WT", "GoodMutation", "BadMutation"),
@@ -148,26 +173,39 @@ d$g <- relevel(d$g, ref = "WT")
 
 f_t <- lm(y ~ g, data = d)  # default coding: contr.treatment
 f_s <- lm(y ~ g, data = d, contrasts = list(g = "contr.sum"))
+f_0 <- lm(y ~ 0 + g, data = d)  # means model
+fits <- list(treatment = f_t, sum = f_s, means = f_0)
 
 ## L: one row of the model matrix per group
-nd  <- data.frame(g = factor(levels(d$g), levels = levels(d$g)))
-L_t <- model.matrix(delete.response(terms(f_t)), nd,
-                    contrasts.arg = f_t$contrasts)
-L_s <- model.matrix(delete.response(terms(f_s)), nd,
-                    contrasts.arg = f_s$contrasts)
+nd <- data.frame(g = factor(levels(d$g), levels = levels(d$g)))
+L <- function(f) model.matrix(delete.response(terms(f)), nd,
+                              contrasts.arg = f$contrasts)
 
 ## c: WT versus the average of the two mutants, on the group means
 cc <- c(WT = 1, GoodMutation = -0.5, BadMutation = -0.5)[levels(d$g)]
 
 ## k = c' L: different under each coding ...
-k_t <- drop(cc %*% L_t)
-k_s <- drop(cc %*% L_s)
-rbind(k_t, k_s)
+ks <- lapply(fits, function(f) drop(cc %*% L(f)))
+ks
 
 ## ... but the same estimate and the same standard error
-c(sum(k_t * coef(f_t)), sum(k_s * coef(f_s)))
-c(sqrt(drop(t(k_t) %*% vcov(f_t) %*% k_t)),
-  sqrt(drop(t(k_s) %*% vcov(f_s) %*% k_s)))
+sapply(names(fits), function(n) {
+  k <- ks[[n]]; f <- fits[[n]]
+  c(estimate = sum(k * coef(f)),
+    se = sqrt(drop(t(k) %*% vcov(f) %*% k)))
+})
+
+## ROS route: predict the cells, apply c; no k needed
+sapply(fits, function(f) sum(cc * predict(f, nd)))
+@
+
+<<ros-route, eval=FALSE>>=
+## NOT RUN: the same comparison with rstanarm, as in ROS 17.1
+library(rstanarm)
+fit <- stan_glm(y ~ g, data = d, refresh = 0)
+mu_draws <- posterior_epred(fit, newdata = nd)  # n_sims x 3
+contrast_draws <- drop(mu_draws %*% cc)
+c(median = median(contrast_draws), mad_sd = mad(contrast_draws))
 @
 
 %% ===================================================================
@@ -178,7 +216,7 @@ c(sqrt(drop(t(k_t) %*% vcov(f_t) %*% k_t)),
 \item Lenth, R. emmeans vignette, ``Comparisons and contrasts in emmeans''. \url{https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html}
 \item McCullagh, P., Nelder, J.\,A. (1989). \emph{Generalized Linear Models}, 2nd ed. Chapman and Hall.
 \item Dunn, P.\,K., Smyth, G.\,K. (2018). \emph{Generalized Linear Models With Examples in R}. Springer.
-\item Gelman, A., Hill, J., Vehtari, A. (2020). \emph{Regression and Other Stories}. Cambridge University Press. \url{https://avehtari.github.io/ROS-Examples/}
+\item Gelman, A., Hill, J., Vehtari, A. (2020). \emph{Regression and Other Stories}. Cambridge University Press. \url{https://avehtari.github.io/ROS-Examples/} Page numbers above refer to the printed pages of the free PDF dated 18 May 2025, available from that page (PDF page = printed page + 14).
 \end{itemize}
 
 \end{document}
