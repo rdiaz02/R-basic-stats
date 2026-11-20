@@ -9,6 +9,7 @@
 \usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash]{caption}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{numprint}
 \usepackage{wasysym}%% smileys. Always after amsmath, or redefined command error
 \usepackage{threeparttable}
 \usepackage{array}
@@ -3439,24 +3440,23 @@ t-tests, but to any kind of test (comparing variances, correlations, etc).
 
 
 
-
 \subsection{Multiple comparisons: struck by lightning, roulette, and lottery}
 
-This has been a short section, because we are skipping the technicalities
-and focus just on the big ideas. But this is a \textbf{VERY IMPORTANT}
-section to remember. When you do many tests, some of them might have low
+% This has been a short section, because we are skipping the technicalities
+% and focus just on the big ideas. But this is a \textbf{VERY IMPORTANT}
+% section to remember.
+This is the textual version in section \ref{mult-test-examples} we have a few numerical examples.
+
+When you do many tests, some of them might have low
 p-values just by chance and you need to adjust for this. If any gene with
 a low p-value is declared significant (regardless of the size of the
 collection of tests) you will be likely to start claiming that many purely
 chance results are ``significant''. And you do not want that. Again, go back to the examples of the lottery and the Russian roulette if this is not completely obvious.
 
-
-
 Remember that very rare events do happen, and they are almost certain to
 happen if the experiment is repeated many times (by the way, this is why
 most of us are not afraid of dying from lighting, even if every year some
 people do in fact die from lightning).
-
 
 When you screen 20000 genes, you are running 20000 times the experiment of
 the p-value and the null hypothesis. And remember the rules: for one true
@@ -3471,6 +3471,42 @@ There are many reviews about multiple testing, FDR, etc. You might want to
 take a look at a three-page one by W.\ Noble, in \textit{Nature
   Biotechnology}, 2009, 27: 1135--1136, ``How does multiple testing work''.
 
+
+\subsection{Multiple testing: some examples}\label{mult-test-examples}
+
+(The numbers below are calculated assuming independence of genes).
+
+\subsubsection{Nothing differentially expressed}
+You measure the expression of \numprint{10000} genes, none differentially expressed. You call a gene ``interesting'' if its p-value (p-value, not adjusted p-value) is less than 0.01.
+
+The number of false positives you expect are around $10000 \times 0.01 = 100$; thus, the FDR should be about $\frac{100}{100} = 1$. All discoveries are false.  %
+
+The probability that you make at least one false positive is \\ $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.01) = 1 - (1 - 0.01)^{10000} = 1 - 0.99^{10000} = 1 - 2.2\ 10^{-44} \simeq 1$. (Note: FWER could be also written as $Pr(\mbox{at least one null rejected})$ since all nulls are true; but better add the ``true null'', even if redundant, for the scenario that comes next.)
+
+
+\subsubsection{Some differentially expressed}
+
+You measure the expression of \numprint{10000} genes. Of these, \numprint{9000} are not differentially expressed, and \numprint{1000} are differentially expressed. You call a gene ``interesting'' if its p-value (p-value, not adjusted p-value) is less than 0.01. And in this experiment the probability of getting a p-value $< 0.01$ for a differentially expressed gene is 0.8 (i.e., power is 0.8); incidentally, this power is not impressive, but larger than the power of many omics studies with small sample sizes.
+
+The total number of genes you expect to call ``interesting'' come from two sets of genes:
+\begin{itemize}
+\item The non-differentially expressed. There will be about $9000 \times 0.01 = 90$ genes that you say are ``interesting'' but they are not differentially expressed. Thus, 90 false positives.
+  \item The differentially expressed. You'll make about $1000 \times 0.8 = 800$ true discoveries.
+\end{itemize}
+
+The FDR should be about (``should be about'' is the expected value) $\frac{90}{(90 + 800)} = \frac{90}{890} =  0.1011$. Notice, in this example, the order of magnitude difference between the p-value threshold and the FDR.
+
+The probability that you make at least one false positive is \\ $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.01) = 1 - (1 - 0.01)^{9000} = 1 - 0.99^{9000} = 1 - 5.2\ 10^{-40} \simeq 1$
+
+
+Now, redo the FDR example if power was 0.5 and the number of differentially expressed were 100 genes:  $FDR= \frac{(9900 \times 0.01)}{(9900 \times 0.01) + (100 \times 0.5)} = 0.66$. With few differentially expressed genes that most findings are false is not unexpected, especially if power is low.
+
+\textbf{Conclusion: we really need to control these errors.}
+
+And, to finish, these examples show that FDR is not a liberal version of FWER. It is always the case that FDR $\le$ FWER. But they measure different errors (which ones? go back to the definitions); thus, referring to one of them as more ``conservative/liberal'' is not appropriate; of course, one can say that an FWER-controlling procedure is more conservative than another FWER-controlling procedure, or that an FDR-controlling procedure is more conservative than another FDR-controlling procedure.
+
+
+
 \clearpage
 
 \section{Two-way ANOVA}\label{twoway}
@@ -3479,7 +3515,7 @@ In a two-way ANOVA, we are interested in the effects of two factors, not just on
 
 
 A key issue in models with two or more predictor variables (such as two-way
-ANOVA) are interactions. What is an interaction? The phenomenon of interaction should be familiar to you: it is very common in life in general, and in biology you might have previously seen at as epistasis in genetics; or take a look at the `Interactions'' section in the leaflet (prospecto) of any drug.
+ANOVA) are interactions. What is an interaction? The phenomenon of interaction should be familiar to you: it is very common in life in general, and in biology you might have previously seen at as epistasis in genetics; or take a look at the ``Interactions'' section in the leaflet (prospecto) of any drug.
 
 
 % If this is not clear, we will
