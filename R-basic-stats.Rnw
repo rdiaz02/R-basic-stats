@@ -2931,14 +2931,25 @@ Since understanding what we just said is crucial, we will use another two exampl
 \item Lottery: we can give you either one lottery ticket or 20 lottery tickets (each with a different number). Assuming you have no problem with becoming rich, what option do you prefer?
 \end{itemize}
 
+If the above is still unclear, think about why it is more likely ``B'' will get killed first. Or why it is more likely you will become richer if we give you 20 different lottery tickets.
+
 
 Now, the following should be clear:
-\begin{itemize}
+\begin{enumerate}
 \item If you test, say, 3 null hypotheses, and each one is true, and you reject any of the hypothesis at the 0.05 level, the probability that you will reject one or more null hypotheses when you shouldn't is larger than 0.05.
 \item If instead of testing 3 null hypotheses you test 20, the probability of rejecting one or more when you shouldn't is much larger than if you were just testing 3 null hypotheses.
-\end{itemize}
+\end{enumerate}
 
-If the above is still unclear, think about why it is more likely ``B'' will get killed first. Or why it is more likely you will become richer if we give you 20 different lottery tickets.
+Let us put some numbers on the above examples, assuming the three tests are independent:
+
+\begin{enumerate}
+\item 3 null hypotheses: $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.05) = 1 - Pr(\mbox{all}\ \mbox{CIs cover the truth}) = 1 - 0.95^{3} = 1 - 0.8574 = 0.1426$
+\item 20 null hypotheses: $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.05) =  Pr(\mbox{all}\ \mbox{CIs cover the truth}) = 1 - 0.95^{20} = 1 - 0.3584 = 0.6415$
+  \end{enumerate}
+
+
+We went from 0.05 to 0.14 with 3 and to 0.64 with 20!!!
+
 
 
 %% To carry out all pairs of tests and control for multiple testing, carry
@@ -3490,7 +3501,9 @@ You measure the expression of \numprint{10000} genes. Of these, \numprint{9000} 
 
 The total number of genes you expect to call ``interesting'' come from two sets of genes:
 \begin{itemize}
+
 \item The non-differentially expressed. There will be about $9000 \times 0.01 = 90$ genes that you say are ``interesting'' but they are not differentially expressed. Thus, 90 false positives.
+
   \item The differentially expressed. You'll make about $1000 \times 0.8 = 800$ true discoveries.
 \end{itemize}
 
@@ -3505,9 +3518,190 @@ Now, redo the FDR example if power was 0.5 and the number of differentially expr
 
 And, to finish, these examples show that FDR is not a liberal version of FWER. It is always the case that FDR $\le$ FWER. But they measure different errors (which ones? go back to the definitions); thus, referring to one of them as more ``conservative/liberal'' is not appropriate; of course, one can say that an FWER-controlling procedure is more conservative than another FWER-controlling procedure, or that an FDR-controlling procedure is more conservative than another FDR-controlling procedure.
 
+\clearpage
+\subsection{Parameterizations, \texttt{model.matrix}, and the meanings of ``contrasts''}\label{params-one-way}
+
+(Yes, this overlaps a lot with \qref{anovaaslm}; I am moving some material to smaller, self-contained, sections close to where the models where discussed, but still leaving the large section for overview. Hopefully, I'll be able to reorganize it will, keeping only the necessary redundancy. But it is still work in progress).
+
+I am putting this here because familiarity with the \texttt{model.matrix} and the two meanings of ``contrasts'' is important to use linear models, and essential when using limma and similar packages for omics data analysis; for full details read and keep handy this reference: Law, C. W., Zeglinski, K., Dong, X., Alhamdoosh, M., Smyth, G. K., \& Ritchie, M. E. (2020). A guide to creating design matrices for gene expression experiments. F1000research, 9, 1444. \Burl{https://doi.org/10.12688/f1000research.27893.1}.
+
+
+The model $y_{ij} = \mu + \alpha_i  + \epsilon_{ij}$ is overparameterized. If we have three means, only three things need to be estimated.
+
+
+<<po1-1>>=
+asLm <- lm(activ ~ ftraining, data = dmit)
+anova(asLm)
+summary(asLm)
+@
+
+We are being shown the fitted coefficients. They are expressed as
+deviations with respect to a baseline level, in this case the first level:
+
+<<>>=
+means <- with(dmit, tapply(activ, ftraining, mean)) ## instead of "tapply",
+## "by" or "aggregate" would also work here but
+## tapply gives a vector and it is eaier to access the elements
+
+means["Morning"]
+means["Lunch"] - means["Morning"]
+means["Afternoon"] - means["Morning"]
+rm(means) ## let's remove it, so as not the leave
+## garbage around
+@
+
+This is the default parameterization in R. But is is not the only one available (more below).
+
+
+Of course, the above applies to more than one factor, and to factors with
+an arbitrary number of levels.
+
+\subsubsection{Changing the reference in the one-way}\label{change-ref-one-way}
+
+We can change the reference, and that will change what we are comparing against:
+
+<<>>=
+dmitb <- dmit
+dmitb$ftraining2 <- factor(dmitb$ftraining,
+                           levels = c("Afternoon", "Lunch", "Morning"))
+## check
+with(dmitb, table(ftraining, ftraining2))
+@
+
+Now, rerun the analysis
+
+<<>>=
+asLm2 <- lm(activ ~ ftraining2, data = dmitb)
+anova(asLm2) ## no difference, of course
+summary(asLm2)
+meansb <- with(dmitb, tapply(activ, ftraining2, mean))
+meansb[1]
+meansb[2] - meansb[1]
+meansb[3] - meansb[1]
+rm(meansb, dmitb)
+@
+
+\subsubsection{Other contrasts}\label{othercontrasts_param}
+I am going to create a smaller and simpler data set, so that we are not overwhelmed with output and the differences are clean numbers, no decimals.
+
+<<oct1>>=
+(ys <- c(0.9, 1.1, 2.9, 3.1, 10.9, 11.1, 10.8, 11.2))
+(xs <- factor(rep(LETTERS[1:3], c(2, 2, 4)))) ## Note unbalanced
+(meansy <- tapply(ys, xs, mean))
+
+## Intercept is A, B and C expressed as deviations from A
+(mTrt <- lm(ys ~ xs))
+
+model.matrix(mTrt)
+
+options()$contrasts
+@
+
+We are using \texttt{contr.treatment}, the default in R. But R could use a different set of contrasts to parameterize the model. A common one, though \textbf{not the default in limma}, are ``contr.sum'' . The idea is:
+``We write the model as $y_{ij} = \mu + \alpha_i + \epsilon_{ij}$; we set $\mu$ to the average of the group means, and enforce the constraint that the sum of the effects is 0, $\sum_i \alpha_i = 0$ (and since one of the $\alpha$s is, therefore, determined given the rest, we drop the last $\alpha$ in the estimation)''.
+ (Note:  when we want to estimate effects in the presence of interactions, which we will see later, we probably want to use \texttt{contr.sum}. We will not pursue this any further here.)
+We will use \Rfunction{contr.Sum} from \CRANpkg{car}, since clearer labeling.
+
+
+<<>>=
+## Fit model with different contrasts
+(mSum <- lm(ys ~ xs, contrasts = list(xs = "contr.Sum")))
+
+## What is that output saying?
+## Intercept is the average of the three group means
+means(meansy)
+## not average of the data
+means(ys)
+
+## S.A is the deviation of A with respect to the intercept
+meansy["A"] - coefficients(mSum)["(Intercept)"]
+
+## S.B the deviation of B wrt Intercept
+meansy["B"] - coefficients(mSum)["(Intercept)"]
+
+## S.C is not estimated, as it is given by the constraints
+##    once S.A and S.B are estimated
+
+## The constraints are enforced: \sum alpha = 0, so alpha_C is known:
+(alpha_C <- -(sum(coefficients(mSum)[c(2, 3)])))
+
+## And predicted value of C is
+coefficients(mSum)["(Intercept)"] + alpha_C
+## dientical to mean of C
+meansy["C"]
+
+## What is the model matrix?
+model.matrix(mSum)
+@
+
+
+\subsubsubsection{Repetition with decimals}
+This repeats the above with a subset of the dmit3 data. This can be skipped as it just repetition.
+
+
+<<modmat15>>=
+(dmit3 <- dmit[c(1:2, 12:13, 24:26), ])
+(mdm3 <- lm(activ ~ ftraining, data = dmit3))
+
+## Again:
+(means <- with(dmit3, tapply(activ, ftraining, mean)))
+means["Morning"]
+means["Lunch"] - means["Morning"]
+means["Afternoon"] - means["Morning"]
+@
+
+This is the model matrix:
+<<modmat16>>=
+model.matrix(mdm3)
+@
+
+
+
+<<modmat17>>=
+options()$contrasts
+(mdm3_sum <- lm(activ ~ ftraining, data = dmit3, contrasts = list(ftraining = "contr.Sum")))
+
+
+## What is the intercept?
+mean(means)
+## ftraining[S.Morning]
+means["Morning"] - mean(means)
+## ftraining[S.Lunch]
+means["Lunch"] - mean(means)
+## No need for an "afternoon coefficient"
+
+## The constraints are enforced: \sum alpha = 0;
+## The value of S.Afternoon, not estimated, = -(S.Morning + S.Lunch)
+means["Afternoon"]
+coeff_afternoon <- -sum(coefficients(mdm3_sum)[c(2, 3)])
+coefficients(mdm3_sum)["(Intercept)"] + coeff_afternoon
+
+## How does the model matrix look
+model.matrix(mdm3_sum)
+
+
+@
+
+
+
+
+<<>>=
+rm(dmit3, mdm3)
+
+@
+
 
 
 \clearpage
+
+
+
+\subsubsection{The two meanings of contrasts}
+
+\subsubsection{Models without an intercept}
+
+\subsubsection{An example of Limma's \texttt{makeContrasts}}
+
 
 \section{Two-way ANOVA}\label{twoway}
 
@@ -8121,7 +8315,6 @@ contrasts(xs)
 
 ## Intercept is A, B and C expressed as deviations from A
 (mTrt <- lm(ys ~ xs))
-
 
 ## Now, change contrasts (we don't store the options, as we will
 ## return to the original opt we saved above)
