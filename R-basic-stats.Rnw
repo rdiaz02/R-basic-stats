@@ -1,4 +1,4 @@
-%\VignetteEngine{knitr::knitr}
+%%\VignetteEngine{knitr::knitr}
 \synctex=1
 \documentclass[a4paper,11pt]{article}
 %% not if using BiocStyle
@@ -2940,7 +2940,7 @@ Now, the following should be clear:
 \item If instead of testing 3 null hypotheses you test 20, the probability of rejecting one or more when you shouldn't is much larger than if you were just testing 3 null hypotheses.
 \end{enumerate}
 
-Let us put some numbers on the above examples, assuming the three tests are independent:
+Let us put some numbers on the above examples, assuming the three (or the twenty) tests are independent:
 
 \begin{enumerate}
 \item 3 null hypotheses: $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.05) = 1 - Pr(\mbox{all}\ \mbox{CIs cover the truth}) = 1 - 0.95^{3} = 1 - 0.8574 = 0.1426$
@@ -3037,7 +3037,8 @@ Because the FWER control has to work both under the complete null, when all null
 \( P( \ge \mbox{1 false rejection}) = 1 - P(\mbox{all CIs cover the truth})\).
 In the second case, when only some nulls are true,
 \(P( \ge \mbox{1 false rejection})  < 1 - P(\mbox{all CIs cover the truth})\);
-the CI for a truly false null might not cover its true value, and this would not be a Type I error. This is why on this second case (when only some nulls are true), FWER is strictly less than \(1 - P(\mbox{all CIs cover the truth})\).}.
+the CI for a truly false null might not cover its true value, and this would not be a Type I error. This is why on this second case (when only some nulls are true), FWER is strictly less than \(1 - P(\mbox{all CIs cover the truth})\).}. Note that we used this same logic before, in the examples with 3 and 20 null hypothesis a few pages back.  There, we wrote: $FWER =  Pr(\mbox{at least one true null rejected}) = 1 - Pr(\mbox{all}\ p_i > 0.05) = 1 - Pr(\mbox{all}\ \mbox{CIs cover the truth})$ as, by construction of the example, all the hypotheses were true. I find it easier to think about this problem in terms of coverage of the CI, because that is what the plot is giving you but, of course, using the ``probability of at least one true null rejected'' and thinking of p-values is equivalent.
+
 
 
 Given how far two of the contrasts are from 0.0, it seems those are highly
@@ -3523,7 +3524,7 @@ And, to finish, these examples show that FDR is not a liberal version of FWER. I
 
 (Yes, this overlaps a lot with \qref{anovaaslm}; I am moving some material to smaller, self-contained, sections close to where the models where discussed, but still leaving the large section for overview. Hopefully, I'll be able to reorganize it will, keeping only the necessary redundancy. But it is still work in progress).
 
-I am putting this here because familiarity with the \texttt{model.matrix} and the two meanings of ``contrasts'' is important to use linear models, and essential when using limma and similar packages for omics data analysis; for full details read and keep handy this reference: Law, C. W., Zeglinski, K., Dong, X., Alhamdoosh, M., Smyth, G. K., \& Ritchie, M. E. (2020). A guide to creating design matrices for gene expression experiments. F1000research, 9, 1444. \Burl{https://doi.org/10.12688/f1000research.27893.1}.
+I am putting this here because familiarity with the \textbf{design matrix}, as given by \texttt{model.matrix}, and the two meanings of \textbf{contrasts} is often very useful when we use linear models, and essential when using limma and similar packages for omics data analysis; for full details read and keep handy this reference: Law, C. W., Zeglinski, K., Dong, X., Alhamdoosh, M., Smyth, G. K., \& Ritchie, M. E. (2020). A guide to creating design matrices for gene expression experiments. F1000research, 9, 1444. \Burl{https://doi.org/10.12688/f1000research.27893.1}.
 
 
 The model $y_{ij} = \mu + \alpha_i  + \epsilon_{ij}$ is overparameterized. If we have three means, only three things need to be estimated.
@@ -3609,9 +3610,9 @@ We will use \Rfunction{contr.Sum} from \CRANpkg{car}, since clearer labeling.
 
 ## What is that output saying?
 ## Intercept is the average of the three group means
-means(meansy)
+mean(meansy)
 ## not average of the data
-means(ys)
+mean(ys)
 
 ## S.A is the deviation of A with respect to the intercept
 meansy["A"] - coefficients(mSum)["(Intercept)"]
@@ -3635,7 +3636,7 @@ model.matrix(mSum)
 @
 
 
-\subsubsubsection{Repetition with decimals}
+\subsubsection{Repetition with decimals}
 This repeats the above with a subset of the dmit3 data. This can be skipped as it just repetition.
 
 
@@ -3697,10 +3698,86 @@ rm(dmit3, mdm3)
 
 
 \subsubsection{The two meanings of contrasts}
+Using the ``contrasts'' option in  R, with values such as  ``contr.treatment'' or ``contr.sum'' specifies how R parameterizes the model; in other words, how the model matrix is constructed and, thus, exactly what is estimated. This use of ``contrasts'' is standard and widespread, in both R and the statistical literature in general (e.g., it is the one in the classic McCullagh \& Nelder,  1989. \textit{Generalized linear models, 2nd ed}. Chapman and Hall/CRC.).
+
+Beyond that, we are interested in comparing (contrasting, testing) specific things. For example, something like ``all the experimental treatments vs.\ the Control'' or ``testing whether all pairs of means are equal'', or ``testing whether the `WT' is the average of `GoodMutation' and `BadMutation'\,''. % Note that  we are referring to comparing/contrasting the different values that we use ``treatment'', but here treatment are the labels in our factors.
+
+This is in fact what the function \texttt{contrMat} constructs in package \texttt{multcomp}. It returns the weights of the group (cell) means, and \texttt{mcp} converts them into weights of the coefficients.
+
+% In fact, using Tukey contrasts in the multcomp package does exactly this: return the set of linear functions of the parameters so that you test what you want to test.
+
+
+The function \texttt{makeContrasts} in limma is also used for this purpose.  You say ``I want to compare `WT' against the average of `GoodMutation' and `BadMutation'\,'' or ``Compare all treatments against the Control''. This returns the set of linear functions of the estimated/fitted parameters so that you test what you want to test.
+
+Regardless of the setting of \verb|options()$contrasts| (e.g., whether ``contr.sum'' or ``contr.treatment'', or, if using package car, ``contr.Sum'', or ``contr.Treatment'', etc), you can always specify the comparisons you are interested in as a linear function of the parameters (the things shown under ``coefficients'') of your model. In other words, as linear functions of what is given by ``model.matrix''.
+
+makeContrasts, in limma, makes this more obvious (see the Law et al. paper) as  you see directly what exactly you are comparing as a function of the model matrix. \texttt{contrMat} hides it from you a little bit more (and, at the same time, is possibly more flexible, as you can pass functions).  Package \texttt{emmeans} uses yet another way of going around this in the sense that the function names and how one builds comparisons (aka contrasts or sets of hypothesis to test) of interest is somewhat different. (Explained in \url{https://cran.r-project.org/web/packages/emmeans/vignettes/comparisons.html}) but the ideas are, of course, the same.
+
+
+
+Again, if you use limma, it seems that the default, \texttt{contr.treatment}, is not changed. If you read the Law et al.\ paper cited above you'll see that changing the contrasts used, or even examining their setting (\verb|options()$contrasts|) does not appear even once. The book by Dunn and Smyth (Smyth is the father of limm), \textit{Generalized linear models with examples in R} (2018, Springer, \Burl{https://doi.org/10.1007/978-1-4419-0118-7}) also does not spend much time in examples with \texttt{model.matrix}.
+It seems that, in particular for limma and makeContrasts, the implicit modus operandi of the authors is:
+``We will not mess around with changing \verb|options()$contrasts|; i.e., we won't do things like \verb|opt <- options(contrasts = c("contr.sum", "contr.poly"))|. We just take things as R does them, and directly use the following route instead: a)  we either use or not use an intercept (when, why, etc, is explained in the Law et al paper); b) we use makeContrasts to compare what we care about.''
+To put it differently: limma seems to say: R will parameterize the model in some way and we are just happy with it, and the only knob we turn is adding, or not, an intercept. That gives a particular model.matrix. Then, use makeContrasts.
+
+
+This is also what, to a large extent, ghlt does, and what ``Anova'' from the car package do (with Type II; with Type III the tests depend on the coding).
+
+To summarize:
+\begin{enumerate}
+\item \textbf{The scientific question lives on the group means.} E.g.; ``WT versus the average of the two mutants''. % is a vector $\mathbf{c}$ applied to the vector of group (cell) means $\bm{\mu}$. It does not depend on any coding.
+\item \textbf{The coding decides the model matrix.} \texttt{contr.treatment}, \texttt{contr.sum}, or dropping the intercept each give a different \texttt{model.matrix}, hence different coefficients $\boldsymbol{\beta}$ with different meanings, but the same fitted group means.
+\item \textbf{The same question under different codings gives a different vector of weights of the coefficients.}
+With limma's \texttt{makeContrasts} you specify the question as a function of the design matrix's terms, whereas with \texttt{contrMat} and \texttt{mcp} in \texttt{glht} things are specified in terms of the cell means. And this also explains why limma often fits models without intercept.
+\end{enumerate}
+
+
+% Changing the Interesante que el cambiar la patemetrización (el uso de \verb|options(contrasts = ...)|, o el mirar el setting vía \verb|options()$contrasts|) no aparece ni una sola vez en el documento de Law. Este uso de la función ``contrasts'' es el estándard y widespread, en R, y en la literatura as far as I remember (McCullagh \& Nelder, ``Generalized Linear Models'').
 
 \subsubsection{Models without an intercept}
 
-\subsubsection{An example of Limma's \texttt{makeContrasts}}
+We are referring to an intercept in a linear model. This linear model is a one-way ANOVA, not a regression, but the $\mu$ is what plays the role of the intercept.  In a one-way if we remove the intercept, we are  fitting the group means directly.
+
+<<monit>>=
+## Recall this
+mTrt
+model.matrix(mTrt)
+
+## Without intercept
+(mNoInt <- lm(ys ~ -1 + xs, contrasts = list(xs = "contr.treatment")))
+
+model.matrix(mNoInt)
+
+## What is this testing?
+summary(mNoInt)
+@
+
+% ## Here, changing contrasts cannot make any difference
+% (mNoInt_sum <- lm(ys ~ -1 + xs, contrasts = list(xs = "contr.Sum")))
+
+% model.matrix(mNoInt_sum)
+
+
+Beware, though: using models without intercept should be done with care, and in regressions in particular it is rarely what you want (we will get back to that).
+
+
+% \subsubsection{An example of Limma's \texttt{makeContrasts}}
+
+% <<makecontrrlima>>=
+% library(limma)
+
+% makeContrasts(xsC - xsB,
+%               levels = colnames(model.matrix(mNoInt)))
+
+% makeContrasts(xsC - xsB,
+%               levels = colnames(model.matrix(mNoInt_sum)))
+
+% makeContrasts(xsC - xsB,
+%               levels = colnames(model.matrix(mTrt)))
+
+% @
+
+% %%% Had we compared against A, harder with intercept.
 
 
 \section{Two-way ANOVA}\label{twoway}
@@ -5322,7 +5399,7 @@ plot(TukeyHSD(clmaov, which = "Diet:Drug"))
 par(op) ## return graphical parameters to previous stage
 @
 
-We have 15 contrasts. Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). Again, we might only care about all comparisons of Drug within each level of Diet, for example (see documentation of R package \CRANpkg{multcomp}).
+We have 15 contrasts (all possible pairs of 6 different treatment combinations). Maybe we do not care about all those (e.g., \texttt{M1:A-HF:B}). Again, we might only care about all comparisons of Drug within each level of Diet, for example (see documentation of R package \CRANpkg{multcomp}); this would give us 6, not 15, contrasts.
 
 
 %% FIXME: check emmeans. Maybe simpler and cleaner?
@@ -5746,10 +5823,9 @@ An alternative to \Rfunction{ellipse} is \CRANpkg{car}'s
 \Rfunction{confidenceEllipse}.
 
 
-(And no, there is nothing wrong with this correlation. It actually makes a lot of
+(And there is nothing wrong with this correlation. It actually makes a lot of
 sense.  Think about tilting the regression line, keeping the center
-of mass fixed, so play with increasing or decreasing the slope: what happens with
-the intercept?)
+of mass fixed, so play with increasing or decreasing the slope: what happens with the intercept?)
 
 
 
@@ -5893,9 +5969,9 @@ For this class, these are the key messages:
 
 \item But adding predictor variables that actually explain nothing will never decrease $R^2$. The adjusted $R^2$ accounts for this (adding a predictor will only increase adjusted $R^2$ if the predictor makes some contribution to improving predictive value). Note that the (unadjusted) $R^2$ is the relative change in residual sums of squares, whereas the adjusted $R^2$ is the relative change in residual variance. In general, the adjusted $R^2$ is a better number to look at (and note it can, in models that explain nothing, become negative)\footnote{There are additional issues that might need to be considered. For example, the default $R^2$ that R gives you, both adjusted and unadjusted, should not be used in models without an intercept (i.e., regression through the origin). And the unadjusted $R^2$ has the virtue that it can be computed for many other models, since it is just the square of the correlation of predicted and observed. We will not discuss these issues here.}.
 
-
-
 \end{itemize}
+
+Beware, though, in particular for the undajusted $R^2$: this should not be taken to be ``the squared correlation I can expect between the predicted and true value for a new observation''. Can you tell why?
 
 The following shows the calculations but the previous summary is enough for this class (i.e., you can skip what follows).
 
@@ -8195,8 +8271,8 @@ mean(mxu[2, ] - mxu[1, ])
 ## or, similarly
 mean(mxu[ , 2] - mxu[, 1])
 
-## So the first cell is the first cell UNDER that additive model. You can't
-## just put the first cell mean in there.
+## So the first cell is the first cell *under that additive model*.
+## You can't just put the first cell mean in there.
 @
 
 
