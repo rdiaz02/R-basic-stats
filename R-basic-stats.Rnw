@@ -5534,8 +5534,27 @@ regression procedure will estimate $\alpha$ and $\beta$, finding values
 ($\hat{\alpha}, \hat{\beta}$) that produce a \textbf{best fitting line}
 (note: it is a line, not an arbitrary curve).
 
+
+The solutions (the estimates) are:
+\begin{gather*}
+  \hat{\beta} = \frac{\sum (x_i - \bar{x}) (y_i - \bar{y})}{\sum (x_i - \bar{x})^2} = \frac{cov(x, y)}{var(x)}  \\
+  \hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}
+\end{gather*} (you do not need to memorize this --- it won't be in the exam).
+
+Beautifully, we get the same solution for $\alpha, \beta$ whether we focus on  ``find the line that minimizes $\sum (y_i - \hat{y}_i)^2 = \sum (y_i - (\hat{\alpha} - \hat{\beta} x_i))$'' (just find the least squares solution) or whether we say ``let us find the line that maximizes the likelihood, when $\epsilon \sim \mathrm{N}(0, \sigma^2)$''\footnote{Maximizing the likelihood: summarizing here the short section in Gelman et al., 2021, in ``Regression and other stories'', section 8.1; we want to find the $\alpha, \beta, \sigma$ that maximize the probability of the data given the parameters:
+  \begin{gather*}
+    p(y | \alpha, \beta, \sigma, X) = \Pi_{i=1}^{i=N} \mathrm{N}(y_i | \alpha + \beta x_i, \sigma^2)
+  \end{gather*}
+  and $\mathrm{N}(y | \mu, \sigma)$ is the density of the normal distribution: $\frac{1}{\sigma\sqrt{2 \pi}} e^{-\frac{(y - \mu)^2}{2 \sigma^2}}$.
+  % The maximum likelihood of $\sigma$, though, is slightly biased down, with $n$ instead of $n-2$ in the denominator.
+}.
+
+
+
+
 %% Let's use a simple data set that relates data set from the base
-%% package, ``women''. Go to ``Data'', ``Data in packages'' and select
+%% package, ``women''. Go to
+``Data'', ``Data in packages'' and select
 %% \Robject{women} (it is in package \CRANpkg{datasets})
 
 
@@ -5546,6 +5565,118 @@ regression procedure will estimate $\alpha$ and $\beta$, finding values
 %%   \end{center}
 %% \end{figure}
 
+
+
+% \subsection{Regression: Pearson and Lee data on mothers and daughters height}\label{regr-pearson-lee}
+
+% These data are used in the book ``Regression and other stories'', by Gelman, Hill, and Vehtari (2021). The book URL is \Burl{https://avehtari.github.io/ROS-Examples/index.html}.
+
+% The data, originally from Karl Pearson and Alice Lee, from 1903, are heights of mothers and daughters. This example is used in section 6.4 and ff.\ of ``Regression and other stories''. We will grab the data directly from the github repo; so that successive runs work without an internet connection, we save the data, just in case. The data are in inches, so we will convert it to cm before saving.
+
+% <<mother-daugther-height>>=
+% heights <- read.table(    "https://raw.githubusercontent.com/avehtari/ROS-Examples/master/PearsonLee/data/Heights.txt",
+%                       header = TRUE)
+% str(heights)
+% heights$daughter_height_cm <- heights$daughter_height * 2.54
+% heights$mother_height_cm <- heights$mother_height * 2.54
+% save(file = "heights-Pearson-Lee.RData", heights)
+% @
+
+% Now, fit the model and plot.
+
+% <<height-mod-plot>>=
+% mh <- lm(daughter_height_cm ~ mother_height_cm, data = heights)
+% plot(daughter_height_cm ~ mother_height_cm, data = heights)
+% abline(mh)
+% @
+
+%% I dislike the huge overlap and that the plot does not look at all like Fig. 6.3 in the book.
+
+\subsection{Regression: Davis data on self-reported height and weight}\label{regr-davis}
+
+These data are used in Fox \& Weisberg's ``An R companion to applied regression, 3rd ed'', chapter 4. Units are kilograms and centimeters of weight, reported weight, height, and reported height.
+
+<<>>=
+library(car)
+data(Davis)
+mh <- lm(weight ~ repwt, data = Davis)
+plot(weight ~ repwt, data = Davis)
+abline(mh)
+summary(mh)
+@
+
+Let us interpret the output.
+
+Notice we are regressing weight on reported weight, so causality is inverted here and that is fine. Don't forget that regression slopes have units (had we used kilograms in one variable and pounds in the other, things would have been different).
+
+
+\subsection{Galton height data}\label{galton-ex}
+
+These data are used by Faraway in chapter 1 of  ``Linear models with R, 2nd ed'' (2015, CRC).  They are the famous Galton data on the ``mid parent height''. We will need to install the \texttt{HistData} package if we don't have it. This package is ``a collection of small data sets that are interesting and important in the history of statistics and data visualization. '' Details about the datasets in \Burl{https://friendly.github.io/HistData/}. Heights are in inches, so I convert them to cm. (These data have often been used as one of the canonical examples of ``regression to the mean'' --- to ``mediocrity'' in Galton's words).
+
+<<galtonex>>=
+data(GaltonFamilies, package = "HistData")
+GaltonFamilies$childHeight_cm <- GaltonFamilies$childHeight * 2.54
+GaltonFamilies$midparentHeight_cm <- GaltonFamilies$midparentHeight * 2.54
+
+mg <- lm(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies)
+plot(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies, col = "slategray4")
+abline(mg, lty = 2)
+
+## The regression line goes through the mean of
+## y and x variables.
+
+meanp <- with(GaltonFamilies, mean(midparentHeight_cm))
+meanc <- with(GaltonFamilies, mean(childHeight_cm))
+points(meanp, meanc, pch = 16, col = "red", cex = 2)
+
+## And this is the regression output
+summary(mg)
+@
+
+
+
+
+
+Notice how the regression line is not the ``principal component line'' (or the ``reduced/standard major axis'' one).
+
+% %%% Reduced major axis
+% <<rmagalton>>=
+% with(GaltonFamilies, {
+%     rmab <<- sd(childHeight_cm)/sd(midparentHeight_cm)
+%     rmai <<- mean(childHeight_cm) - rmab * mean(midparentHeight_cm)
+% })
+
+% ## also betaOLS/abs(corr)
+% with(GaltonFamilies,
+%      rmab2 <<- coefficients(mg)[2]/abs(cor(midparentHeight_cm, childHeight_cm))
+%      )
+% rmab
+% rmab2
+
+%% Can use the smatr package
+%% sma(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies, method = "SMA")
+
+% @
+
+
+
+Centering can help make the intercept more interpretable here:
+
+<<galtonexcenter>>=
+GaltonFamilies$centered_midparentHeight_cm <-
+    scale(GaltonFamilies$midparentHeight_cm, scale = FALSE)
+mg2 <- lm(childHeight_cm ~ centered_midparentHeight_cm,
+          data = GaltonFamilies)
+summary(mg2)
+@
+
+If it helps interpretation, you can subtract not the mean, but any other sensible value that will make the regression more interpretable.
+More generally, centering can also help for other numerical issues (e.g., see section \ref{aic-not-the-issue} and \ref{wrong}) and can also help interpreting models with interactions (not pursued here; see ``Regression and otheer stories'', chapter 12).
+
+
+
+\subsection{Regression: the bird metabolic rate vs.\ weight example}\label{bird-metab-weight-example}
 
 
 We will use a subset of data from the AnAge data set (Animal Ageing and
@@ -5663,7 +5794,7 @@ Do you know  what ``R-squared'' refers to  (we explain this in more detail in se
 By the way, did you see the note about missingness? Do you know what that
 means?
 
-\subsection{And how does it look like: should have plotted the data!}
+\subsubsection{And how does it look like: should have plotted the data!}
 Eh!!! We should probably have plotted the data as the first thing. First, let's do a scatterplot (you
 might want to not show the spread \footnote{I find the spread
   information to be confusing. But I like to leave the
@@ -5750,6 +5881,34 @@ try to identify transformations, including some diagnostic plots that can
 help (e.g., component+residual plots, section \nameref{diagnostics}).
 
 
+\subsubsection{Centering and interpreting the log-log relationship}\label{regr-center-log-log}
+
+
+The slope, about 0.65, is the increase in the log metabolic rate for one unit increase in the log of the mass, in grams. What is this saying in the original units?
+
+\begin{gather*}
+  \widehat{\log(\mathit{Metab})} = \hat{\alpha} + \hat{\beta} \log(\mathit{Mass})\\
+  e^{\widehat{\log(\mathit{Metab})}} = e^{\hat{\alpha} + \hat{\beta} \log(\mathit{Mass})}\\
+  \widehat{\mathit{Metab}} = e^{\hat{\alpha}} e^{\hat{\beta} \log(\mathit{Mass})}\\
+  \widehat{\mathit{Metab}} = a e^{\hat{\beta} \log(\mathit{Mass})}\\
+  \widehat{\mathit{Metab}} = a (e^{\log(\mathit{Mass})})^{\hat{\beta}}\\
+  \widehat{\mathit{Metab}} = a \mathit{Mass}^{\hat{\beta}}
+\end{gather*}
+
+where I've called $a = e^{\hat{\alpha}}$ and $\widehat{\mathit{Metab}} = e^{\widehat{\log(\mathit{Metab})}}$. Note that $\widehat{\mathit{Metab}}$ is the predicted geometric mean of the metabolic rate for a given mass, not its arithmetic mean (see the footnote at the end of section \ref{ci-regression}).  So we have a non-linear  relationship in the original scale, which we have linearized by taking logs. Thus, the ratio of the predicted metabolic rates of two species with different mass is given by $\frac{\widehat{\mathit{Metab}}_2}{\widehat{\mathit{Metab}}_1} = (\frac{\mathit{Mass}_2}{\mathit{Mass}_1})^{\hat{\beta}}$. It is possible to interpret the slope as the approximate percent change in the dependent variable given a 1\% change in the $X$\footnote{
+$\hat{\beta}$  is often interpreted as the approximate \% change in metabolic rate associated with a 1\% increase in body mass;
+see \Burl{https://stats.oarc.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/}; other explanations in
+\Burl{https://cscu.cornell.edu/wp-content/uploads/logv.pdf},
+\Burl{https://stats.oarc.ucla.edu/sas/faq/how-can-i-interpret-log-transformed-variables-in-terms-of-percent-change-in-linear-regression/}, \Burl{https://library.virginia.edu/data/articles/interpreting-log-transformations-in-a-linear-model}, and
+\Burl{https://stats.stackexchange.com/questions/18480/interpretation-of-log-transformed-predictor-and-or-response}.}.
+
+
+The point of this comment, though, is not this specific transformation nor its specific interpretation, but to remember that if you transform variables, the interpretation of the coefficients changes. Likewise, you might transform only the $y$ or only the $x$, and sometimes using logs in different bases (2 or 10) might simplify interpretations; see section 3.4.1 of Fox \& Weisberg's ``An R companion to applied regression'' and \\ \Burl{https://stats.oarc.ucla.edu/other/mult-pkg/faq/general/faqhow-do-i-interpret-a-regression-model-when-some-variables-are-log-transformed/}.
+
+What about the intercept? The intercept is not very useful here. We could center the data, as we did with the Galton data. But do we want the log metabolic rate at the log of the average bird weight, or the log metabolic rate at the average of the log of weights? That is a question of what is more useful to you. These two can be very different: for these birds, the geometric mean mass, $\exp(\overline{\log(\mathit{Mass})})$, is \Sexpr{round(exp(mean(model.frame(metablog)$logBodyMass)))} g, but the arithmetic mean mass is \Sexpr{round(mean(exp(model.frame(metablog)$logBodyMass)))} g. Centering \texttt{logBodyMass} at its mean, as we would do with \texttt{scale}, gives the intercept for a bird of \Sexpr{round(exp(mean(model.frame(metablog)$logBodyMass)))} g. And you will probably want to obtain the prediction in the original units (exponentiate).
+
+
+
 \subsection{Confidence intervals and predictions intervals or prediction and
   confidence bands}\label{ci-regression}
 
@@ -5777,17 +5936,38 @@ ci.plot(lm_cib_2)
 You can run the previous code changing the value of \texttt{N}, to get an
 intuition of the difference between the two bands.
 
-Basically:
 \begin{itemize}
 \item Confidence interval bands are for the regression line itself which is the same as saying that they are for the expected value of the response variable. (We are modeling $E[y] = \alpha + \beta x$). The more uncertain we are about the overall trend, about the line, the wider the confidence interval bands will be.
 
 \item Prediction interval bands are for the observations; so, in addition to the uncertainty around the regression line, we have the $\sigma$, the standard deviation of the observations around their mean value, around $E[y]$.
+
 \item To clarify the above, think about this: suppose you take a huge sample, say of size 10 million, of people and do a regression of body mass on body height. You will estimate the regression line with very little uncertainty. In other words, you will be very, very certain about where $E[body\_mass]$ is given $body\_height$. But \ldots no matter your sample size, there is quite a bit of variation in body mass for a given body height. So the prediction bands will be relatively wide, to accomodate this fact.
 
   This is, by the way, the reason why you can be very certain about an overall trend (the expected value) and yet be unable to really predict any one specific individuals actual value. (This is similar to situation where you can say, for example, that a particular intervention or factor is associated with a change in the probability of event A of 70\%, and yet that might not be a very precise forecast for any specific idividual.)  It is crucial to understand the difference between predicting the mean and predicting a specific individual's value.
 
   In contrast, if $\sigma$ is very, very, very tiny, then the prediction bands will be very, very close to the confidence interval bands.
 \end{itemize}
+
+You can obtain the confidence or prediction values for any value of $x$ using function \texttt{predict}; here we show the first five (and you can pass new data to obtain predictions for new data under the fitted model).
+
+<<peredciband>>=
+predict(lm_cib_2, interval = "confidence")[1:5, ]
+
+## The warning is nothing to be concerned about here.
+predict(lm_cib_2, interval = "prediction")[1:5, ]
+predict(lm_cib_2, newdata = dummy_data, interval = "prediction")[1:5, ]
+
+rm(lm_cib_2, N, dummy_data)
+@
+
+(What about the warning when using \texttt{prediction}? Nothing to worry about here. This comes from Dalgaard's ``Introductory statistics with R, 2nd ed.'': ``The limits should not be used for evaluating the observed data to which the line has been fitted. These will tend to lie closer to the line for the extreme x values because those data points are the more influential; that is, the prediction bands curve the wrong way.'')
+
+What about transformations and getting the intervals (predictions and confidence) in the original scale? To obtain the CI of a prediction in the original units, a standard procedure is to obtain it in the transformed units and then back-transform (e.g., exponentiate), which means that the CI will not be symmetrical in the original scale for non-linear transformations\footnote{But what is the confidence band a CI of? Back-transforming a CI for the mean on the log scale (i.e., of $\overline{\log(y)}$) gives a CI for the geometric mean on the original scale (i.e., of $\exp(\overline{\log(y)})$), not the arithmetic mean. This is from the definition of the geometric mean of $y$: the geometric mean of $y$ is $\sqrt[n]{y_1\ y_2 \ldots y_n} = \exp(\frac{1}{n}\sum_{i=1}^{n} \log(y_i))$. This is also the median if errors are symmetric in the log scale --- the reason is both intuitive and beautiful: if the distribution is symmetric in the log scale, half of the values lie below the mean, and half above the mean, and the mean and the median are the same value, and now, when we exponentiate, and since it is a monotonic transformation, the value that was both the mean and median of the symmetric distribution becomes the median, because it is still leaving half of the values above and half below. The point prediction is the same in the confidence and the prediction intervals, so in both its back-transformation is the geometric mean. The limits of the prediction interval, back-transformed, are the limits of a prediction interval for a new $y$ in the original units.}.
+
+
+
+
+
 
 
 \subsection{Confidence intervals for the parameters}\label{ci-regr-params}
@@ -5847,6 +6027,8 @@ In the previous section we had
 Now we can have two or more independent variables:
 
 \[Y = \alpha + \beta_1 X_1 + \beta_2 X_2 + \ldots + \epsilon\]
+
+When we move to multiple regression, it might be simpler to refer to all coefficients as $\beta$, so instead of $\alpha$ use $\beta_0$\footnote{And the least squares estimates are given, in matrix notation, by $\hat{\beta} = (X^t X)^{-1} X^{t} y$, though, ``for real'', the software uses smarter (more numerically stable) procedures that do not involve a brute force matrix inversion. By the way, the coefficient estimates of all the ANOVAs we have seen are the ones given by this same expression, where the $X$ is what is given by \texttt{model.matrix}.}.
 
 
 I will use a dataset that is a small subset from the original
@@ -6143,7 +6325,7 @@ visualizing 3D plots (see \nameref{regr-int}), but you will probably need to dec
 what exactly you want to plot and for what. For example, predictions with respect
 to each variable in different panels. You can easily obtain, for each
 observation, its predicted (fitted) value and its confidence or prediction
-values. For example (showing just the first five values)
+values. For example, as in section \ref{ci-regression} (and showing just the first five values)
 
 <<>>=
 predict(mcyst, interval = "confidence", level = 0.95)[1:5, ]
@@ -7542,7 +7724,7 @@ Anova(mcystL_r2)
 anova(mcystL_r2, mcystL_r)
 @
 
-\subsection{AIC was not the issue: this model should not be fitted this way}
+\subsection{AIC was not the issue: this model should not be fitted this way}\label{aic-not-the-issue}
 
 This is an example, with another type of data.
 The moral of this example is not really AIC, but the problems of the fit: the
