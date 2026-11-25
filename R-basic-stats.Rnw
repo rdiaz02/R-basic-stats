@@ -3582,7 +3582,7 @@ meansb[3] - meansb[1]
 rm(meansb, dmitb)
 @
 
-\subsubsection{Other contrasts}\label{othercontrasts_param}
+\subsubsection{Other contrasts}\label{othercontrasts_param_1}
 I am going to create a smaller and simpler data set, so that we are not overwhelmed with output and the differences are clean numbers, no decimals.
 
 <<oct1>>=
@@ -4497,8 +4497,8 @@ AB: SS(AB|A, B) = R(A,B) - R(A, B, AB)
 \end{verbatim}
 
 Interaction need not be absent. But this does not mean these SS are
-interpretable. (And beware of the contrasts you use ---section
-\nameref{othercontrasts_param}--- if you want to take a look at coefficients. Note
+interpretable. (And beware of the contrasts you use ---sections
+\ref{othercontrasts_param_1} and \ref{othercontrasts_param}--- if you want to take a look at coefficients. Note
 also possible issues related to changes in results if you center the
 predictors in models with continuous predictors). We will not use Type III
 in this notes. Why? Read the paper by Bill Venables ``Exegeses on linear
@@ -5654,8 +5654,6 @@ plot(childHeight ~ mother, data = daus,
      col = adjustcolor("black", 0.8))
 abline(gm, lty = 2)
 points(meanp, meanc, pch = 16, col = "red", cex = 2)
-
-rm(daus, g, gm, meanp, meanc)
 @
 
 
@@ -5687,12 +5685,12 @@ rm(daus, g, gm, meanp, meanc)
 
 Notice how the regression line is not the ``principal component line'' --- which minimizes the sum of squared distances perpendicular to the line ---, nor the ``reduced/standardized major axis'' one --- minimizes sum of areas of triangles between point and line.
 
-<<rmmpclm>>=
+<<rmmpclm, fig.width=6,fig.height=6>>=
 N <- 5000
 x <- rnorm(N)
 y <- x + rnorm(N, 0, sd = 1.0)
 plot(y ~ x, col = adjustcolor("black", 0.4))
-summary(myx <- lm(y ~ x))
+myx <- lm(y ~ x)
 abline(myx)
 points(mean(x), mean(y), pch = 16, col = "red", cex = 2)
 rm(y, x, myx)
@@ -6265,7 +6263,7 @@ length(resid(mcyst))
 
 In our pemax example we saw several problems (e.g., the large standard errors in the estimated regression coefficients and the flip in signs) caused by the strong linear relationships between predictors. In the simplest cases, these can be detected by plots, as we did. But that  will not always show the source of the problem, specially when the linear relationship involves groups of variables, where pairwise plots can fail to show a clear pattern.
 
-The variance inflation factor, that we can compute with function \texttt{vif}, estimates ``the harm produced by collinearity'' (Fox \& Weisberg, ``An R companion to applied regresssion, 3rd ed'', section 8.8):
+The variance inflation factor, which we can compute with function \texttt{vif}, estimates ``the harm produced by collinearity'' (Fox \& Weisberg, ``An R companion to applied regresssion, 3rd ed'', section 8.8):
 
 <<vif1>>=
 vif(mcyst)
@@ -6460,7 +6458,7 @@ ANCOVA is a procedure for differentiating the above scenarios. It also works whe
 To put it differently, these are the steps:
 \begin{enumerate}
 \item \verb@ Y ~ X * Z@. Look at the interaction first (as we \textbf{always do})
-\item If there is no interaction (no different slopes): fit \verb@ Y ~ X + Z@:
+\item If there is no interaction (no different slopes): fit \verb@ Y ~ X + Z@ (i.e., same slope, different intercepts):
   \begin{enumerate}
   \item If X is "not-significant": we are left with \verb@ Y ~ Z @ (different means)
   \item If Z is "not-significant": we are left with \verb@ Y ~ X @ (same slope, single intercept, so same mean conditioned on X)

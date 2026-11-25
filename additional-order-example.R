@@ -2,7 +2,7 @@
 ## and equivalence of testing procedures
 
 library(car)
-load("additiona-order-example-data.RData")
+load("additional-order-example-data.RData")
 ## dms2$y2 <- dms2$y + rnorm(nrow(dms2), sd = 4)
 
 
