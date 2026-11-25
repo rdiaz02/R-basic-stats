@@ -5722,9 +5722,9 @@ Back to the Galton data. Centering can help make the intercept more interpretabl
 
 <<galtonexcenter>>=
 
-g$mother_centered <- scale(g$mother, scale = FALSE)
+daus$mother_centered <- scale(daus$mother, scale = FALSE)
 gm2 <- lm(childHeight ~ mother_centered,
-          data = g)
+          data = daus)
 summary(gm2)
 
 rm(daus, g, gm, gm2, meanp, meanc)
@@ -8852,10 +8852,7 @@ options(width = 60)
 sessionInfo()
 @
 
-
-
 \end{document}
-
 
 %%% Local Variables:
 %%% TeX-master: t

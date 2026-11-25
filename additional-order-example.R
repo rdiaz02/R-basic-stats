@@ -41,3 +41,14 @@ anova(m4, m3b)
 ## Testing interaction Var1:Var2
 anova(m5, m3)
 anova(m5, m3b)
+
+
+m6 <- lm(y2 ~ Var3 + Var2, data = dms2)
+
+
+## Don't do this!!
+## These are not nested models: m7 and m8
+## are not one a subset of the other
+m7 <- lm(y2 ~ Var3 * Var2, data = dms2)
+m8 <- lm(y2 ~ Var1 * Var2, data = dms2)
+anova(m7, m8)
