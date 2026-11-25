@@ -5553,8 +5553,7 @@ Beautifully, we get the same solution for $\alpha, \beta$ whether we focus on  `
 
 
 %% Let's use a simple data set that relates data set from the base
-%% package, ``women''. Go to
-``Data'', ``Data in packages'' and select
+%% package, ``women''. Go to ``Data'', ``Data in packages'' and select
 %% \Robject{women} (it is in package \CRANpkg{datasets})
 
 
@@ -5594,7 +5593,7 @@ Beautifully, we get the same solution for $\alpha, \beta$ whether we focus on  `
 
 \subsection{Regression: Davis data on self-reported height and weight}\label{regr-davis}
 
-These data are used in Fox \& Weisberg's ``An R companion to applied regression, 3rd ed'', chapter 4. Units are kilograms and centimeters of weight, reported weight, height, and reported height.
+These data are used in Fox \& Weisberg's ``An R companion to applied regression, 3rd ed'', chapter 4. Units are kilograms for weight and reported weight, and centimeters for height, and reported height.
 
 <<>>=
 library(car)
@@ -5605,46 +5604,106 @@ abline(mh)
 summary(mh)
 @
 
-Let us interpret the output.
+Let us interpret the output. Don't forget that regression slopes have units (had we used kilograms in one variable and pounds in the other, things would have been different).
 
-Notice we are regressing weight on reported weight, so causality is inverted here and that is fine. Don't forget that regression slopes have units (had we used kilograms in one variable and pounds in the other, things would have been different).
 
+Notice we are regressing weight on reported weight, so causality is inverted here and that is fine.
 
 \subsection{Galton height data}\label{galton-ex}
 
-These data are used by Faraway in chapter 1 of  ``Linear models with R, 2nd ed'' (2015, CRC).  They are the famous Galton data on the ``mid parent height''. We will need to install the \texttt{HistData} package if we don't have it. This package is ``a collection of small data sets that are interesting and important in the history of statistics and data visualization. '' Details about the datasets in \Burl{https://friendly.github.io/HistData/}. Heights are in inches, so I convert them to cm. (These data have often been used as one of the canonical examples of ``regression to the mean'' --- to ``mediocrity'' in Galton's words).
+We will now analyze the famous Galton data on parents and childs' heights. We will need to install the \texttt{HistData} package if we don't have it. This package is ``a collection of small data sets that are interesting and important in the history of statistics and data visualization. '' Details about the datasets in \Burl{https://friendly.github.io/HistData/}. % Heights are in inches, so I convert them to cm.
+These data have often been used as one of the canonical examples of ``regression to the mean'' --- to ``mediocrity'' in Galton's words.  We will look at the relationship between the daughter's height and the mother's height.
+You can see other analyses in chapter 1 of Faraway's  ``Linear models with R, 2nd ed'' (2015, CRC) and chapter 6 of Gelman, Hill, and Vehtari's ``Regression and other stories'' (2021, Cambridge Univ.~Press).
 
-<<galtonex>>=
+
+
+
+<<galtonex2>>=
 data(GaltonFamilies, package = "HistData")
-GaltonFamilies$childHeight_cm <- GaltonFamilies$childHeight * 2.54
-GaltonFamilies$midparentHeight_cm <- GaltonFamilies$midparentHeight * 2.54
 
-mg <- lm(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies)
-plot(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies, col = "slategray4")
-abline(mg, lty = 2)
+g <- GaltonFamilies
+daus <- subset(g, gender == "female")
+gm <- lm(childHeight ~ mother, data = daus)
+plot(childHeight ~ mother, data = daus,
+     col = "slategray4")
+abline(gm, lty = 2)
 
 ## The regression line goes through the mean of
 ## y and x variables.
 
-meanp <- with(GaltonFamilies, mean(midparentHeight_cm))
-meanc <- with(GaltonFamilies, mean(childHeight_cm))
+meanp <- with(daus, mean(mother))
+meanc <- with(daus, mean(childHeight))
 points(meanp, meanc, pch = 16, col = "red", cex = 2)
 
 ## And this is the regression output
-summary(mg)
+summary(gm)
+
+@
+
+(Note: the above plot might have benefited from a little jittering or transparency)
+
+<<ggexj>>=
+par(mfrow = c(1, 2))
+plot(jitter(childHeight, amount = 0.5) ~ jitter(mother, amount = 0.5),
+     data = daus,
+     col = "slategray4")
+abline(gm, lty = 2)
+points(meanp, meanc, pch = 16, col = "red", cex = 2)
+
+plot(childHeight ~ mother, data = daus,
+     col = adjustcolor("black", 0.8))
+abline(gm, lty = 2)
+points(meanp, meanc, pch = 16, col = "red", cex = 2)
+
+rm(daus, g, gm, meanp, meanc)
 @
 
 
 
+% <<galtonex>>=
+% data(GaltonFamilies, package = "HistData")
+% GaltonFamilies$childHeight_cm <- GaltonFamilies$childHeight * 2.54
+% GaltonFamilies$midparentHeight_cm <- GaltonFamilies$midparentHeight * 2.54
+
+% mg <- lm(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies)
+% plot(childHeight_cm ~ midparentHeight_cm, data = GaltonFamilies,
+%      col = "slategray4")
+% abline(mg, lty = 2)
+
+% ## The regression line goes through the mean of
+% ## y and x variables.
+
+% meanp <- with(GaltonFamilies, mean(midparentHeight_cm))
+% meanc <- with(GaltonFamilies, mean(childHeight_cm))
+% points(meanp, meanc, pch = 16, col = "red", cex = 2)
+
+% ## And this is the regression output
+% summary(mg)
+% @
 
 
-Notice how the regression line is not the ``principal component line'' (or the ``reduced/standard major axis'' one).
+
+
+
+Notice how the regression line is not the ``principal component line'' --- which minimizes the sum of squared distances perpendicular to the line ---, nor the ``reduced/standardized major axis'' one --- minimizes sum of areas of triangles between point and line.
+
+<<rmmpclm>>=
+N <- 5000
+x <- rnorm(N)
+y <- x + rnorm(N, 0, sd = 1.0)
+plot(y ~ x, col = adjustcolor("black", 0.4))
+summary(myx <- lm(y ~ x))
+abline(myx)
+points(mean(x), mean(y), pch = 16, col = "red", cex = 2)
+rm(y, x, myx)
+@
+
 
 % %%% Reduced major axis
 % <<rmagalton>>=
 % with(GaltonFamilies, {
-%     rmab <<- sd(childHeight_cm)/sd(midparentHeight_cm)
-%     rmai <<- mean(childHeight_cm) - rmab * mean(midparentHeight_cm)
+% rmab <<- sd(childHeight_cm)/sd(midparentHeight_cm)
+% rmai <<- mean(childHeight_cm) - rmab * mean(midparentHeight_cm)
 % })
 
 % ## also betaOLS/abs(corr)
@@ -5661,14 +5720,16 @@ Notice how the regression line is not the ``principal component line'' (or the `
 
 
 
-Centering can help make the intercept more interpretable here:
+Back to the Galton data. Centering can help make the intercept more interpretable here:
 
 <<galtonexcenter>>=
-GaltonFamilies$centered_midparentHeight_cm <-
-    scale(GaltonFamilies$midparentHeight_cm, scale = FALSE)
-mg2 <- lm(childHeight_cm ~ centered_midparentHeight_cm,
-          data = GaltonFamilies)
-summary(mg2)
+
+g$mother_centered <- scale(g$mother, scale = FALSE)
+gm2 <- lm(childHeight ~ mother_centered,
+          data = g)
+summary(gm2)
+
+rm(daus, g, gm, gm2, meanp, meanc)
 @
 
 If it helps interpretation, you can subtract not the mean, but any other sensible value that will make the regression more interpretable.
