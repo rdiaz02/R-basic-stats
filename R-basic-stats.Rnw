@@ -3557,7 +3557,7 @@ This is the default parameterization in R. But is is not the only one available 
 Of course, the above applies to more than one factor, and to factors with
 an arbitrary number of levels.
 
-\subsubsection{Changing the reference in the one-way}\label{change-ref-one-way}
+\subsubsection{Changing the reference in the one-way}\label{change-ref-one-way-1}
 
 We can change the reference, and that will change what we are comparing against:
 
