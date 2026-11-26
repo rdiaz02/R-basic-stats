@@ -767,7 +767,8 @@ In this example, we know our p-value will be at least 0.5: we are asking for the
 
 
 
-Technical point. The null is composite (\(H_0: \mu_A \le \mu_B\)) instead of just a single value (\(\mu_A = \mu_B\) so \(\mu_A - \mu_B = 0\)).  The p-value is computed at the boundary because that is the value in the null that makes results as extreme as, or more extreme than, the observed one most likely.
+Technical point, that you can skip. The null is composite (\(H_0: \mu_A \le \mu_B\)) : it contains many (infinite) values of \(\mu_A - \mu_B\) (0 and every negative value), not just one.  What we do is compute the p-value at the boundary of the null, \(\mu_A = \mu_B\) (i.e., \(\mu_A - \mu_B = 0\)). Why? Because of all the values in the null, this is the one under which a result as extreme as, or more extreme than, the observed one is most probable; for any other value, i.e, for \(\mu_A - \mu_B < 0\) that probability is smaller. So the p-value we report is the largest one over the whole null: if we reject at the boundary, we reject for every value in the null. (And this is also why, in the examples above, the t-statistic is simply \((\bar{X}_A - \bar{X}_B)/se\): we subtract 0, the boundary value.)
+
 
 \subsection{Some issues with one-sided tests}
 
