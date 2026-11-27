@@ -6597,7 +6597,8 @@ Make sure you understand the differences with respect to the previous
 model. What are we fitting here? What are we saying, biologically, in this
 model?
 
-
+%% FIXME: formally comparing models I do a lot before, with
+%% Type II in Anovas. Maybe reduce this section and move material before?
 \subsection{Formally comparing models}\label{model-comp}
 In this case, the sequential anova table (as produced by
 \Rfunction{ancova} or \Rfunction{anova}) suggests that we could simplify
@@ -6924,19 +6925,14 @@ check some of their basic assumptions. We cannot do justice to this
 
 In general, for linear models (ANOVAs, regressions, etc) we want to check:
 
-\begin{itemize}
-\item Constant variance (across groups or over the range of the independet
-  variables). Often referred to as ``homoscedasticity'' (where
-  ``heteroscedasticity'' is the opposite).
-\item Linearity (for regression).
-\item Approximate normality of residuals (for a t-test or an ANOVA this is
-  the same as normality of the data within each group, as in section
-  \nameref{sec:assumptions-t}: a residual is an observation minus its group
-  mean; for a regression only the residuals version makes sense).
-\item Possible highly influential points (i.e., do our results depend on
-  one or two points that are driving the model one way or another?).
-\item Possible outliers.
-\end{itemize}
+\begin{description}
+\item[Linearity and additivity]
+\item[Constant variance of errors](across groups or over the range of the independet   variables). Often referred to as ``homoscedasticity'' (where   ``heteroscedasticity'' is the opposite).
+\item[Approximate normality of residuals] (for a t-test or an ANOVA this is   the same as normality of the data within each group, as in section   \nameref{sec:assumptions-t}: a residual is an observation minus its group   mean; for a regression only the residuals version makes sense).
+\item[Influential points] Do our results depend on
+  one or two points that are driving the model one way or another?
+\item[Outliers]
+\end{description}
 
 
 \textbf{Independence} is also a crucial assumption. But often, checking
@@ -6961,6 +6957,12 @@ Before looking at the plots, two concepts should be clear:
 
 \end{description}
 
+
+There are other assential assumptions we take for granted, that cannot directly check, but that you should assess, based on the description of the data collection process (details in Gelman, Hill, Vehtari, 2021, ``Regression and other stories'', cp.~ 11):
+\begin{description}
+\item[Validity] The data are relevant for the research question.The things you have measured, are the things your research question is about?
+\item[Representativeness] Does your sample represent the population you are interested in?
+\end{description}
 
 \subsection{Diagnostics: an example with a designed experiment with
   factors} \label{diag-factors}
